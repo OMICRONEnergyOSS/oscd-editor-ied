@@ -22,11 +22,13 @@
     editor.setAttribute(name, value);
   }
 
-  // const sample = await fetch('sample.scd').then(r => r.text());
-  // editor.docs = {
-  //   ['sample.scd']: new DOMParser().parseFromString(sample, 'application/xml'),
-  // };
-  // editor.docName = 'sample.scd';
+  // const filename = 'sample.scd';
+  const filename = 'XAT_Subsystem_Testing_old_coords_removed.scd';
+  const sample = await fetch(filename).then(r => r.text());
+  editor.docs = {
+    [filename]: new DOMParser().parseFromString(sample, 'application/xml'),
+  };
+  editor.docName = filename;
 </script>
 
 <style>

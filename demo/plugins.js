@@ -2,21 +2,7 @@ import OscdMenuOpen from '@omicronenergy/oscd-menu-open';
 import OscdMenuSave from '@omicronenergy/oscd-menu-save';
 import OscdBackgroundEditV1 from '@omicronenergy/oscd-background-editv1';
 
-import OscdEditorIED from '../src/oscd-editor-ied.js';
-
-import {
-  registerTranslateConfig,
-  use,
-} from '../plugins/openscd.github.io/_snowpack/pkg/lit-translate.js';
-import { loader as sprinteinsTranslationLoader } from '../plugins/openscd.github.io/openscd/dist/translations/loader.js';
-
-/*test */
-
-registerTranslateConfig({
-  loader: sprinteinsTranslationLoader,
-  empty: key => key,
-});
-use('en');
+import OscdEditorIED from '../dist/oscd-editor-ied.js';
 
 const oscdShell = document.querySelector('oscd-shell');
 if (oscdShell) {
