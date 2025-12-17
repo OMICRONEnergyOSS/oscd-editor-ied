@@ -1,4 +1,11 @@
-import { LitElement, PropertyValues, TemplateResult, html, css } from 'lit';
+import {
+  LitElement,
+  PropertyValues,
+  TemplateResult,
+  html,
+  css,
+  nothing,
+} from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
 import { OscdListItem } from '@omicronenergy/oscd-ui/list/OscdListItem.js';
@@ -10,31 +17,24 @@ import {
 import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
 import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
 
-// import { IEDContainer } from './components/ied-container.js';
-// import './ied/element-path.js';
-// import './ied/create-ied-dialog.js';
-
 import {
   findLLN0LNodeType,
   createLLN0LNodeType,
   createIEDStructure,
-  compareNames,
+  FullElementPathEvent,
 } from './foundation.js';
 
-// import { CreateIedDialog } from './ied/create-ied-dialog.js';
 import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
 import { Insert } from '@openscd/oscd-api';
 import { initializeNsdoc, Nsdoc } from './foundation/nsdoc.js';
 import { OpenscdApi } from './foundation/types.js';
 import { SelectItem } from '@omicronenergy/oscd-ui/selection-list/OscdSelectionList.js';
+import { IedContainer } from './components/ied-container.js';
+import { ElementPath } from './components/element-path.js';
+import { msg } from '@lit/localize';
+import { compareNames } from '@omicronenergy/oscd-edit-dialog';
 
 type SelectedItemsChangedEvent = CustomEvent<{ selectedItems: string[] }>;
-
-function translate(key: string): string {
-  // Placeholder translation function,
-  // replace with actual implementation as needed.
-  return key;
-}
 
 function getIEDSelectItem(element: Element, selected: boolean): SelectItem {
   const name = element.getAttribute('name');
@@ -73,6 +73,8 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
     'oscd-list-item': OscdListItem,
     'oscd-scl-icon': OscdSclIcon,
     'oscd-icon': OscdIcon,
+    'element-path': ElementPath,
+    'ied-container': IedContainer,
   };
 
   /** The document being edited as provided to plugins by [[`OpenSCD`]]. */
@@ -103,6 +105,9 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
 
   @state()
   iedMap: { [key: string]: Element } = {};
+
+  @state()
+  selectedElementPath: string[] = [];
 
   @state()
   private get iedList(): Element[] {
@@ -286,68 +291,76 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
     this.requestUpdate('selectedIed');
   }
 
-  private renderIEDList(): TemplateResult {
-    const iedList = this.iedList;
-    if (iedList.length === 0) {
-      return html`<h1>
-        <span style="color: var(--base1)"
-          >${translate('iededitor.missing')}</span
-        >
-      </h1>`;
-    }
-    return html`<section>
-      <div class="header">
-        <h1>${translate('filters')}:</h1>
-        <oscd-filter-button
-          id="iedFilter"
-          icon="developer_board"
-          .items=${iedList.map(ied =>
-            getIEDSelectItem(ied, this.selectedIEDs.includes(ied)),
-          )}
-          .header=${translate('iededitor.iedSelector')}
-          @filter-button-dialog-close=${(e: FilterButtonDialogCloseEvent) =>
-            this.onSelectionChange(e.detail.selectedElements)}
-        >
-        </oscd-filter-button>
+  private renderHeader(): TemplateResult {
+    return html`<div class="header">
+      <h1>${msg('filters')}:</h1>
+      <oscd-filter-button
+        id="iedFilter"
+        .items=${this.iedList.map(ied =>
+          getIEDSelectItem(ied, this.selectedIEDs.includes(ied)),
+        )}
+        .header=${msg('Select IED')}
+        @filter-button-dialog-close=${(e: FilterButtonDialogCloseEvent) =>
+          this.onSelectionChange(e.detail.selectedElements)}
+      >
+        <oscd-icon class="ied-icon" slot="icon">developer_board</oscd-icon>
+      </oscd-filter-button>
 
-        <oscd-filter-button
-          id="lnClassesFilter"
-          multi="true"
-          .header="${translate('iededitor.lnFilter')}"
-          .items=${this.lnClassList.map(lnClass =>
-            getLnClassSelectItem(lnClass, this.selectedLNClasses, this.nsdoc),
-          )}
-          @selected-items-changed="${(e: SelectedItemsChangedEvent) => {
-            this.selectedLNClasses = e.detail.selectedItems;
-            this.requestUpdate('selectedIed');
-          }}"
-        >
-          <oscd-scl-icon slot="icon">lNIcon</oscd-scl-icon>
-        </oscd-filter-button>
+      <oscd-filter-button
+        id="lnClassesFilter"
+        multiselect
+        .header="${msg('Logical Node Filter')}"
+        .items=${this.lnClassList.map(lnClass =>
+          getLnClassSelectItem(lnClass, this.selectedLNClasses, this.nsdoc),
+        )}
+        @selected-items-changed="${(e: SelectedItemsChangedEvent) => {
+          this.selectedLNClasses = e.detail.selectedItems;
+          this.requestUpdate('selectedIed');
+        }}"
+      >
+        <oscd-scl-icon slot="icon">lNIcon</oscd-scl-icon>
+      </oscd-filter-button>
 
-        <element-path class="elementPath"></element-path>
-      </div>
+      <element-path
+        class="elementPath"
+        .paths=${this.selectedElementPath}
+      ></element-path>
 
-      <ied-container
-        .editCount=${this.editCount}
-        .doc=${this.doc}
-        .element=${this.selectedIed}
-        .selectedLNClasses=${this.calcSelectedLNClasses()}
-        .nsdoc=${this.nsdoc}
-      ></ied-container>
-    </section>`;
-  }
-
-  render(): TemplateResult {
-    return html`<div>
       <oscd-outlined-button
         class="add-ied-button"
         @click=${() => console.log('Create IED clicked')}
       >
         <oscd-icon slot="icon">add</oscd-icon>
-        ${translate('iededitor.createIed')}
+        ${msg('Create Virtual IED')}
       </oscd-outlined-button>
-      ${this.renderIEDList()}
+    </div>`;
+  }
+
+  private renderSelectedIED(): TemplateResult {
+    if (this.iedList.length === 0) {
+      return html`<h1>
+        <span style="color: var(--base1)">${msg('No IED')}</span>
+      </h1>`;
+    }
+    return html`<section>
+      ${this.selectedIed
+        ? html`<ied-container
+            @full-element-path=${(event: FullElementPathEvent) => {
+              this.selectedElementPath = event.detail.elementNames;
+            }}
+            .editCount=${this.editCount}
+            .doc=${this.doc}
+            .element=${this.selectedIed}
+            .selectedLNClasses=${this.calcSelectedLNClasses()}
+            .nsdoc=${this.nsdoc}
+          ></ied-container>`
+        : nothing}
+    </section>`;
+  }
+
+  render(): TemplateResult {
+    return html`<div>
+      ${this.renderHeader()} ${this.renderSelectedIED()}
       <create-ied-dialog
         .doc=${this.doc}
         .onConfirm=${(iedName: string) => this.createVirtualIED(iedName)}
@@ -357,38 +370,40 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
 
   static styles = css`
     :host {
-      width: 100vw;
       position: relative;
     }
 
+    .header,
     section {
-      padding: 8px 12px 16px;
+      padding-inline: 12px;
+    }
+    section {
+      padding-block: 8px 16px;
     }
 
     .header {
       display: flex;
+      gap: 8px;
+      align-items: center;
+      max-width: calc(100% - 24px);
     }
 
     h1 {
-      color: var(--mdc-theme-on-surface);
-      font-family: 'Roboto', sans-serif;
+      color: var(--md-theme-on-surface);
+      font-family: var(--oscd-text-font, 'Roboto', sans-serif);
       font-weight: 300;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
       margin: 0px;
       line-height: 48px;
-      padding-left: 0.3em;
     }
 
     .elementPath {
       margin-left: auto;
       padding-right: 12px;
+      min-width: 0;
     }
 
-    .add-ied-button {
-      float: right;
-      margin: 8px 12px 0 0;
+    oscd-action-pane {
+      --oscd-action-pane-theme-on-primary: var(--oscd-base2);
     }
   `;
 }

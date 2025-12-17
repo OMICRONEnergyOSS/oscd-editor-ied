@@ -7,91 +7,6 @@
       "path": "src/foundation.ts",
       "declarations": [
         {
-          "kind": "class",
-          "description": "Base class for all containers inside the IED Editor.",
-          "name": "Container",
-          "members": [
-            {
-              "kind": "field",
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "attribute": "doc"
-            },
-            {
-              "kind": "field",
-              "name": "editCount",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1",
-              "attribute": "editCount"
-            },
-            {
-              "kind": "field",
-              "name": "element",
-              "type": {
-                "text": "Element"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "nsdoc",
-              "type": {
-                "text": "Nsdoc"
-              },
-              "attribute": "nsdoc"
-            },
-            {
-              "kind": "field",
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              },
-              "default": "[]",
-              "attribute": "ancestors"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "fieldName": "doc"
-            },
-            {
-              "name": "editCount",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1",
-              "fieldName": "editCount"
-            },
-            {
-              "name": "nsdoc",
-              "type": {
-                "text": "Nsdoc"
-              },
-              "fieldName": "nsdoc"
-            },
-            {
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              },
-              "default": "[]",
-              "fieldName": "ancestors"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "customElement": true
-        },
-        {
           "kind": "function",
           "name": "findElement",
           "return": {
@@ -116,30 +31,6 @@
             }
           ],
           "description": "Search for an element with a passed tag-name in the list of ancestors passed."
-        },
-        {
-          "kind": "function",
-          "name": "compareNames",
-          "return": {
-            "type": {
-              "text": "number"
-            }
-          },
-          "parameters": [
-            {
-              "name": "a",
-              "type": {
-                "text": "Element | string"
-              }
-            },
-            {
-              "name": "b",
-              "type": {
-                "text": "Element | string"
-              }
-            }
-          ],
-          "description": "Sorts selected `ListItem`s to the top and disabled ones to the bottom."
         },
         {
           "kind": "function",
@@ -489,25 +380,9 @@
       "exports": [
         {
           "kind": "js",
-          "name": "Container",
-          "declaration": {
-            "name": "Container",
-            "module": "src/foundation.ts"
-          }
-        },
-        {
-          "kind": "js",
           "name": "findElement",
           "declaration": {
             "name": "findElement",
-            "module": "src/foundation.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "compareNames",
-          "declaration": {
-            "name": "compareNames",
             "module": "src/foundation.ts"
           }
         },
@@ -664,7 +539,7 @@
                 "text": "object"
               },
               "static": true,
-              "default": "{ 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filter-button': OscdFilterButton, 'oscd-list-item': OscdListItem, }"
+              "default": "{ 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filter-button': OscdFilterButton, 'oscd-list-item': OscdListItem, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'element-path': ElementPath, 'ied-container': IedContainer, }"
             },
             {
               "kind": "field",
@@ -713,7 +588,7 @@
               "kind": "field",
               "name": "oscdApi",
               "type": {
-                "text": "OpenscdApi | null"
+                "text": "OpenscdApi | null | undefined"
               },
               "default": "null",
               "attribute": "oscdApi"
@@ -722,7 +597,7 @@
               "kind": "field",
               "name": "selectedIEDs",
               "type": {
-                "text": "string[]"
+                "text": "Element[]"
               },
               "default": "[]"
             },
@@ -733,6 +608,14 @@
                 "text": "string[]"
               },
               "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "iedMap",
+              "type": {
+                "text": "{ [key: string]: Element }"
+              },
+              "default": "{}"
             },
             {
               "kind": "field",
@@ -830,14 +713,24 @@
                 {
                   "name": "selectedIeds",
                   "type": {
-                    "text": "string[]"
+                    "text": "Element[]"
                   }
                 }
               ]
             },
             {
               "kind": "method",
-              "name": "renderIEDList",
+              "name": "renderHeader",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderSelectedIED",
               "privacy": "private",
               "return": {
                 "type": {
@@ -888,7 +781,7 @@
             {
               "name": "oscdApi",
               "type": {
-                "text": "OpenscdApi | null"
+                "text": "OpenscdApi | null | undefined"
               },
               "default": "null",
               "fieldName": "oscdApi"
@@ -920,6 +813,1508 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/access-point-container.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "AccessPointContainer",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-icon': OscdIcon, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon-button': OscdIconButton, 'oscd-action-pane': OscdActionPane, 'server-container': ServerContainer, 'ln-container': LDeviceContainer, }"
+            },
+            {
+              "kind": "field",
+              "name": "selectedLNClasses",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "attribute": "selectedLNClasses"
+            },
+            {
+              "kind": "field",
+              "name": "lnElements",
+              "type": {
+                "text": "Element[]"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "renderServicesIcon",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "openEditWizard",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "openSettingsWizard",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "services",
+                  "type": {
+                    "text": "Element"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "header",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "removeAccessPoint",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "attribute": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "editCount",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "attribute": "editCount",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "element",
+              "type": {
+                "text": "Element"
+              },
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "attribute": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "attribute": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "selectedLNClasses",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "fieldName": "selectedLNClasses"
+            },
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "fieldName": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "editCount",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "fieldName": "editCount",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "fieldName": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "fieldName": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "BaseContainer",
+            "module": "/src/components/base-container.js"
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "AccessPointContainer",
+          "declaration": {
+            "name": "AccessPointContainer",
+            "module": "src/components/access-point-container.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/base-container.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Base class for all containers inside the IED Editor.",
+          "name": "BaseContainer",
+          "members": [
+            {
+              "kind": "field",
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "attribute": "doc"
+            },
+            {
+              "kind": "field",
+              "name": "editCount",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "attribute": "editCount"
+            },
+            {
+              "kind": "field",
+              "name": "element",
+              "type": {
+                "text": "Element"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "attribute": "nsdoc"
+            },
+            {
+              "kind": "field",
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "attribute": "ancestors"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "fieldName": "doc"
+            },
+            {
+              "name": "editCount",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "fieldName": "editCount"
+            },
+            {
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "fieldName": "nsdoc"
+            },
+            {
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "fieldName": "ancestors"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "BaseContainer",
+          "declaration": {
+            "name": "BaseContainer",
+            "module": "src/components/base-container.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/da-container.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "[[`IED`]] plugin subeditor for editing `(B)DA` element.",
+          "name": "DAContainer",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-action-pane': OscdActionPane, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'da-container': DAContainer, }"
+            },
+            {
+              "kind": "field",
+              "name": "instanceElement",
+              "type": {
+                "text": "Element"
+              },
+              "description": "The optional DAI of this (B)DA."
+            },
+            {
+              "kind": "field",
+              "name": "toggleButton",
+              "type": {
+                "text": "OscdIconButton | undefined"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "header",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getBDAElements",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "description": "Get the nested (B)DA element(s) if available."
+            },
+            {
+              "kind": "method",
+              "name": "getTemplateStructure",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "description": "Use the list of ancestor to retrieve the list from DO to the current (B)DA Element.\nThis structure is used to create the initialized structure from (DOI/SDI/DAI)."
+            },
+            {
+              "kind": "method",
+              "name": "openCreateWizard",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "openEditWizard",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "val",
+                  "type": {
+                    "text": "Element"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderVal",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult[]"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "attribute": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "editCount",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "attribute": "editCount",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "element",
+              "type": {
+                "text": "Element"
+              },
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "attribute": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "attribute": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "BaseContainer",
+            "module": "/src/components/base-container.js"
+          },
+          "attributes": [
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "fieldName": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "editCount",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "fieldName": "editCount",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "fieldName": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "fieldName": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DAContainer",
+          "declaration": {
+            "name": "DAContainer",
+            "module": "src/components/da-container.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/do-container.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "DOContainer",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-outlined-button': OscdOutlinedButton, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'oscd-action-pane': OscdActionPane, 'do-container': DOContainer, 'da-container': DAContainer, }"
+            },
+            {
+              "kind": "field",
+              "name": "instanceElement",
+              "type": {
+                "text": "Element"
+              },
+              "description": "The optional DOI of this DO."
+            },
+            {
+              "kind": "field",
+              "name": "toggleButton",
+              "type": {
+                "text": "OscdIconButton | undefined"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "header",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "getDOElements",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "description": "Get the nested SDO element(s)."
+            },
+            {
+              "kind": "method",
+              "name": "getDAElements",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "description": "Get the nested (B)DA element(s)."
+            },
+            {
+              "kind": "method",
+              "name": "getInstanceDOElement",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "parameters": [
+                {
+                  "name": "dO",
+                  "type": {
+                    "text": "Element"
+                  },
+                  "description": "The (S)DO object to search with."
+                }
+              ],
+              "description": "Get the instance element (SDI) of a (S)DO element (if available)"
+            },
+            {
+              "kind": "field",
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "attribute": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "editCount",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "attribute": "editCount",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "element",
+              "type": {
+                "text": "Element"
+              },
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "attribute": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "attribute": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "BaseContainer",
+            "module": "/src/components/base-container.js"
+          },
+          "attributes": [
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "fieldName": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "editCount",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "fieldName": "editCount",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "fieldName": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "fieldName": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DOContainer",
+          "declaration": {
+            "name": "DOContainer",
+            "module": "src/components/do-container.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/element-path.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "ElementPath",
+          "members": [
+            {
+              "kind": "field",
+              "name": "elementNames",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "ElementPath",
+          "declaration": {
+            "name": "ElementPath",
+            "module": "src/components/element-path.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/ied-container.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "[[`IED`]] plugin subeditor for editing `IED` element.",
+          "name": "IedContainer",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-icon': OscdIcon, 'oscd-icon-button': OscdIconButton, 'oscd-action-pane': OscdActionPane, 'access-point-container': AccessPointContainer, // 'add-access-point-dialog': AddAccessPointDialog, }"
+            },
+            {
+              "kind": "field",
+              "name": "selectedLNClasses",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "attribute": "selectedLNClasses"
+            },
+            {
+              "kind": "field",
+              "name": "addAccessPointDialog",
+              "type": {
+                "text": "OscdDialog"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "openEditWizard",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderServicesIcon",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "handleEditServices",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "services",
+                  "type": {
+                    "text": "Element"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "removeIED",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "header",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "attribute": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "editCount",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "attribute": "editCount",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "element",
+              "type": {
+                "text": "Element"
+              },
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "attribute": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "attribute": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "selectedLNClasses",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "fieldName": "selectedLNClasses"
+            },
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "fieldName": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "editCount",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "fieldName": "editCount",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "fieldName": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "fieldName": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "BaseContainer",
+            "module": "/src/components/base-container.js"
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "IedContainer",
+          "declaration": {
+            "name": "IedContainer",
+            "module": "src/components/ied-container.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/ldevice-container.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "[[`IED`]] plugin subeditor for editing `LDevice` element.",
+          "name": "LDeviceContainer",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-action-pane': OscdActionPane, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'ln-container': LNContainer, }"
+            },
+            {
+              "kind": "field",
+              "name": "selectedLNClasses",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "attribute": "selectedLNClasses"
+            },
+            {
+              "kind": "field",
+              "name": "toggleButton",
+              "type": {
+                "text": "OscdIconButton | undefined"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "openEditWizard",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "header",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "lnElements",
+              "type": {
+                "text": "Element[]"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "handleAddLN",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "data",
+                  "type": {
+                    "text": "unknown"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "removeLDevice",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "attribute": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "editCount",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "attribute": "editCount",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "element",
+              "type": {
+                "text": "Element"
+              },
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "attribute": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "attribute": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "selectedLNClasses",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "fieldName": "selectedLNClasses"
+            },
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "fieldName": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "editCount",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "fieldName": "editCount",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "fieldName": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "fieldName": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "BaseContainer",
+            "module": "/src/components/base-container.js"
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LDeviceContainer",
+          "declaration": {
+            "name": "LDeviceContainer",
+            "module": "src/components/ldevice-container.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/ln-container.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "[[`IED`]] plugin subeditor for editing `LN` and `LN0` element.",
+          "name": "LNContainer",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-outlined-button': OscdOutlinedButton, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-action-pane': OscdActionPane, 'oscd-icon': OscdIcon, 'do-container': DOContainer, }"
+            },
+            {
+              "kind": "field",
+              "name": "toggleButton",
+              "type": {
+                "text": "OscdIconButton | undefined"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "header",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getDOElements",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "description": "Get the DO child elements of this LN(0) section."
+            },
+            {
+              "kind": "method",
+              "name": "getInstanceElement",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "parameters": [
+                {
+                  "name": "dO",
+                  "type": {
+                    "text": "Element"
+                  },
+                  "description": "The DO object to use."
+                }
+              ],
+              "description": "Get the instance element (DOI) of a DO element (if available)"
+            },
+            {
+              "kind": "method",
+              "name": "openEditWizard",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "removeElement",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "attribute": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "editCount",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "attribute": "editCount",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "element",
+              "type": {
+                "text": "Element"
+              },
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "attribute": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "attribute": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "BaseContainer",
+            "module": "/src/components/base-container.js"
+          },
+          "attributes": [
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "fieldName": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "editCount",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "fieldName": "editCount",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "fieldName": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "fieldName": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LNContainer",
+          "declaration": {
+            "name": "LNContainer",
+            "module": "src/components/ln-container.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/server-container.ts",
       "declarations": [
         {
@@ -927,6 +2322,15 @@
           "description": "[[`IED`]] plugin subeditor for editing `Server` element.",
           "name": "ServerContainer",
           "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-icon': OscdIcon, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon-button': OscdIconButton, 'oscd-action-pane': OscdActionPane, 'ldevice-container': LDeviceContainer, // 'add-access-point-dialog': AddAccessPointDialog, }"
+            },
             {
               "kind": "field",
               "name": "selectedLNClasses",
@@ -976,8 +2380,8 @@
               },
               "attribute": "doc",
               "inheritedFrom": {
-                "name": "Container",
-                "module": "src/foundation.ts"
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
               }
             },
             {
@@ -989,8 +2393,8 @@
               "default": "-1",
               "attribute": "editCount",
               "inheritedFrom": {
-                "name": "Container",
-                "module": "src/foundation.ts"
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
               }
             },
             {
@@ -1000,8 +2404,8 @@
                 "text": "Element"
               },
               "inheritedFrom": {
-                "name": "Container",
-                "module": "src/foundation.ts"
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
               }
             },
             {
@@ -1012,8 +2416,8 @@
               },
               "attribute": "nsdoc",
               "inheritedFrom": {
-                "name": "Container",
-                "module": "src/foundation.ts"
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
               }
             },
             {
@@ -1025,8 +2429,8 @@
               "default": "[]",
               "attribute": "ancestors",
               "inheritedFrom": {
-                "name": "Container",
-                "module": "src/foundation.ts"
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
               }
             }
           ],
@@ -1046,8 +2450,8 @@
               },
               "fieldName": "doc",
               "inheritedFrom": {
-                "name": "Container",
-                "module": "src/foundation.ts"
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
               }
             },
             {
@@ -1058,8 +2462,8 @@
               "default": "-1",
               "fieldName": "editCount",
               "inheritedFrom": {
-                "name": "Container",
-                "module": "src/foundation.ts"
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
               }
             },
             {
@@ -1069,8 +2473,8 @@
               },
               "fieldName": "nsdoc",
               "inheritedFrom": {
-                "name": "Container",
-                "module": "src/foundation.ts"
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
               }
             },
             {
@@ -1081,31 +2485,27 @@
               "default": "[]",
               "fieldName": "ancestors",
               "inheritedFrom": {
-                "name": "Container",
-                "module": "src/foundation.ts"
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
               }
             }
           ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
           "superclass": {
-            "name": "Container",
-            "module": "/src/foundation.js"
-          },
-          "tagName": "server-container",
-          "customElement": true
+            "name": "BaseContainer",
+            "module": "/src/components/base-container.js"
+          }
         }
       ],
       "exports": [
         {
           "kind": "js",
           "name": "ServerContainer",
-          "declaration": {
-            "name": "ServerContainer",
-            "module": "src/components/server-container.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "server-container",
           "declaration": {
             "name": "ServerContainer",
             "module": "src/components/server-container.ts"

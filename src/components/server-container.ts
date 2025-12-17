@@ -1,36 +1,35 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { PropertyValues, TemplateResult, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { PropertyValues, TemplateResult, html } from 'lit';
+import { property, state } from 'lit/decorators.js';
 
-import {
-  Container,
-  findLLN0LNodeType,
-  createLLN0LNodeType,
-} from '../foundation.js';
+import { findLLN0LNodeType, createLLN0LNodeType } from '../foundation.js';
 
-import '@openscd/open-scd/src/action-pane.js';
-import './ldevice-container.js';
-import './add-ldevice-dialog.js';
-
-import '@omicronenergy/oscd-ui/dist/icon/oscd-scl-icon.js';
-
-function translate(key: string): string {
-  const translations: Record<string, string> = {
-    'iededitor.addLDeviceDialog.title': 'Add LDevice',
-  };
-  return translations[key] || key;
-}
+import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
+import { BaseContainer } from './base-container.js';
+import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
+import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
+import { OscdIconButton } from '@omicronenergy/oscd-ui/iconbutton/OscdIconButton.js';
+import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
+import { LDeviceContainer } from './ldevice-container.js';
+import { msg } from '@lit/localize';
+import { Insert } from '@openscd/oscd-api';
 
 /** [[`IED`]] plugin subeditor for editing `Server` element. */
-@customElement('server-container')
-export class ServerContainer extends Container {
+export class ServerContainer extends ScopedElementsMixin(BaseContainer) {
+  static scopedElements = {
+    'oscd-icon': OscdIcon,
+    'oscd-scl-icon': OscdSclIcon,
+    'oscd-icon-button': OscdIconButton,
+    'oscd-action-pane': OscdActionPane,
+    'ldevice-container': LDeviceContainer,
+    // 'add-access-point-dialog': AddAccessPointDialog,
+  };
+
   @property()
   selectedLNClasses: string[] = [];
 
   private header(): TemplateResult {
-    const desc = this.element.getAttribute('desc') ?? undefined;
-
-    return html`Server${desc ? html` &mdash; ${desc}` : nothing}`;
+    const desc = this.element.getAttribute('desc');
+    return html`Server${desc ? ` \u2014 ${desc}` : ''}`;
   }
 
   protected updated(_changedProperties: PropertyValues): void {
@@ -59,7 +58,7 @@ export class ServerContainer extends Container {
   }
 
   private handleAddLDevice(_data: unknown) {
-    const inserts: any[] = [];
+    const inserts: Insert[] = [];
     const lln0Type = findLLN0LNodeType(this.doc);
     const lnTypeId = lln0Type?.getAttribute('id') || 'PlaceholderLLN0';
 
@@ -83,16 +82,12 @@ export class ServerContainer extends Container {
   }
 
   render(): TemplateResult {
-    return html`<action-pane .label="${this.header()}">
+    return html`<oscd-action-pane .label=${this.header()}>
       <oscd-scl-icon slot="icon">serverIcon</oscd-scl-icon>
-      <abbr
-        slot="action"
-        title=${translate('iededitor.addLDeviceDialog.title')}
-      >
-        <mwc-icon-button
-          icon="playlist_add"
-          @click=${() => console.log('Add LDevice clicked')}
-        ></mwc-icon-button>
+      <abbr slot="action" title=${msg('Add AccessPoint')}>
+        <oscd-icon-button @click=${() => console.log('Add LDevice clicked')}>
+          <oscd-icon>playlist_add</oscd-icon>
+        </oscd-icon-button>
       </abbr>
       ${this.lDeviceElements.map(
         server =>
@@ -109,6 +104,6 @@ export class ServerContainer extends Container {
         .server=${this.element}
         .onConfirm=${(data: unknown) => this.handleAddLDevice(data)}
       ></add-ldevice-dialog>
-    </action-pane>`;
+    </oscd-action-pane>`;
   }
 }

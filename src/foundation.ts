@@ -1,50 +1,7 @@
-import { LitElement } from 'lit';
-import { property } from 'lit/decorators.js';
-
-import { Insert } from '@omicronenergy/oscd-api';
+import { Insert } from '@openscd/oscd-api';
 
 import { insertSelectedLNodeType } from '@openscd/scl-lib';
 import { createElement } from '@openscd/scl-lib/dist/foundation/utils.js';
-import { Nsdoc } from './foundation/nsdoc.js';
-
-/** Base class for all containers inside the IED Editor. */
-export class Container extends LitElement {
-  @property()
-  doc!: XMLDocument;
-  @property({ type: Number })
-  editCount = -1;
-
-  @property({ attribute: false })
-  element!: Element;
-
-  @property()
-  nsdoc!: Nsdoc;
-
-  @property()
-  ancestors: Element[] = [];
-
-  constructor() {
-    super();
-
-    this.addEventListener('focus', event => {
-      event.stopPropagation();
-      const pathOfAncestorNames = this.ancestors.map(
-        ancestor => getTitleForElementPath(ancestor)!,
-      );
-      pathOfAncestorNames.push(getTitleForElementPath(this.element)!);
-
-      this.dispatchEvent(newFullElementPathEvent(pathOfAncestorNames));
-    });
-
-    this.addEventListener('blur', () => {
-      this.dispatchEvent(
-        newFullElementPathEvent(
-          this.ancestors.map(ancestor => getTitleForElementPath(ancestor)!),
-        ),
-      );
-    });
-  }
-}
 
 /**
  * Search for an element with a passed tag-name in the list of ancestors passed.
@@ -57,29 +14,6 @@ export function findElement(
   tagName: string,
 ): Element | null {
   return ancestors.find(element => element.tagName === tagName) ?? null;
-}
-
-/** Sorts selected `ListItem`s to the top and disabled ones to the bottom. */
-export function compareNames(a: Element | string, b: Element | string): number {
-  if (typeof a === 'string' && typeof b === 'string') {
-    return a.localeCompare(b);
-  }
-
-  if (typeof a === 'object' && typeof b === 'string') {
-    return (a.getAttribute('name') ?? '').localeCompare(b);
-  }
-
-  if (typeof a === 'string' && typeof b === 'object') {
-    return a.localeCompare(b.getAttribute('name')!);
-  }
-
-  if (typeof a === 'object' && typeof b === 'object') {
-    return (a.getAttribute('name') ?? '').localeCompare(
-      b.getAttribute('name') ?? '',
-    );
-  }
-
-  return 0;
 }
 
 /**
