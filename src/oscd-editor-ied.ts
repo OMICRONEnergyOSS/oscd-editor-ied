@@ -6,7 +6,7 @@ import {
   css,
   nothing,
 } from 'lit';
-import { property, state } from 'lit/decorators.js';
+import { property, query, state } from 'lit/decorators.js';
 import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
 import { OscdListItem } from '@omicronenergy/oscd-ui/list/OscdListItem.js';
 import { OscdOutlinedButton } from '@omicronenergy/oscd-ui/button/OscdOutlinedButton.js';
@@ -21,11 +21,11 @@ import {
   findLLN0LNodeType,
   createLLN0LNodeType,
   createIEDStructure,
-  FullElementPathEvent,
 } from './foundation.js';
 
 import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
 import { Insert } from '@openscd/oscd-api';
+import WizardDialog from '@omicronenergy/oscd-edit-dialog/OscdEditDialog.js';
 import { initializeNsdoc, Nsdoc } from './foundation/nsdoc.js';
 import { OpenscdApi } from './foundation/types.js';
 import { SelectItem } from '@omicronenergy/oscd-ui/selection-list/OscdSelectionList.js';
@@ -33,6 +33,19 @@ import { IedContainer } from './components/ied-container.js';
 import { ElementPath } from './components/element-path.js';
 import { msg } from '@lit/localize';
 import { compareNames } from '@omicronenergy/oscd-edit-dialog';
+import {
+  CreateElementEvent,
+  EditElementEvent,
+  EVENTS,
+  FullElementPathEvent,
+  newAddElementEvent,
+} from './foundation/events.js';
+
+const PLUGIN_STATE_STORAGE_KEY = 'oscd-editor-ied-state';
+
+type PluginState = {
+  selectedIEDsByName?: string[];
+};
 
 type SelectedItemsChangedEvent = CustomEvent<{ selectedItems: string[] }>;
 
@@ -75,6 +88,7 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
     'oscd-icon': OscdIcon,
     'element-path': ElementPath,
     'ied-container': IedContainer,
+    'oscd-edit-dialog': WizardDialog,
   };
 
   /** The document being edited as provided to plugins by [[`OpenSCD`]]. */
@@ -162,11 +176,30 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
     return undefined;
   }
 
+  @query('oscd-edit-dialog') editDialog!: WizardDialog;
+
   lNClassListOpenedOnce = false;
 
   connectedCallback(): void {
     super.connectedCallback();
     this.loadPluginState();
+    this.addEventListener(
+      EVENTS.ADD_ELEMENT,
+      async (event: CreateElementEvent) => {
+        console.log('AddElementEvent received:', event.detail);
+        const edits = await this.editDialog.create(event.detail);
+        console.log('edits from create:', edits);
+        this.dispatchEvent(newEditEventV2(edits));
+      },
+    );
+    this.addEventListener(
+      EVENTS.EDIT_ELEMENT,
+      async (event: EditElementEvent) => {
+        console.log('EditElementEvent received:', event.detail);
+        const edits = await this.editDialog.edit(event.detail);
+        this.dispatchEvent(newEditEventV2(edits));
+      },
+    );
   }
 
   disconnectedCallback(): void {
@@ -232,13 +265,13 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
   }
 
   private loadPluginState(): void {
-    const stateApi = this.oscdApi?.pluginState;
-    const iedNames: string[] =
-      (stateApi?.getState()?.selectedIEDs as string[]) ?? [];
+    const pluginState: PluginState = JSON.parse(
+      localStorage.getItem(PLUGIN_STATE_STORAGE_KEY) ?? '{}',
+    );
 
-    const iedElements = iedNames
-      .map(iedName => this.iedMap[iedName])
-      .filter(ied => !!ied);
+    const iedElements = this.iedList.filter(ied =>
+      pluginState.selectedIEDsByName?.includes(ied.getAttribute('name')!),
+    );
 
     // We want to always fire this - even for an empty selection,
     // because if the file has changed and the selection is no longer valid,
@@ -247,11 +280,13 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
   }
 
   private storePluginState(): void {
-    const stateApi = this.oscdApi?.pluginState;
+    const pluginState: PluginState = {
+      selectedIEDsByName: this.selectedIEDs
+        .map<string>(ied => ied.getAttribute('name') ?? '')
+        .filter(name => name !== ''),
+    };
 
-    if (stateApi) {
-      stateApi.setState({ selectedIEDs: this.selectedIEDs });
-    }
+    localStorage.setItem(PLUGIN_STATE_STORAGE_KEY, JSON.stringify(pluginState));
   }
 
   private calcSelectedLNClasses(): string[] {
@@ -328,7 +363,14 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
 
       <oscd-outlined-button
         class="add-ied-button"
-        @click=${() => console.log('Create IED clicked')}
+        @click=${() => {
+          this.dispatchEvent(
+            newAddElementEvent({
+              tagName: 'IED',
+              parent: this.doc.querySelector('SCL')!,
+            }),
+          );
+        }}
       >
         <oscd-icon slot="icon">add</oscd-icon>
         ${msg('Create Virtual IED')}
@@ -361,6 +403,7 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
   render(): TemplateResult {
     return html`<div>
       ${this.renderHeader()} ${this.renderSelectedIED()}
+      <oscd-edit-dialog></oscd-edit-dialog>
       <create-ied-dialog
         .doc=${this.doc}
         .onConfirm=${(iedName: string) => this.createVirtualIED(iedName)}

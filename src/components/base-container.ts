@@ -1,11 +1,9 @@
 import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
 import { LitElement } from 'lit';
 import { property } from 'lit/decorators.js';
-import {
-  getTitleForElementPath,
-  newFullElementPathEvent,
-} from '../foundation.js';
+import { getTitleForElementPath } from '../foundation.js';
 import { Nsdoc } from '../foundation/nsdoc.js';
+import { newFullElementPathEvent } from '../foundation/events.js';
 
 /** Base class for all containers inside the IED Editor. */
 export class BaseContainer extends ScopedElementsMixin(LitElement) {

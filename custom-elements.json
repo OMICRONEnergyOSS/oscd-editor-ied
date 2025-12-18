@@ -619,6 +619,14 @@
             },
             {
               "kind": "field",
+              "name": "selectedElementPath",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]"
+            },
+            {
+              "kind": "field",
               "name": "iedList",
               "type": {
                 "text": "Element[]"
@@ -643,6 +651,13 @@
               },
               "privacy": "private",
               "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "editDialog",
+              "type": {
+                "text": "WizardDialog"
+              }
             },
             {
               "kind": "field",
@@ -1424,7 +1439,7 @@
             },
             {
               "kind": "method",
-              "name": "getDOElements",
+              "name": "getSDOElements",
               "privacy": "private",
               "return": {
                 "type": {
@@ -1608,7 +1623,7 @@
           "members": [
             {
               "kind": "field",
-              "name": "elementNames",
+              "name": "paths",
               "type": {
                 "text": "string[]"
               },

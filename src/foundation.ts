@@ -221,22 +221,6 @@ export function getValueElements(parent: Element): Element[] {
   return Array.from(parent.querySelectorAll('Val'));
 }
 
-export interface FullElementPathDetail {
-  elementNames: string[];
-}
-export type FullElementPathEvent = CustomEvent<FullElementPathDetail>;
-export function newFullElementPathEvent(
-  elementNames: string[],
-  eventInitDict?: CustomEventInit<FullElementPathDetail>,
-): FullElementPathEvent {
-  return new CustomEvent<FullElementPathDetail>('full-element-path', {
-    bubbles: true,
-    composed: true,
-    ...eventInitDict,
-    detail: { elementNames, ...eventInitDict?.detail },
-  });
-}
-
 /**
  * Get all LDevice inst values from a Server element.
  * @param server - The Server element to search in.
@@ -255,10 +239,4 @@ export function getLDeviceInsts(server: Element): string[] {
  */
 export function getLNodeTypes(doc: XMLDocument): Element[] {
   return Array.from(doc.querySelectorAll('DataTypeTemplates > LNodeType'));
-}
-
-declare global {
-  interface ElementEventMap {
-    ['full-element-path']: FullElementPathEvent;
-  }
 }

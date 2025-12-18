@@ -48,7 +48,7 @@ export class DOContainer extends ScopedElementsMixin(BaseContainer) {
    * Get the nested SDO element(s).
    * @returns The nested SDO element(s) of this DO container.
    */
-  private getDOElements(): Element[] {
+  private getSDOElements(): Element[] {
     const doType = findDOTypeElement(this.element);
     if (doType != null) {
       return Array.from(doType.querySelectorAll(':scope > SDO'));
@@ -88,7 +88,7 @@ export class DOContainer extends ScopedElementsMixin(BaseContainer) {
 
   render(): TemplateResult {
     const daElements = this.getDAElements();
-    const doElements = this.getDOElements();
+    const doElements = this.getSDOElements();
 
     return html`<oscd-action-pane
       .label="${this.header()}"
