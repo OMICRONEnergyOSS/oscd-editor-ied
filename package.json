@@ -1,6 +1,6 @@
 {
   "name": "@omicronenergy/oscd-editor-ied",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "OpenSCD Editor Plugin for Editing the IEDs in an IEC 61850 document.",
   "type": "module",
   "repository": {
