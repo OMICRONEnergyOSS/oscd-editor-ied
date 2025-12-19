@@ -7,6 +7,8 @@ export enum EVENTS {
   FULL_ELEMENT_PATH = 'full-element-path',
   ADD_ELEMENT = 'oscd-editor-ied-add-element',
   EDIT_ELEMENT = 'oscd-editor-ied-edit-element',
+  IED_CREATED = 'oscd-editor-ied-created',
+  CONFIRM_DELETE = 'confirm-delete',
 }
 
 export interface FullElementPathDetail {
@@ -50,11 +52,40 @@ export function newEditElementEvent(
     detail: { ...detail, ...eventInitDict?.detail },
   });
 }
+export type IedCreatedDetail = {
+  iedName: string;
+};
+export type IedCreatedEvent = CustomEvent<IedCreatedDetail>;
+export function newIedCreatedEvent(detail: IedCreatedDetail): IedCreatedEvent {
+  return new CustomEvent<IedCreatedDetail>(EVENTS.IED_CREATED, {
+    bubbles: true,
+    composed: true,
+    detail,
+  });
+}
+
+export type ConfirmDeleteDetail = {
+  heading: string;
+  message: string;
+  onConfirm: () => void;
+};
+export type ConfirmDeleteEvent = CustomEvent<ConfirmDeleteDetail>;
+export function newConfirmDeleteEvent(
+  detail: ConfirmDeleteDetail,
+): ConfirmDeleteEvent {
+  return new CustomEvent<ConfirmDeleteDetail>(EVENTS.CONFIRM_DELETE, {
+    bubbles: true,
+    composed: true,
+    detail,
+  });
+}
 
 declare global {
   interface ElementEventMap {
     [EVENTS.FULL_ELEMENT_PATH]: FullElementPathEvent;
     [EVENTS.ADD_ELEMENT]: CreateElementEvent;
     [EVENTS.EDIT_ELEMENT]: EditElementEvent;
+    [EVENTS.IED_CREATED]: IedCreatedEvent;
+    [EVENTS.CONFIRM_DELETE]: ConfirmDeleteEvent;
   }
 }

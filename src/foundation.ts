@@ -1,5 +1,4 @@
 import { Insert } from '@openscd/oscd-api';
-
 import { insertSelectedLNodeType } from '@openscd/scl-lib';
 import { createElement } from '@openscd/scl-lib/dist/foundation/utils.js';
 
@@ -14,19 +13,6 @@ export function findElement(
   tagName: string,
 ): Element | null {
   return ancestors.find(element => element.tagName === tagName) ?? null;
-}
-
-/**
- * Search for the LN0 or LN element in the list of ancestors passed.
- * @param ancestors - The list of elements to search in for an LN or LN0 element.
- * @returns The LN0/LN Element found or null if not found.
- */
-export function findLogicalNodeElement(ancestors: Element[]): Element | null {
-  let element = findElement(ancestors, 'LN0');
-  if (!element) {
-    element = findElement(ancestors, 'LN');
-  }
-  return element;
 }
 
 /**
@@ -65,47 +51,6 @@ export function createLLN0LNodeType(doc: XMLDocument, id: string): Insert[] {
   };
 
   return insertSelectedLNodeType(doc, selection, logicalnode);
-}
-
-/**
- * Create a basic IED structure with the specified name.
- * @param doc - The XML document to create the IED in.
- * @param iedName - The name for the new IED.
- * @param lnTypeId - The LNodeType ID to use for the LN0.
- * @param manufacturer - Optional manufacturer name, defaults to 'OpenSCD'.
- * @returns The created IED element.
- */
-export function createIEDStructure(
-  doc: XMLDocument,
-  iedName: string,
-  lnTypeId: string,
-  manufacturer: string = 'OpenSCD',
-): Element {
-  const ied = createElement(doc, 'IED', {
-    name: iedName,
-    manufacturer,
-  });
-
-  const accessPoint = createElement(doc, 'AccessPoint', { name: 'AP1' });
-  ied.appendChild(accessPoint);
-
-  const server = createElement(doc, 'Server', {});
-  accessPoint.appendChild(server);
-
-  const authentication = createElement(doc, 'Authentication', {});
-  server.appendChild(authentication);
-
-  const lDevice = createElement(doc, 'LDevice', { inst: 'LD1' });
-  server.appendChild(lDevice);
-
-  const ln0 = createElement(doc, 'LN0', {
-    lnClass: 'LLN0',
-    inst: '',
-    lnType: lnTypeId,
-  });
-  lDevice.appendChild(ln0);
-
-  return ied;
 }
 
 /**

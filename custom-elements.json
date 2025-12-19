@@ -34,25 +34,6 @@
         },
         {
           "kind": "function",
-          "name": "findLogicalNodeElement",
-          "return": {
-            "type": {
-              "text": ""
-            }
-          },
-          "parameters": [
-            {
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              },
-              "description": "The list of elements to search in for an LN or LN0 element."
-            }
-          ],
-          "description": "Search for the LN0 or LN element in the list of ancestors passed."
-        },
-        {
-          "kind": "function",
           "name": "findLLN0LNodeType",
           "return": {
             "type": {
@@ -95,47 +76,6 @@
             }
           ],
           "description": "Create a minimal LLN0 LNodeType with essential data objects."
-        },
-        {
-          "kind": "function",
-          "name": "createIEDStructure",
-          "return": {
-            "type": {
-              "text": ""
-            }
-          },
-          "parameters": [
-            {
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "description": "The XML document to create the IED in."
-            },
-            {
-              "name": "iedName",
-              "type": {
-                "text": "string"
-              },
-              "description": "The name for the new IED."
-            },
-            {
-              "name": "lnTypeId",
-              "type": {
-                "text": "string"
-              },
-              "description": "The LNodeType ID to use for the LN0."
-            },
-            {
-              "name": "manufacturer",
-              "default": "'OpenSCD'",
-              "type": {
-                "text": "string"
-              },
-              "description": "Optional manufacturer name, defaults to 'OpenSCD'."
-            }
-          ],
-          "description": "Create a basic IED structure with the specified name."
         },
         {
           "kind": "function",
@@ -316,30 +256,6 @@
         },
         {
           "kind": "function",
-          "name": "newFullElementPathEvent",
-          "return": {
-            "type": {
-              "text": "FullElementPathEvent"
-            }
-          },
-          "parameters": [
-            {
-              "name": "elementNames",
-              "type": {
-                "text": "string[]"
-              }
-            },
-            {
-              "name": "eventInitDict",
-              "optional": true,
-              "type": {
-                "text": "CustomEventInit<FullElementPathDetail>"
-              }
-            }
-          ]
-        },
-        {
-          "kind": "function",
           "name": "getLDeviceInsts",
           "return": {
             "type": {
@@ -388,14 +304,6 @@
         },
         {
           "kind": "js",
-          "name": "findLogicalNodeElement",
-          "declaration": {
-            "name": "findLogicalNodeElement",
-            "module": "src/foundation.ts"
-          }
-        },
-        {
-          "kind": "js",
           "name": "findLLN0LNodeType",
           "declaration": {
             "name": "findLLN0LNodeType",
@@ -407,14 +315,6 @@
           "name": "createLLN0LNodeType",
           "declaration": {
             "name": "createLLN0LNodeType",
-            "module": "src/foundation.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "createIEDStructure",
-          "declaration": {
-            "name": "createIEDStructure",
             "module": "src/foundation.ts"
           }
         },
@@ -484,14 +384,6 @@
         },
         {
           "kind": "js",
-          "name": "newFullElementPathEvent",
-          "declaration": {
-            "name": "newFullElementPathEvent",
-            "module": "src/foundation.ts"
-          }
-        },
-        {
-          "kind": "js",
           "name": "getLDeviceInsts",
           "declaration": {
             "name": "getLDeviceInsts",
@@ -539,7 +431,7 @@
                 "text": "object"
               },
               "static": true,
-              "default": "{ 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filter-button': OscdFilterButton, 'oscd-list-item': OscdListItem, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'element-path': ElementPath, 'ied-container': IedContainer, }"
+              "default": "{ 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filter-button': OscdFilterButton, 'oscd-list-item': OscdListItem, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'element-path': ElementPath, 'ied-container': IedContainer, 'oscd-edit-dialog': WizardDialog, 'create-ied-dialog': CreateIedDialog, 'confirm-delete-dialog': ConfirmDeleteDialog, }"
             },
             {
               "kind": "field",
@@ -661,6 +553,20 @@
             },
             {
               "kind": "field",
+              "name": "createIedDialog",
+              "type": {
+                "text": "CreateIedDialog"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "confimDeleteDialog",
+              "type": {
+                "text": "ConfirmDeleteDialog"
+              }
+            },
+            {
+              "kind": "field",
               "name": "lNClassListOpenedOnce",
               "type": {
                 "text": "boolean"
@@ -669,18 +575,50 @@
             },
             {
               "kind": "method",
-              "name": "createVirtualIED",
+              "name": "handleElementCreate",
               "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
               "parameters": [
                 {
-                  "name": "iedName",
+                  "name": "event",
                   "type": {
-                    "text": "string"
+                    "text": "CreateElementEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "handleIedCreated",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "IedCreatedEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "handleEditElement",
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "EditElementEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "handleConfirmDelete",
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "ConfirmDeleteEvent"
                   }
                 }
               ]
@@ -822,6 +760,354 @@
           "declaration": {
             "name": "IedPlugin",
             "module": "src/oscd-editor-ied.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/foundation/events.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "newFullElementPathEvent",
+          "return": {
+            "type": {
+              "text": "FullElementPathEvent"
+            }
+          },
+          "parameters": [
+            {
+              "name": "elementNames",
+              "type": {
+                "text": "string[]"
+              }
+            },
+            {
+              "name": "eventInitDict",
+              "optional": true,
+              "type": {
+                "text": "CustomEventInit<FullElementPathDetail>"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "newAddElementEvent",
+          "return": {
+            "type": {
+              "text": "CreateElementEvent"
+            }
+          },
+          "parameters": [
+            {
+              "name": "detail",
+              "type": {
+                "text": "CreateWizard"
+              }
+            },
+            {
+              "name": "eventInitDict",
+              "optional": true,
+              "type": {
+                "text": "CustomEventInit<CreateWizard>"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "newEditElementEvent",
+          "return": {
+            "type": {
+              "text": "EditElementEvent"
+            }
+          },
+          "parameters": [
+            {
+              "name": "detail",
+              "type": {
+                "text": "EditWizard"
+              }
+            },
+            {
+              "name": "eventInitDict",
+              "optional": true,
+              "type": {
+                "text": "CustomEventInit<EditWizard>"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "newIedCreatedEvent",
+          "return": {
+            "type": {
+              "text": "IedCreatedEvent"
+            }
+          },
+          "parameters": [
+            {
+              "name": "detail",
+              "type": {
+                "text": "IedCreatedDetail"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "newConfirmDeleteEvent",
+          "return": {
+            "type": {
+              "text": "ConfirmDeleteEvent"
+            }
+          },
+          "parameters": [
+            {
+              "name": "detail",
+              "type": {
+                "text": "ConfirmDeleteDetail"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "newFullElementPathEvent",
+          "declaration": {
+            "name": "newFullElementPathEvent",
+            "module": "src/foundation/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "newAddElementEvent",
+          "declaration": {
+            "name": "newAddElementEvent",
+            "module": "src/foundation/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "newEditElementEvent",
+          "declaration": {
+            "name": "newEditElementEvent",
+            "module": "src/foundation/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "newIedCreatedEvent",
+          "declaration": {
+            "name": "newIedCreatedEvent",
+            "module": "src/foundation/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "newConfirmDeleteEvent",
+          "declaration": {
+            "name": "newConfirmDeleteEvent",
+            "module": "src/foundation/events.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/foundation/nsd.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "nsd72",
+          "declaration": {
+            "name": "nsd72",
+            "module": "src/foundation/nsd.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "nsd73",
+          "declaration": {
+            "name": "nsd73",
+            "module": "src/foundation/nsd.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "nsd74",
+          "declaration": {
+            "name": "nsd74",
+            "module": "src/foundation/nsd.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "nsd7420",
+          "declaration": {
+            "name": "nsd7420",
+            "module": "src/foundation/nsd.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "nsd81",
+          "declaration": {
+            "name": "nsd81",
+            "module": "src/foundation/nsd.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/foundation/nsdoc.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "initializeNsdoc",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "description": "Initialize the full Nsdoc object."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "initializeNsdoc",
+          "declaration": {
+            "name": "initializeNsdoc",
+            "module": "src/foundation/nsdoc.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/foundation/types.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/foundation/virtual-ied.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "findLogicalNodeElement",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "description": "The list of elements to search in for an LN or LN0 element."
+            }
+          ],
+          "description": "Search for the LN0 or LN element in the list of ancestors passed."
+        },
+        {
+          "kind": "function",
+          "name": "createIEDStructure",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "description": "The XML document to create the IED in."
+            },
+            {
+              "name": "iedName",
+              "type": {
+                "text": "string"
+              },
+              "description": "The name for the new IED."
+            },
+            {
+              "name": "lnTypeId",
+              "type": {
+                "text": "string"
+              },
+              "description": "The LNodeType ID to use for the LN0."
+            },
+            {
+              "name": "manufacturer",
+              "default": "'OpenSCD'",
+              "type": {
+                "text": "string"
+              },
+              "description": "Optional manufacturer name, defaults to 'OpenSCD'."
+            }
+          ],
+          "description": "Create a basic IED structure with the specified name."
+        },
+        {
+          "kind": "function",
+          "name": "createVirtualIED",
+          "return": {
+            "type": {
+              "text": "Insert[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "iedName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "findLogicalNodeElement",
+          "declaration": {
+            "name": "findLogicalNodeElement",
+            "module": "src/foundation/virtual-ied.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "createIEDStructure",
+          "declaration": {
+            "name": "createIEDStructure",
+            "module": "src/foundation/virtual-ied.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "createVirtualIED",
+          "declaration": {
+            "name": "createVirtualIED",
+            "module": "src/foundation/virtual-ied.ts"
           }
         }
       ]
@@ -1058,6 +1344,246 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/add-access-point-dialog.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A dialog component for adding new AccessPoints",
+          "name": "AddAccessPointDialog",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-dialog': OscdDialog, 'oscd-filled-textfield': OscdFilledTextField, 'oscd-button': OscdOutlinedButton, 'oscd-switch': OscdSwitch, 'oscd-select': OscdFilledSelect, 'oscd-list-item': OscdListItem, }"
+            },
+            {
+              "kind": "field",
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "attribute": "doc"
+            },
+            {
+              "kind": "field",
+              "name": "ied",
+              "type": {
+                "text": "Element"
+              },
+              "attribute": "ied"
+            },
+            {
+              "kind": "field",
+              "name": "onConfirm",
+              "type": {
+                "text": "(data: AccessPointCreationData) => void"
+              },
+              "attribute": "onConfirm"
+            },
+            {
+              "kind": "field",
+              "name": "dialog",
+              "type": {
+                "text": "OscdDialog"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "apNameField",
+              "type": {
+                "text": "OscdFilledTextField"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "apName",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "createServerAt",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "serverAtApName",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "serverAtDesc",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "open",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "isApNameUnique",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "accessPointsWithServer",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "reset",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "handleCreate",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getApNameError",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderServerAtSection",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "fieldName": "doc"
+            },
+            {
+              "name": "ied",
+              "type": {
+                "text": "Element"
+              },
+              "fieldName": "ied"
+            },
+            {
+              "name": "onConfirm",
+              "type": {
+                "text": "(data: AccessPointCreationData) => void"
+              },
+              "fieldName": "onConfirm"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "AddAccessPointDialog",
+          "declaration": {
+            "name": "AddAccessPointDialog",
+            "module": "src/components/add-access-point-dialog.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/base-container.ts",
       "declarations": [
         {
@@ -1159,6 +1685,290 @@
           "declaration": {
             "name": "BaseContainer",
             "module": "src/components/base-container.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/confirm-delete-dialog.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A dialog component for creating virtual IEDs",
+          "name": "ConfirmDeleteDialog",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-dialog': OscdDialog, 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filled-button': OscdFilledButton, }"
+            },
+            {
+              "kind": "field",
+              "name": "heading",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "message",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "onConfirm",
+              "type": {
+                "text": "() => void | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "confirmDelete",
+              "privacy": "public",
+              "parameters": [
+                {
+                  "name": "details",
+                  "type": {
+                    "text": "ConfirmDeleteDetail"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "dialog",
+              "type": {
+                "text": "OscdDialog"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "handleConfirm",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "ConfirmDeleteDialog",
+          "declaration": {
+            "name": "ConfirmDeleteDialog",
+            "module": "src/components/confirm-delete-dialog.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/create-ied-dialog.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A dialog component for creating virtual IEDs",
+          "name": "CreateIedDialog",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-dialog': OscdDialog, 'oscd-filled-textfield': OscdFilledTextField, 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filled-button': OscdFilledButton, }"
+            },
+            {
+              "kind": "field",
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "attribute": "doc"
+            },
+            {
+              "kind": "field",
+              "name": "onConfirm",
+              "type": {
+                "text": "(iedName: string) => void"
+              },
+              "attribute": "onConfirm"
+            },
+            {
+              "kind": "field",
+              "name": "dialog",
+              "type": {
+                "text": "OscdDialog"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "newIedName",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "method",
+              "name": "isIedNameValid",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "getIedNameError",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "isIedNameUnique",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "handleCreate",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "fieldName": "doc"
+            },
+            {
+              "name": "onConfirm",
+              "type": {
+                "text": "(iedName: string) => void"
+              },
+              "fieldName": "onConfirm"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CreateIedDialog",
+          "declaration": {
+            "name": "CreateIedDialog",
+            "module": "src/components/create-ied-dialog.ts"
           }
         }
       ]
@@ -2527,85 +3337,6 @@
           }
         }
       ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/foundation/nsd.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "nsd72",
-          "declaration": {
-            "name": "nsd72",
-            "module": "src/foundation/nsd.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "nsd73",
-          "declaration": {
-            "name": "nsd73",
-            "module": "src/foundation/nsd.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "nsd74",
-          "declaration": {
-            "name": "nsd74",
-            "module": "src/foundation/nsd.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "nsd7420",
-          "declaration": {
-            "name": "nsd7420",
-            "module": "src/foundation/nsd.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "nsd81",
-          "declaration": {
-            "name": "nsd81",
-            "module": "src/foundation/nsd.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/foundation/nsdoc.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "initializeNsdoc",
-          "return": {
-            "type": {
-              "text": ""
-            }
-          },
-          "description": "Initialize the full Nsdoc object."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "initializeNsdoc",
-          "declaration": {
-            "name": "initializeNsdoc",
-            "module": "src/foundation/nsdoc.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/foundation/types.ts",
-      "declarations": [],
-      "exports": []
     }
   ]
 }

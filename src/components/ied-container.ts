@@ -1,17 +1,25 @@
 import { css, html, TemplateResult } from 'lit';
-
-import { OscdDialog } from '@omicronenergy/oscd-ui/dialog/OscdDialog.js';
-import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
-// import { newEditEventV2 } from '@omicronenergy/oscd-api/utils.js';
-import { wizards } from '@omicronenergy/oscd-edit-dialog/wizards.js';
 import { property, query } from 'lit/decorators.js';
 import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
-import { BaseContainer } from './base-container.js';
-
-import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
-import { OscdIconButton } from '@omicronenergy/oscd-ui/iconbutton/OscdIconButton.js';
-import { AccessPointContainer } from './access-point-container.js';
 import { msg } from '@lit/localize';
+
+import { OscdIconButton } from '@omicronenergy/oscd-ui/iconbutton/OscdIconButton.js';
+import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
+import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
+
+import { BaseContainer } from './base-container.js';
+import { AccessPointContainer } from './access-point-container.js';
+import {
+  AccessPointCreationData,
+  AddAccessPointDialog,
+} from './add-access-point-dialog.js';
+import {
+  newConfirmDeleteEvent,
+  newEditElementEvent,
+} from '../foundation/events.js';
+import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
+import { createAccessPoint, createServerAt } from '../foundation.js';
+import { Insert } from '@openscd/oscd-api';
 
 /** [[`IED`]] plugin subeditor for editing `IED` element. */
 export class IedContainer extends ScopedElementsMixin(BaseContainer) {
@@ -20,48 +28,44 @@ export class IedContainer extends ScopedElementsMixin(BaseContainer) {
     'oscd-icon-button': OscdIconButton,
     'oscd-action-pane': OscdActionPane,
     'access-point-container': AccessPointContainer,
-    // 'add-access-point-dialog': AddAccessPointDialog,
+    'add-access-point-dialog': AddAccessPointDialog,
   };
 
   @property()
   selectedLNClasses: string[] = [];
 
   @query('add-access-point-dialog')
-  addAccessPointDialog!: OscdDialog;
+  addAccessPointDialog!: AddAccessPointDialog;
 
-  private openEditWizard(): void {
-    const wizard = wizards['IED'].edit(this.element);
-    if (wizard) {
-      // this.dispatchEvent(newWizardEvent(wizard));
-      console.log('Please implement me');
-    }
+  private handleEditIed(): void {
+    this.dispatchEvent(newEditElementEvent({ element: this.element }));
   }
 
-  // private createAccessPoint(data: AccessPointCreationData): void {
-  //   const inserts: InsertV2[] = [];
-  //   const accessPoint = createAccessPoint(this.doc, data.name);
+  private createAccessPoint(data: AccessPointCreationData): void {
+    const inserts: Insert[] = [];
+    const accessPoint = createAccessPoint(this.doc, data.name);
 
-  //   inserts.push({
-  //     parent: this.element,
-  //     node: accessPoint,
-  //     reference: null,
-  //   });
+    inserts.push({
+      parent: this.element,
+      node: accessPoint,
+      reference: null,
+    });
 
-  //   if (data.createServerAt && data.serverAtApName) {
-  //     const serverAt = createServerAt(
-  //       this.doc,
-  //       data.serverAtApName,
-  //       data.serverAtDesc,
-  //     );
-  //     inserts.push({
-  //       parent: accessPoint,
-  //       node: serverAt,
-  //       reference: null,
-  //     });
-  //   }
+    if (data.createServerAt && data.serverAtApName) {
+      const serverAt = createServerAt(
+        this.doc,
+        data.serverAtApName,
+        data.serverAtDesc,
+      );
+      inserts.push({
+        parent: accessPoint,
+        node: serverAt,
+        reference: null,
+      });
+    }
 
-  //   this.dispatchEvent(newEditEventV2(inserts));
-  // }
+    this.dispatchEvent(newEditEventV2(inserts));
+  }
 
   private renderServicesIcon(): TemplateResult {
     const services: Element | null = this.element.querySelector('Services');
@@ -74,7 +78,9 @@ export class IedContainer extends ScopedElementsMixin(BaseContainer) {
       slot="action"
       title="${msg('Show Services the IED/AccessPoint provides')}"
     >
-      <oscd-icon-button @click=${() => this.handleEditServices(services)}
+      <oscd-icon-button
+        disabled
+        @click=${() => this.handleEditServices(services)}
         ><oscd-icon>settings</oscd-icon></oscd-icon-button
       >
     </abbr>`;
@@ -93,7 +99,18 @@ export class IedContainer extends ScopedElementsMixin(BaseContainer) {
   }
 
   private removeIED(): void {
-    console.log('Please implement me', this.element);
+    const heading = this.header();
+    this.dispatchEvent(
+      newConfirmDeleteEvent({
+        heading: msg(`Delete`),
+        message: msg(
+          `Are you sure you want to delete IED "${heading}" and all its content?`,
+        ),
+        onConfirm: () => {
+          this.dispatchEvent(newEditEventV2({ node: this.element }));
+        },
+      }),
+    );
   }
 
   private header() {
@@ -112,7 +129,7 @@ export class IedContainer extends ScopedElementsMixin(BaseContainer) {
         >
       </abbr>
       <abbr slot="action" title="${msg('edit')}">
-        <oscd-icon-button @click=${() => this.openEditWizard()}
+        <oscd-icon-button @click=${() => this.handleEditIed()}
           ><oscd-icon>edit</oscd-icon></oscd-icon-button
         >
       </abbr>
@@ -136,9 +153,8 @@ export class IedContainer extends ScopedElementsMixin(BaseContainer) {
       <add-access-point-dialog
         .doc=${this.doc}
         .ied=${this.element}
-        .onConfirm=${(data: unknown) =>
-          // this.createAccessPoint(data)
-          console.log('Please implement me', data)}
+        .onConfirm=${(data: AccessPointCreationData) =>
+          this.createAccessPoint(data)}
       ></add-access-point-dialog>
     </oscd-action-pane>`;
   }

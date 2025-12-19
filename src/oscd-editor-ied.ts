@@ -17,14 +17,7 @@ import {
 import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
 import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
 
-import {
-  findLLN0LNodeType,
-  createLLN0LNodeType,
-  createIEDStructure,
-} from './foundation.js';
-
 import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
-import { Insert } from '@openscd/oscd-api';
 import WizardDialog from '@omicronenergy/oscd-edit-dialog/OscdEditDialog.js';
 import { initializeNsdoc, Nsdoc } from './foundation/nsdoc.js';
 import { OpenscdApi } from './foundation/types.js';
@@ -34,12 +27,16 @@ import { ElementPath } from './components/element-path.js';
 import { msg } from '@lit/localize';
 import { compareNames } from '@omicronenergy/oscd-edit-dialog';
 import {
+  ConfirmDeleteEvent,
   CreateElementEvent,
   EditElementEvent,
   EVENTS,
   FullElementPathEvent,
+  IedCreatedEvent,
   newAddElementEvent,
 } from './foundation/events.js';
+import { CreateIedDialog } from './components/create-ied-dialog.js';
+import { ConfirmDeleteDialog } from './components/confirm-delete-dialog.js';
 
 const PLUGIN_STATE_STORAGE_KEY = 'oscd-editor-ied-state';
 
@@ -57,7 +54,7 @@ function getIEDSelectItem(element: Element, selected: boolean): SelectItem {
 
   return {
     headline: `${name} ${descr ? descr : ''}`,
-    supportingText: `${type} ${type && manufacturer ? '&mdash;' : ''}
+    supportingText: `${type ?? ''} ${type && manufacturer ? '\u2014' : ''}
                 ${manufacturer}`,
     selected,
     attachedElement: element,
@@ -89,6 +86,8 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
     'element-path': ElementPath,
     'ied-container': IedContainer,
     'oscd-edit-dialog': WizardDialog,
+    'create-ied-dialog': CreateIedDialog,
+    'confirm-delete-dialog': ConfirmDeleteDialog,
   };
 
   /** The document being edited as provided to plugins by [[`OpenSCD`]]. */
@@ -178,61 +177,94 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
 
   @query('oscd-edit-dialog') editDialog!: WizardDialog;
 
+  @query('create-ied-dialog') createIedDialog!: CreateIedDialog;
+
+  @query('confirm-delete-dialog') confimDeleteDialog!: ConfirmDeleteDialog;
+
   lNClassListOpenedOnce = false;
+
+  private async handleElementCreate(event: CreateElementEvent) {
+    //right now, V-IEDs get special treatment
+    if (event.detail.tagName === 'IED') {
+      this.createIedDialog.show();
+    } else {
+      const edits = await this.editDialog.create(event.detail);
+      this.dispatchEvent(newEditEventV2(edits));
+    }
+  }
+
+  private handleIedCreated(event: IedCreatedEvent) {
+    const newIed = this.doc.querySelector(
+      `:root > IED[name="${event.detail.iedName}"]`,
+    );
+    if (!newIed) {
+      return;
+    }
+    this.selectedIEDs = [newIed];
+    this.selectedLNClasses = [];
+    this.requestUpdate('iedList');
+  }
+
+  async handleEditElement(event: EditElementEvent) {
+    const edits = await this.editDialog.edit(event.detail);
+    this.dispatchEvent(newEditEventV2(edits));
+  }
+
+  handleConfirmDelete(event: ConfirmDeleteEvent) {
+    const confirmHandler = event.detail.onConfirm;
+    this.confimDeleteDialog.confirmDelete({
+      ...event.detail,
+      onConfirm: () => {
+        confirmHandler();
+        this.requestUpdate('iedList');
+      },
+    });
+  }
 
   connectedCallback(): void {
     super.connectedCallback();
     this.loadPluginState();
-    this.addEventListener(
-      EVENTS.ADD_ELEMENT,
-      async (event: CreateElementEvent) => {
-        console.log('AddElementEvent received:', event.detail);
-        const edits = await this.editDialog.create(event.detail);
-        console.log('edits from create:', edits);
-        this.dispatchEvent(newEditEventV2(edits));
-      },
-    );
-    this.addEventListener(
-      EVENTS.EDIT_ELEMENT,
-      async (event: EditElementEvent) => {
-        console.log('EditElementEvent received:', event.detail);
-        const edits = await this.editDialog.edit(event.detail);
-        this.dispatchEvent(newEditEventV2(edits));
-      },
-    );
+    this.addEventListener(EVENTS.ADD_ELEMENT, this.handleElementCreate);
+    this.addEventListener(EVENTS.IED_CREATED, this.handleIedCreated);
+    this.addEventListener(EVENTS.EDIT_ELEMENT, this.handleEditElement);
+    this.addEventListener(EVENTS.CONFIRM_DELETE, this.handleConfirmDelete);
   }
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
     this.storePluginState();
+    this.removeEventListener(EVENTS.ADD_ELEMENT, this.handleElementCreate);
+    this.removeEventListener(EVENTS.IED_CREATED, this.handleIedCreated);
+    this.removeEventListener(EVENTS.EDIT_ELEMENT, this.handleEditElement);
+    this.removeEventListener(EVENTS.CONFIRM_DELETE, this.handleConfirmDelete);
   }
 
-  private createVirtualIED(iedName: string): void {
-    const inserts: Insert[] = [];
+  // private handleCreateVirtualIED(iedName: string): void {
+  //   const inserts: Insert[] = [];
 
-    const existingLLN0 = findLLN0LNodeType(this.doc);
-    const lnTypeId = existingLLN0?.getAttribute('id') || 'PlaceholderLLN0';
+  //   const existingLLN0 = findLLN0LNodeType(this.doc);
+  //   const lnTypeId = existingLLN0?.getAttribute('id') || 'PlaceholderLLN0';
 
-    const ied = createIEDStructure(this.doc, iedName, lnTypeId);
+  //   const ied = createIEDStructure(this.doc, iedName, lnTypeId);
 
-    const dataTypeTemplates = this.doc.querySelector('DataTypeTemplates');
-    inserts.push({
-      parent: this.doc.querySelector('SCL')!,
-      node: ied,
-      reference: dataTypeTemplates,
-    });
+  //   const dataTypeTemplates = this.doc.querySelector('DataTypeTemplates');
+  //   inserts.push({
+  //     parent: this.doc.querySelector('SCL')!,
+  //     node: ied,
+  //     reference: dataTypeTemplates,
+  //   });
 
-    if (!existingLLN0) {
-      const lnodeTypeInserts = createLLN0LNodeType(this.doc, lnTypeId);
-      inserts.push(...lnodeTypeInserts);
-    }
+  //   if (!existingLLN0) {
+  //     const lnodeTypeInserts = createLLN0LNodeType(this.doc, lnTypeId);
+  //     inserts.push(...lnodeTypeInserts);
+  //   }
 
-    this.dispatchEvent(newEditEventV2(inserts));
+  //   this.dispatchEvent(newEditEventV2(inserts));
 
-    this.selectedIEDs = [ied];
-    this.selectedLNClasses = [];
-    this.requestUpdate('selectedIed');
-  }
+  //   this.selectedIEDs = [ied];
+  //   this.selectedLNClasses = [];
+  //   this.requestUpdate('selectedIed');
+  // }
 
   protected updated(_changedProperties: PropertyValues): void {
     super.updated(_changedProperties);
@@ -330,7 +362,8 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
     return html`<div class="header">
       <h1>${msg('filters')}:</h1>
       <oscd-filter-button
-        id="iedFilter"
+        filterable
+        searchhelper=${msg('Search')}
         .items=${this.iedList.map(ied =>
           getIEDSelectItem(ied, this.selectedIEDs.includes(ied)),
         )}
@@ -404,14 +437,16 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
     return html`<div>
       ${this.renderHeader()} ${this.renderSelectedIED()}
       <oscd-edit-dialog></oscd-edit-dialog>
-      <create-ied-dialog
-        .doc=${this.doc}
-        .onConfirm=${(iedName: string) => this.createVirtualIED(iedName)}
-      ></create-ied-dialog>
+      <create-ied-dialog .doc=${this.doc}></create-ied-dialog>
+      <confirm-delete-dialog></confirm-delete-dialog>
     </div>`;
   }
 
   static styles = css`
+    * {
+      /* patch theme colors defined in shell until we can correct them */
+      --md-icon-button-disabled-icon-color: var(--oscd-base00);
+    }
     :host {
       position: relative;
     }
