@@ -9,6 +9,8 @@ import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
 import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
 import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
 import { LNContainer } from '../lnode/ln-container.js';
+import { newEditElementEvent } from '../../foundation/events.js';
+import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
 
 /** [[`IED`]] plugin subeditor for editing `LDevice` element. */
 export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
@@ -29,12 +31,8 @@ export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
   // @query('add-ln-dialog')
   // addLnDialog!: AddLnDialog;
 
-  private openEditWizard(): void {
-    // const wizard = wizards['LDevice'].edit(this.element);
-    // if (wizard) {
-    //   this.dispatchEvent(newWizardEvent(wizard));
-    // }
-    console.log('Please implement me', this);
+  private handleEditLDevice(): void {
+    this.dispatchEvent(newEditElementEvent({ element: this.element }));
   }
 
   private header() {
@@ -81,12 +79,11 @@ export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
   }
 
   private removeLDevice(): void {
-    // this.dispatchEvent(
-    //   newActionEvent({
-    //     old: { parent: this.element.parentElement!, element: this.element },
-    //   }),
-    // );
-    console.log('Please implement me', this.element);
+    this.dispatchEvent(
+      newEditEventV2({
+        node: this.element,
+      }),
+    );
   }
 
   render(): TemplateResult {
@@ -102,7 +99,7 @@ export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
         <oscd-icon>delete</oscd-icon>
       </oscd-icon-button>
       <abbr slot="action" title="${msg('edit')}">
-        <oscd-icon-button @click=${() => this.openEditWizard()}>
+        <oscd-icon-button @click=${() => this.handleEditLDevice()}>
           <oscd-icon>edit</oscd-icon>
         </oscd-icon-button>
       </abbr>
