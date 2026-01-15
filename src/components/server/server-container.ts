@@ -1,15 +1,15 @@
-import { PropertyValues, TemplateResult, html } from 'lit';
-import { property, state } from 'lit/decorators.js';
+import { TemplateResult, html, nothing } from 'lit';
+import { property } from 'lit/decorators.js';
 
-import { findLLN0LNodeType, createLLN0LNodeType } from '../foundation.js';
+import { findLLN0LNodeType, createLLN0LNodeType } from '../../foundation.js';
 
 import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
-import { BaseContainer } from './base-container.js';
+import { BaseContainer } from '../base-container.js';
 import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
 import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
 import { OscdIconButton } from '@omicronenergy/oscd-ui/iconbutton/OscdIconButton.js';
 import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
-import { LDeviceContainer } from './ldevice-container.js';
+import { LDeviceContainer } from '../ldevice/ldevice-container.js';
 import { msg } from '@lit/localize';
 import { Insert } from '@openscd/oscd-api';
 
@@ -28,21 +28,15 @@ export class ServerContainer extends ScopedElementsMixin(BaseContainer) {
   selectedLNClasses: string[] = [];
 
   private header(): TemplateResult {
+    const name = this.element.tagName;
     const desc = this.element.getAttribute('desc');
-    return html`Server${desc ? ` \u2014 ${desc}` : ''}`;
+    const ref =
+      name === 'ServerAt' ? ` (${this.element.getAttribute('apName')})` : '';
+
+    return html`${name}${ref}${desc ? ` \u2014 ${desc}` : ''}`;
   }
 
-  protected updated(_changedProperties: PropertyValues): void {
-    super.updated(_changedProperties);
-
-    // When the LN Classes filter is updated, we also want to trigger rendering for the LN Elements.
-    if (_changedProperties.has('selectedLNClasses')) {
-      this.requestUpdate('lDeviceElements');
-    }
-  }
-
-  @state()
-  private get lDeviceElements(): Element[] {
+  private getLDeviceElements(): Element[] {
     return Array.from(this.element.querySelectorAll(':scope > LDevice')).filter(
       element => {
         return (
@@ -81,18 +75,22 @@ export class ServerContainer extends ScopedElementsMixin(BaseContainer) {
     // this.dispatchEvent(newEditEventV2(inserts));
   }
 
-  render(): TemplateResult {
+  render() {
     return html`<oscd-action-pane .label=${this.header()}>
       <oscd-scl-icon slot="icon">serverIcon</oscd-scl-icon>
-      <abbr slot="action" title=${msg('Add AccessPoint')}>
-        <oscd-icon-button @click=${() => console.log('Add LDevice clicked')}>
-          <oscd-icon>playlist_add</oscd-icon>
-        </oscd-icon-button>
-      </abbr>
-      ${this.lDeviceElements.map(
+      ${this.element.tagName === 'Server'
+        ? html`<abbr slot="action" title=${msg('Add LDevice')}>
+            <oscd-icon-button
+              @click=${() => console.log('Add LDevice clicked')}
+            >
+              <oscd-icon>playlist_add</oscd-icon>
+            </oscd-icon-button>
+          </abbr>`
+        : nothing}
+      ${this.getLDeviceElements().map(
         server =>
           html`<ldevice-container
-            .editCount=${this.editCount}
+            .docVersion=${this.docVersion}
             .doc=${this.doc}
             .element=${server}
             .nsdoc=${this.nsdoc}

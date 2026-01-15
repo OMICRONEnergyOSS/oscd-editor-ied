@@ -11,7 +11,7 @@ export class BaseContainer extends ScopedElementsMixin(LitElement) {
   doc!: XMLDocument;
 
   @property({ type: Number })
-  editCount = -1;
+  docVersion = -1;
 
   @property({ attribute: false })
   element!: Element;

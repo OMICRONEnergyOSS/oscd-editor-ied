@@ -22,7 +22,7 @@ import WizardDialog from '@omicronenergy/oscd-edit-dialog/OscdEditDialog.js';
 import { initializeNsdoc, Nsdoc } from './foundation/nsdoc.js';
 import { OpenscdApi } from './foundation/types.js';
 import { SelectItem } from '@omicronenergy/oscd-ui/selection-list/OscdSelectionList.js';
-import { IedContainer } from './components/ied-container.js';
+import { IedContainer } from './components/ied/ied-container.js';
 import { ElementPath } from './components/element-path.js';
 import { msg } from '@lit/localize';
 import { compareNames } from '@omicronenergy/oscd-edit-dialog';
@@ -35,8 +35,8 @@ import {
   IedCreatedEvent,
   newAddElementEvent,
 } from './foundation/events.js';
-import { CreateIedDialog } from './components/create-ied-dialog.js';
 import { ConfirmDeleteDialog } from './components/confirm-delete-dialog.js';
+import { VirtualIedCreateDialog } from './components/virtual-ied-create-dialog.js';
 
 const PLUGIN_STATE_STORAGE_KEY = 'oscd-editor-ied-state';
 
@@ -86,7 +86,7 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
     'element-path': ElementPath,
     'ied-container': IedContainer,
     'oscd-edit-dialog': WizardDialog,
-    'create-ied-dialog': CreateIedDialog,
+    'virtual-ied-create-dialog': VirtualIedCreateDialog,
     'confirm-delete-dialog': ConfirmDeleteDialog,
   };
 
@@ -101,7 +101,7 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
   docName!: string;
 
   @property({ type: Number })
-  editCount = -1;
+  docVersion = -1;
 
   /** All the nsdoc files that are being uploaded via the settings. */
   @property({ type: Object })
@@ -177,7 +177,7 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
 
   @query('oscd-edit-dialog') editDialog!: WizardDialog;
 
-  @query('create-ied-dialog') createIedDialog!: CreateIedDialog;
+  @query('virtual-ied-create-dialog') createIedDialog!: VirtualIedCreateDialog;
 
   @query('confirm-delete-dialog') confimDeleteDialog!: ConfirmDeleteDialog;
 
@@ -266,33 +266,33 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
   //   this.requestUpdate('selectedIed');
   // }
 
-  protected updated(_changedProperties: PropertyValues): void {
-    super.updated(_changedProperties);
-
+  protected willUpdate(_changedProperties: PropertyValues): void {
     // When the document is updated, we reset the selected IED if it no longer exists
     const isDocumentUpdated =
       _changedProperties.has('doc') ||
-      _changedProperties.has('editCount') ||
+      _changedProperties.has('docVersion') ||
       _changedProperties.has('nsdoc');
 
-    if (isDocumentUpdated) {
-      // if the IED exists, retain selection
-      const iedExists = this.doc?.querySelector(
-        `IED[name="${this.selectedIEDs[0]}"]`,
-      );
+    if (!isDocumentUpdated) {
+      return;
+    }
 
-      if (iedExists) {
-        return;
-      }
+    const currentSelection = this.selectedIEDs[0];
+    const iedExists = currentSelection
+      ? this.doc?.querySelector(`IED[name="${currentSelection}"]`)
+      : null;
 
-      this.selectedIEDs = [];
-      this.selectedLNClasses = [];
-      this.lNClassListOpenedOnce = false;
+    if (iedExists) {
+      return;
+    }
 
-      const iedList = this.iedList;
-      if (iedList.length > 0) {
-        this.selectedIEDs = [iedList[0]];
-      }
+    this.selectedIEDs = [];
+    this.selectedLNClasses = [];
+    this.lNClassListOpenedOnce = false;
+
+    const iedList = this.iedList;
+    if (iedList.length > 0) {
+      this.selectedIEDs = [iedList[0]];
     }
   }
 
@@ -355,7 +355,6 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
     this.lNClassListOpenedOnce = false;
     this.selectedIEDs = selectedIeds;
     this.selectedLNClasses = [];
-    this.requestUpdate('selectedIed');
   }
 
   private renderHeader(): TemplateResult {
@@ -383,7 +382,6 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
         )}
         @selected-items-changed="${(e: SelectedItemsChangedEvent) => {
           this.selectedLNClasses = e.detail.selectedItems;
-          this.requestUpdate('selectedIed');
         }}"
       >
         <oscd-scl-icon slot="icon">lNIcon</oscd-scl-icon>
@@ -396,6 +394,7 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
 
       <oscd-outlined-button
         class="add-ied-button"
+        data-testid="add-ied-button"
         @click=${() => {
           this.dispatchEvent(
             newAddElementEvent({
@@ -423,7 +422,7 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
             @full-element-path=${(event: FullElementPathEvent) => {
               this.selectedElementPath = event.detail.elementNames;
             }}
-            .editCount=${this.editCount}
+            .docVersion=${this.docVersion}
             .doc=${this.doc}
             .element=${this.selectedIed}
             .selectedLNClasses=${this.calcSelectedLNClasses()}
@@ -437,7 +436,7 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
     return html`<div>
       ${this.renderHeader()} ${this.renderSelectedIED()}
       <oscd-edit-dialog></oscd-edit-dialog>
-      <create-ied-dialog .doc=${this.doc}></create-ied-dialog>
+      <virtual-ied-create-dialog .doc=${this.doc}></virtual-ied-create-dialog>
       <confirm-delete-dialog></confirm-delete-dialog>
     </div>`;
   }

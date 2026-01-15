@@ -22,8 +22,8 @@
     editor.setAttribute(name, value);
   }
 
-  // const filename = 'sample.scd';
-  const filename = 'XAT_Subsystem_Testing_old_coords_removed.scd';
+  const filename = 'sample.scd';
+  // const filename = 'XAT_Subsystem_Testing_old_coords_removed.scd';
   const sample = await fetch(filename).then(r => r.text());
   editor.docs = {
     [filename]: new DOMParser().parseFromString(sample, 'application/xml'),
@@ -35,6 +35,10 @@
   * {
     --oscd-theme-text-font: 'Roboto';
     --oscd-theme-icon-font: 'Material Symbols Outlined';
+
+    /* background-image: url('https://omicronenergyoss.github.io/oscd-shell/demo/background.svg'); */
+    /* background-size: cover; */
+    background-color: #1460ac;
 
     margin: 0px;
     padding: 0px;

@@ -59,7 +59,11 @@ export class ConfirmDeleteDialog extends ScopedElementsMixin(LitElement) {
           <oscd-outlined-button slot="secondaryAction" @click=${this.close}>
             ${msg('Cancel')}
           </oscd-outlined-button>
-          <oscd-filled-button slot="primaryAction" @click=${this.handleConfirm}>
+          <oscd-filled-button
+            slot="primaryAction"
+            data-testid="confirm-delete-button"
+            @click=${this.handleConfirm}
+          >
             ${msg('Delete')}
           </oscd-filled-button>
         </div>

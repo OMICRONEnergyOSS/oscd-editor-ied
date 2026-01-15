@@ -1,5 +1,5 @@
 import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
-import { BaseContainer } from './base-container.js';
+import { BaseContainer } from '../base-container.js';
 import { OscdOutlinedButton } from '@omicronenergy/oscd-ui/button/OscdOutlinedButton.js';
 import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
 import { OscdIconButton } from '@omicronenergy/oscd-ui/iconbutton/OscdIconButton.js';
@@ -7,7 +7,7 @@ import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
 import { html, nothing, TemplateResult } from 'lit';
 import { query } from 'lit/decorators.js';
 import { msg } from '@lit/localize';
-import { DOContainer } from './do-container.js';
+import { DOContainer } from '../do/do-container.js';
 import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
 
 /** [[`IED`]] plugin subeditor for editing `LN` and `LN0` element. */
@@ -119,7 +119,7 @@ export class LNContainer extends ScopedElementsMixin(BaseContainer) {
         ? doElements.map(
             dO =>
               html`<do-container
-                .editCount=${this.editCount}
+                .docVersion=${this.docVersion}
                 .doc=${this.doc}
                 .element=${dO}
                 .instanceElement=${this.getInstanceElement(dO)}

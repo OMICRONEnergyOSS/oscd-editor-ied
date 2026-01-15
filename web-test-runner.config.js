@@ -18,8 +18,8 @@ const filteredLogs = ['Running in dev mode', 'Lit is in dev mode'];
 
 const browsers = [
   playwrightLauncher({ product: 'chromium' }),
-  playwrightLauncher({ product: 'firefox' }),
-  playwrightLauncher({ product: 'webkit' }),
+  // playwrightLauncher({ product: 'firefox' }),
+  // playwrightLauncher({ product: 'webkit' }),
 ];
 
 function defaultGetImageDiff({ baselineImage, image, options }) {

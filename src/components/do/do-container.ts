@@ -8,10 +8,10 @@ import { OscdOutlinedButton } from '@omicronenergy/oscd-ui/button/OscdOutlinedBu
 import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
 import { OscdIconButton } from '@omicronenergy/oscd-ui/iconbutton/OscdIconButton.js';
 import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
-import { findDOTypeElement, getInstanceDAElement } from '../foundation.js';
-import { BaseContainer } from './base-container.js';
+import { findDOTypeElement, getInstanceDAElement } from '../../foundation.js';
+import { BaseContainer } from '../base-container.js';
 import { msg } from '@lit/localize';
-import { DAContainer } from './da-container.js';
+import { DAContainer } from '../da/da-container.js';
 import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
 
 export class DOContainer extends ScopedElementsMixin(BaseContainer) {
@@ -130,7 +130,7 @@ export class DOContainer extends ScopedElementsMixin(BaseContainer) {
         ? daElements.map(
             daElement =>
               html`<da-container
-                .editCount=${this.editCount}
+                .docVersion=${this.docVersion}
                 .doc=${this.doc}
                 .element=${daElement}
                 .instanceElement=${getInstanceDAElement(
@@ -146,7 +146,7 @@ export class DOContainer extends ScopedElementsMixin(BaseContainer) {
         ? doElements.map(
             doElement =>
               html`<do-container
-                .editCount=${this.editCount}
+                .docVersion=${this.docVersion}
                 .doc=${this.doc}
                 .element=${doElement}
                 .instanceElement=${this.getInstanceDOElement(doElement)}

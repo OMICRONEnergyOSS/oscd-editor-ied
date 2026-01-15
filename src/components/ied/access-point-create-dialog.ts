@@ -6,31 +6,35 @@ import { OscdFilledTextField } from '@omicronenergy/oscd-ui/textfield/OscdFilled
 import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
 import { LitElement, TemplateResult, html, css } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
-import {
-  getExistingAccessPointNames,
-  getAccessPointsWithServer,
-} from '../foundation.js';
+import { getAccessPointsWithServer } from '../../foundation.js';
 import { msg } from '@lit/localize';
 import { OscdFilledButton } from '@omicronenergy/oscd-ui/button/OscdFilledButton.js';
 import { OscdSelectOption } from '@omicronenergy/oscd-ui/select/OscdSelectOption.js';
+import {
+  renderApNameField,
+  renderDescField,
+} from '../access-point/access-point-edit-dialog.js';
+import { OscdSclTextField } from '@omicronenergy/oscd-ui/scl-textfield/OscdSclTextField.js';
 
-export interface AccessPointCreationData {
+export interface AccessPointCreateData {
   name: string;
+  desc: string | null;
   createServerAt: boolean;
   serverAtApName?: string;
   serverAtDesc?: string;
 }
 
 /** A dialog component for adding new AccessPoints */
-export class AddAccessPointDialog extends ScopedElementsMixin(LitElement) {
+export class AccessPointCreateDialog extends ScopedElementsMixin(LitElement) {
   static scopedElements = {
     'oscd-dialog': OscdDialog,
-    'oscd-filled-textfield': OscdFilledTextField,
+    'oscd-filled-text-field': OscdFilledTextField,
     'oscd-filled-button': OscdFilledButton,
     'oscd-outlined-button': OscdOutlinedButton,
     'oscd-switch': OscdSwitch,
     'oscd-filled-select': OscdFilledSelect,
     'oscd-select-option': OscdSelectOption,
+    'oscd-scl-text-field': OscdSclTextField,
   };
 
   @property()
@@ -40,14 +44,13 @@ export class AddAccessPointDialog extends ScopedElementsMixin(LitElement) {
   ied!: Element;
 
   @property({ type: Function })
-  onConfirm!: (data: AccessPointCreationData) => void;
-
-  @query('oscd-dialog') dialog!: OscdDialog;
-
-  @query('#apName') apNameField!: OscdFilledTextField;
+  onConfirm!: (data: AccessPointCreateData) => void;
 
   @state()
   private apName = '';
+
+  @state()
+  private desc: string | null = null;
 
   @state()
   private createServerAt = false;
@@ -58,18 +61,9 @@ export class AddAccessPointDialog extends ScopedElementsMixin(LitElement) {
   @state()
   private serverAtDesc = '';
 
-  get open() {
-    return this.dialog?.open ?? false;
-  }
+  @query('oscd-dialog') dialog!: OscdDialog;
 
-  private isApNameUnique(name: string): boolean {
-    const existingNames = getExistingAccessPointNames(this.ied);
-    return !existingNames.includes(name);
-  }
-
-  private get accessPointsWithServer(): string[] {
-    return getAccessPointsWithServer(this.ied);
-  }
+  @query('#apName') apNameField!: OscdFilledTextField;
 
   public show(): void {
     this.reset();
@@ -78,6 +72,7 @@ export class AddAccessPointDialog extends ScopedElementsMixin(LitElement) {
 
   private reset(): void {
     this.apName = '';
+    this.desc = null;
     this.createServerAt = false;
     this.serverAtApName = '';
     this.serverAtDesc = '';
@@ -85,13 +80,13 @@ export class AddAccessPointDialog extends ScopedElementsMixin(LitElement) {
 
   private close(): void {
     this.dialog.close();
-    this.reset();
   }
 
   private handleCreate(): void {
     if (this.apNameField.checkValidity()) {
-      const data: AccessPointCreationData = {
+      const data: AccessPointCreateData = {
         name: this.apName,
+        desc: this.desc,
         createServerAt: this.createServerAt,
         serverAtApName: this.createServerAt ? this.serverAtApName : undefined,
         serverAtDesc:
@@ -104,24 +99,8 @@ export class AddAccessPointDialog extends ScopedElementsMixin(LitElement) {
     }
   }
 
-  private getApNameError(value: string): string {
-    const trimmed = value.trim();
-    if (!trimmed) {
-      return '';
-    }
-    if (!/^[A-Za-z0-9][0-9A-Za-z_]*$/.test(trimmed)) {
-      return msg('AccessPoint name cannot contain spaces');
-    }
-    if (trimmed.length > 32) {
-      return msg('AccessPoint name is too long');
-    }
-    if (!this.isApNameUnique(trimmed)) {
-      return msg('AccessPoint name already exists');
-    }
-    return '';
-  }
-
   private renderServerAtSection(): TemplateResult {
+    const accessPointsWithServer = getAccessPointsWithServer(this.ied);
     return html`
       <label>
         <oscd-switch
@@ -129,9 +108,10 @@ export class AddAccessPointDialog extends ScopedElementsMixin(LitElement) {
           @change=${(e: Event) => {
             this.createServerAt = (e.target as OscdSwitch).selected;
             this.serverAtApName = this.createServerAt
-              ? this.accessPointsWithServer[0]
+              ? accessPointsWithServer[0]
               : '';
           }}
+          ?disabled=${accessPointsWithServer.length === 0}
         ></oscd-switch>
         ${msg('Add ServerAt')}
       </label>
@@ -147,56 +127,44 @@ export class AddAccessPointDialog extends ScopedElementsMixin(LitElement) {
               style="width: 100%; margin-bottom: 16px;"
             >
               <oscd-select-option aria-label="blank"></oscd-select-option>
-              ${this.accessPointsWithServer.map(
+              ${accessPointsWithServer.map(
                 (ap: string) =>
                   html`<oscd-select-option value=${ap}
                     >${ap}</oscd-select-option
                   >`,
               )}
             </oscd-filled-select>
-            <oscd-filled-textfield
+            <oscd-filled-text-field
               label=${msg('ServerAt description')}
               .value=${this.serverAtDesc}
               @input=${(e: Event) => {
                 this.serverAtDesc = (e.target as HTMLInputElement).value;
               }}
               style="width: 100%; margin-bottom: 16px;"
-            ></oscd-filled-textfield>
+            ></oscd-filled-text-field>
           `
         : ''}
     `;
   }
 
   render(): TemplateResult {
-    const apNameError = this.getApNameError(this.apName);
     return html`
       <oscd-dialog @closed=${this.close}>
         <div slot="headline">${msg('Add AccessPoint')}</div>
         <div slot="content">
-          <oscd-filled-textfield
-            id="apName"
-            label=${msg('AccessPoint name')}
-            .value=${this.apName}
-            ?error=${!!apNameError}
-            .errorText=${apNameError}
-            .validityTransform=${(value: string) => {
-              const error = this.getApNameError(value);
-              return {
-                valid: error === '',
-                customError: error !== '',
-              };
-            }}
-            pattern="[A-Za-z0-9][0-9A-Za-z_]*"
-            maxLength="32"
-            required
-            autoValidate
-            helper=${msg('AccessPoint name')}
-            dialogInitialFocus
-            style="width: 100%; margin-bottom: 16px;"
-            @input=${(e: Event) => {
-              this.apName = (e.target as HTMLInputElement).value;
-            }}
-          ></oscd-filled-textfield>
+          ${renderApNameField({
+            value: this.apName,
+            ied: this.ied,
+            onInput: value => {
+              this.apName = value;
+            },
+          })}
+          ${renderDescField({
+            value: this.desc,
+            onInput: value => {
+              this.desc = value;
+            },
+          })}
           ${this.renderServerAtSection()}
         </div>
         <div slot="actions">
@@ -220,19 +188,13 @@ export class AddAccessPointDialog extends ScopedElementsMixin(LitElement) {
 
   static styles = css`
     [slot='content'] {
-      margin-top: 16px;
       width: 320px;
-      height: 280px;
+      height: 380px;
       max-width: 100vw;
       box-sizing: border-box;
-    }
-
-    oscd-filled-select,
-    oscd-filled-textfield {
-      /* width: 100%;
-      min-width: 0;
-      max-width: 100%;
-      box-sizing: border-box; */
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
     label {

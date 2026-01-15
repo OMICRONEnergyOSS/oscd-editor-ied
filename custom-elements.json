@@ -99,9 +99,34 @@
                 "text": "string"
               },
               "description": "The name for the new AccessPoint."
+            },
+            {
+              "name": "desc",
+              "type": {
+                "text": "string | null"
+              }
             }
           ],
           "description": "Create an AccessPoint element for an IED."
+        },
+        {
+          "kind": "function",
+          "name": "createServer",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "description": "The XML document to create the ServerAt in."
+            }
+          ],
+          "description": "Create a Server element."
         },
         {
           "kind": "function",
@@ -328,6 +353,14 @@
         },
         {
           "kind": "js",
+          "name": "createServer",
+          "declaration": {
+            "name": "createServer",
+            "module": "src/foundation.ts"
+          }
+        },
+        {
+          "kind": "js",
           "name": "createServerAt",
           "declaration": {
             "name": "createServerAt",
@@ -431,7 +464,7 @@
                 "text": "object"
               },
               "static": true,
-              "default": "{ 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filter-button': OscdFilterButton, 'oscd-list-item': OscdListItem, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'element-path': ElementPath, 'ied-container': IedContainer, 'oscd-edit-dialog': WizardDialog, 'create-ied-dialog': CreateIedDialog, 'confirm-delete-dialog': ConfirmDeleteDialog, }"
+              "default": "{ 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filter-button': OscdFilterButton, 'oscd-list-item': OscdListItem, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'element-path': ElementPath, 'ied-container': IedContainer, 'oscd-edit-dialog': WizardDialog, 'virtual-ied-create-dialog': VirtualIedCreateDialog, 'confirm-delete-dialog': ConfirmDeleteDialog, }"
             },
             {
               "kind": "field",
@@ -460,12 +493,12 @@
             },
             {
               "kind": "field",
-              "name": "editCount",
+              "name": "docVersion",
               "type": {
                 "text": "number"
               },
               "default": "-1",
-              "attribute": "editCount"
+              "attribute": "docVersion"
             },
             {
               "kind": "field",
@@ -555,7 +588,7 @@
               "kind": "field",
               "name": "createIedDialog",
               "type": {
-                "text": "CreateIedDialog"
+                "text": "VirtualIedCreateDialog"
               }
             },
             {
@@ -716,12 +749,12 @@
               "fieldName": "docName"
             },
             {
-              "name": "editCount",
+              "name": "docVersion",
               "type": {
                 "text": "number"
               },
               "default": "-1",
-              "fieldName": "editCount"
+              "fieldName": "docVersion"
             },
             {
               "name": "nsdoc",
@@ -760,6 +793,439 @@
           "declaration": {
             "name": "IedPlugin",
             "module": "src/oscd-editor-ied.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/base-container.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Base class for all containers inside the IED Editor.",
+          "name": "BaseContainer",
+          "members": [
+            {
+              "kind": "field",
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "attribute": "doc"
+            },
+            {
+              "kind": "field",
+              "name": "docVersion",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "attribute": "docVersion"
+            },
+            {
+              "kind": "field",
+              "name": "element",
+              "type": {
+                "text": "Element"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "attribute": "nsdoc"
+            },
+            {
+              "kind": "field",
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "attribute": "ancestors"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "fieldName": "doc"
+            },
+            {
+              "name": "docVersion",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "fieldName": "docVersion"
+            },
+            {
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "fieldName": "nsdoc"
+            },
+            {
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "fieldName": "ancestors"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "BaseContainer",
+          "declaration": {
+            "name": "BaseContainer",
+            "module": "src/components/base-container.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/confirm-delete-dialog.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A dialog component for creating virtual IEDs",
+          "name": "ConfirmDeleteDialog",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-dialog': OscdDialog, 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filled-button': OscdFilledButton, }"
+            },
+            {
+              "kind": "field",
+              "name": "heading",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "message",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "onConfirm",
+              "type": {
+                "text": "() => void | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "confirmDelete",
+              "privacy": "public",
+              "parameters": [
+                {
+                  "name": "details",
+                  "type": {
+                    "text": "ConfirmDeleteDetail"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "dialog",
+              "type": {
+                "text": "OscdDialog"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "handleConfirm",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "ConfirmDeleteDialog",
+          "declaration": {
+            "name": "ConfirmDeleteDialog",
+            "module": "src/components/confirm-delete-dialog.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/element-path.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "ElementPath",
+          "members": [
+            {
+              "kind": "field",
+              "name": "paths",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "ElementPath",
+          "declaration": {
+            "name": "ElementPath",
+            "module": "src/components/element-path.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/virtual-ied-create-dialog.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A dialog component for creating virtual IEDs",
+          "name": "VirtualIedCreateDialog",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-dialog': OscdDialog, 'oscd-filled-textfield': OscdFilledTextField, 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filled-button': OscdFilledButton, }"
+            },
+            {
+              "kind": "field",
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "attribute": "doc"
+            },
+            {
+              "kind": "field",
+              "name": "onConfirm",
+              "type": {
+                "text": "(iedName: string) => void"
+              },
+              "attribute": "onConfirm"
+            },
+            {
+              "kind": "field",
+              "name": "dialog",
+              "type": {
+                "text": "OscdDialog"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "newIedName",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "method",
+              "name": "isIedNameValid",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "getIedNameError",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "isIedNameUnique",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "handleCreate",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "fieldName": "doc"
+            },
+            {
+              "name": "onConfirm",
+              "type": {
+                "text": "(iedName: string) => void"
+              },
+              "fieldName": "onConfirm"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "VirtualIedCreateDialog",
+          "declaration": {
+            "name": "VirtualIedCreateDialog",
+            "module": "src/components/virtual-ied-create-dialog.ts"
           }
         }
       ]
@@ -1114,7 +1580,475 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/access-point-container.ts",
+      "path": "src/test-utils/actions.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "typeIn",
+          "return": {
+            "type": {
+              "text": "Promise<void>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "element",
+              "type": {
+                "text": "HTMLElement"
+              }
+            },
+            {
+              "name": "text",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "setSclTextFieldValue",
+          "return": {
+            "type": {
+              "text": "Promise<void>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "oscdSclTextField",
+              "type": {
+                "text": "OscdSclTextField"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "activateOscdSclTextField",
+          "return": {
+            "type": {
+              "text": "Promise<void>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "oscdSclTextField",
+              "type": {
+                "text": "OscdSclTextField"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "typeIn",
+          "declaration": {
+            "name": "typeIn",
+            "module": "src/test-utils/actions.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "setSclTextFieldValue",
+          "declaration": {
+            "name": "setSclTextFieldValue",
+            "module": "src/test-utils/actions.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "activateOscdSclTextField",
+          "declaration": {
+            "name": "activateOscdSclTextField",
+            "module": "src/test-utils/actions.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/test-utils/queries.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "getNamedElement",
+          "return": {
+            "type": {
+              "text": "Element | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              }
+            },
+            {
+              "name": "localName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "getFirstChildElement",
+          "return": {
+            "type": {
+              "text": "Element | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "element",
+              "type": {
+                "text": "Element"
+              }
+            },
+            {
+              "name": "localName",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "getNamedElement",
+          "declaration": {
+            "name": "getNamedElement",
+            "module": "src/test-utils/queries.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "getFirstChildElement",
+          "declaration": {
+            "name": "getFirstChildElement",
+            "module": "src/test-utils/queries.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/test-utils/test-files.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "testDocs",
+          "type": {
+            "text": "object"
+          },
+          "default": "{ empty: `<?xml version=\"1.0\" encoding=\"UTF-8\"?><SCL xmlns=\"http://www.iec.ch/61850/2003/SCL\" version=\"2007\" revision=\"B\"> <Header id=\"development sample\"/> <Substation name=\"S1\"> <VoltageLevel name=\"V1\" > <Bay name=\"B2\" /> <Bay name=\"B1\" /> </VoltageLevel> </Substation> </SCL>`, withIED: `<?xml version=\"1.0\" encoding=\"UTF-8\"?><SCL xmlns=\"http://www.iec.ch/61850/2003/SCL\" version=\"2007\" revision=\"B\"> <Header id=\"development sample\"/> <Substation name=\"S1\"> <VoltageLevel name=\"V1\" > <Bay name=\"B2\" /> <Bay name=\"B1\" /> </VoltageLevel> </Substation> <IED name=\"IED1\" manufacturer=\"OpenSCD\"> <AccessPoint name=\"AP1\"> <Server> <Authentication/> <LDevice inst=\"LD1\"> <LN0 lnClass=\"LLN0\" inst=\"\" lnType=\"PlaceholderLLN0\"/> </LDevice> </Server> </AccessPoint> </IED> <DataTypeTemplates> <LNodeType lnClass=\"LLN0\" id=\"PlaceholderLLN0\"> <DO name=\"Beh\" type=\"Beh$oscd$_c6ed035c8137b35a\"/> </LNodeType> <DOType cdc=\"ENS\" id=\"Beh$oscd$_c6ed035c8137b35a\"> <DA name=\"stVal\" fc=\"ST\" dchg=\"true\" dupd=\"true\" bType=\"Enum\" type=\"stVal$oscd$_48ba16345b8e7f5b\"/> <DA name=\"q\" fc=\"ST\" qchg=\"true\" bType=\"Quality\"/> <DA name=\"t\" fc=\"ST\" bType=\"Timestamp\"/> </DOType> <EnumType id=\"stVal$oscd$_48ba16345b8e7f5b\"> <EnumVal ord=\"1\">on</EnumVal> <EnumVal ord=\"2\">blocked</EnumVal> <EnumVal ord=\"3\">test</EnumVal> <EnumVal ord=\"4\">test/blocked</EnumVal> <EnumVal ord=\"5\">off</EnumVal> </EnumType> </DataTypeTemplates> </SCL>`, }"
+        },
+        {
+          "kind": "function",
+          "name": "parseDoc",
+          "return": {
+            "type": {
+              "text": "XMLDocument"
+            }
+          },
+          "parameters": [
+            {
+              "name": "xml",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "testDocs",
+          "declaration": {
+            "name": "testDocs",
+            "module": "src/test-utils/test-files.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "parseDoc",
+          "declaration": {
+            "name": "parseDoc",
+            "module": "src/test-utils/test-files.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/test-utils/test-harness.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "ComponentTestHarness",
+          "members": [
+            {
+              "kind": "field",
+              "name": "element",
+              "type": {
+                "text": "LitElement"
+              },
+              "default": "element"
+            },
+            {
+              "kind": "field",
+              "name": "editor",
+              "type": {
+                "text": "XMLEditor"
+              },
+              "default": "new XMLEditor()"
+            },
+            {
+              "kind": "field",
+              "name": "commitSpy",
+              "type": {
+                "text": "sinon.SinonSpy<\n    [change: EditV2, (CommitOptions | undefined)?],\n    Commit<EditV2>\n  >"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "handleEdit",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "handleDelete",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "confirmDeleteEvent",
+                  "type": {
+                    "text": "ConfirmDeleteEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "dispose",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "kind": "class",
+          "description": "",
+          "name": "PluginTestHarness",
+          "members": [
+            {
+              "kind": "field",
+              "name": "plugin",
+              "type": {
+                "text": "Plugin & LitElement"
+              },
+              "default": "plugin"
+            },
+            {
+              "kind": "method",
+              "name": "handleEdit",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "ComponentTestHarness",
+                "module": "src/test-utils/test-harness.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "setDoc",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "docName",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "doc",
+                  "type": {
+                    "text": "XMLDocument"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "element",
+              "type": {
+                "text": "LitElement"
+              },
+              "default": "element",
+              "inheritedFrom": {
+                "name": "ComponentTestHarness",
+                "module": "src/test-utils/test-harness.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "editor",
+              "type": {
+                "text": "XMLEditor"
+              },
+              "default": "new XMLEditor()",
+              "inheritedFrom": {
+                "name": "ComponentTestHarness",
+                "module": "src/test-utils/test-harness.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "commitSpy",
+              "type": {
+                "text": "sinon.SinonSpy<\n    [change: EditV2, (CommitOptions | undefined)?],\n    Commit<EditV2>\n  >"
+              },
+              "inheritedFrom": {
+                "name": "ComponentTestHarness",
+                "module": "src/test-utils/test-harness.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "handleDelete",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "confirmDeleteEvent",
+                  "type": {
+                    "text": "ConfirmDeleteEvent"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "ComponentTestHarness",
+                "module": "src/test-utils/test-harness.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "dispose",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "inheritedFrom": {
+                "name": "ComponentTestHarness",
+                "module": "src/test-utils/test-harness.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "ComponentTestHarness",
+            "module": "src/test-utils/test-harness.ts"
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "ComponentTestHarness",
+          "declaration": {
+            "name": "ComponentTestHarness",
+            "module": "src/test-utils/test-harness.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "PluginTestHarness",
+          "declaration": {
+            "name": "PluginTestHarness",
+            "module": "src/test-utils/test-harness.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/access-point/access-point-container.spec.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "access-point-container",
+          "declaration": {
+            "name": "AccessPointContainer",
+            "module": "/src/components/access-point/access-point-container.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/access-point/access-point-container.ts",
       "declarations": [
         {
           "kind": "class",
@@ -1128,7 +2062,7 @@
                 "text": "object"
               },
               "static": true,
-              "default": "{ 'oscd-icon': OscdIcon, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon-button': OscdIconButton, 'oscd-action-pane': OscdActionPane, 'server-container': ServerContainer, 'ln-container': LDeviceContainer, }"
+              "default": "{ 'oscd-icon': OscdIcon, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon-button': OscdIconButton, 'oscd-action-pane': OscdActionPane, 'server-container': ServerContainer, 'ln-container': LDeviceContainer, 'access-point-edit-dialog': AccessPointEditDialog, }"
             },
             {
               "kind": "field",
@@ -1140,13 +2074,21 @@
               "attribute": "selectedLNClasses"
             },
             {
-              "kind": "field",
-              "name": "lnElements",
-              "type": {
-                "text": "Element[]"
-              },
+              "kind": "method",
+              "name": "getLnElements",
               "privacy": "private",
-              "readonly": true
+              "return": {
+                "type": {
+                  "text": "Element[]"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "accessPointDialog",
+              "type": {
+                "text": "AccessPointEditDialog"
+              }
             },
             {
               "kind": "method",
@@ -1155,16 +2097,6 @@
               "return": {
                 "type": {
                   "text": "TemplateResult"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "openEditWizard",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
                 }
               }
             },
@@ -1202,6 +2134,18 @@
               }
             },
             {
+              "kind": "method",
+              "name": "updateAccessPoint",
+              "parameters": [
+                {
+                  "name": "data",
+                  "type": {
+                    "text": "AccessPointEditData"
+                  }
+                }
+              ]
+            },
+            {
               "kind": "field",
               "name": "doc",
               "type": {
@@ -1215,12 +2159,12 @@
             },
             {
               "kind": "field",
-              "name": "editCount",
+              "name": "docVersion",
               "type": {
                 "text": "number"
               },
               "default": "-1",
-              "attribute": "editCount",
+              "attribute": "docVersion",
               "inheritedFrom": {
                 "name": "BaseContainer",
                 "module": "src/components/base-container.ts"
@@ -1284,12 +2228,12 @@
               }
             },
             {
-              "name": "editCount",
+              "name": "docVersion",
               "type": {
                 "text": "number"
               },
               "default": "-1",
-              "fieldName": "editCount",
+              "fieldName": "docVersion",
               "inheritedFrom": {
                 "name": "BaseContainer",
                 "module": "src/components/base-container.ts"
@@ -1328,7 +2272,9 @@
           "superclass": {
             "name": "BaseContainer",
             "module": "/src/components/base-container.js"
-          }
+          },
+          "tagName": "access-point-container",
+          "customElement": true
         }
       ],
       "exports": [
@@ -1337,19 +2283,88 @@
           "name": "AccessPointContainer",
           "declaration": {
             "name": "AccessPointContainer",
-            "module": "src/components/access-point-container.ts"
+            "module": "src/components/access-point/access-point-container.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/add-access-point-dialog.ts",
+      "path": "src/components/access-point/access-point-edit-dialog.ts",
       "declarations": [
+        {
+          "kind": "function",
+          "name": "validateApName",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "description": "The name to validate"
+            },
+            {
+              "name": "ied",
+              "type": {
+                "text": "Element"
+              },
+              "description": "The IED element to check for uniqueness"
+            },
+            {
+              "name": "currentName",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Validates an AccessPoint name against business rules"
+        },
+        {
+          "kind": "function",
+          "name": "renderApNameField",
+          "return": {
+            "type": {
+              "text": "TemplateResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "{\n  value,\n  ied,\n  onInput,\n  currentName,\n}",
+              "type": {
+                "text": "{\n  value: string;\n  ied: Element;\n  onInput: (value: string) => void;\n  currentName?: string;\n}"
+              }
+            }
+          ],
+          "description": "Renders a validated AccessPoint name field"
+        },
+        {
+          "kind": "function",
+          "name": "renderDescField",
+          "return": {
+            "type": {
+              "text": "TemplateResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "{\n  value,\n  onInput,\n  label = msg('Desc'),\n}",
+              "type": {
+                "text": "{\n  value: string | null;\n  onInput: (value: string) => void;\n  label?: string;\n}"
+              }
+            }
+          ],
+          "description": "Renders a description field"
+        },
         {
           "kind": "class",
           "description": "A dialog component for adding new AccessPoints",
-          "name": "AddAccessPointDialog",
+          "name": "AccessPointEditDialog",
           "members": [
             {
               "kind": "field",
@@ -1358,7 +2373,7 @@
                 "text": "object"
               },
               "static": true,
-              "default": "{ 'oscd-dialog': OscdDialog, 'oscd-filled-textfield': OscdFilledTextField, 'oscd-button': OscdOutlinedButton, 'oscd-switch': OscdSwitch, 'oscd-select': OscdFilledSelect, 'oscd-list-item': OscdListItem, }"
+              "default": "{ 'oscd-dialog': OscdDialog, 'oscd-filled-text-field': OscdFilledTextField, 'oscd-filled-button': OscdFilledButton, 'oscd-outlined-button': OscdOutlinedButton, 'oscd-scl-text-field': OscdSclTextField, }"
             },
             {
               "kind": "field",
@@ -1370,19 +2385,47 @@
             },
             {
               "kind": "field",
-              "name": "ied",
+              "name": "element",
               "type": {
                 "text": "Element"
               },
-              "attribute": "ied"
+              "attribute": "element"
             },
             {
               "kind": "field",
               "name": "onConfirm",
               "type": {
-                "text": "(data: AccessPointCreationData) => void"
+                "text": "(data: AccessPointEditData) => void"
               },
               "attribute": "onConfirm"
+            },
+            {
+              "kind": "field",
+              "name": "apName",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "desc",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
             },
             {
               "kind": "field",
@@ -1396,84 +2439,6 @@
               "name": "apNameField",
               "type": {
                 "text": "OscdFilledTextField"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "apName",
-              "type": {
-                "text": "string"
-              },
-              "privacy": "private",
-              "default": "''"
-            },
-            {
-              "kind": "field",
-              "name": "createServerAt",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "private",
-              "default": "false"
-            },
-            {
-              "kind": "field",
-              "name": "serverAtApName",
-              "type": {
-                "text": "string"
-              },
-              "privacy": "private",
-              "default": "''"
-            },
-            {
-              "kind": "field",
-              "name": "serverAtDesc",
-              "type": {
-                "text": "string"
-              },
-              "privacy": "private",
-              "default": "''"
-            },
-            {
-              "kind": "field",
-              "name": "open",
-              "readonly": true
-            },
-            {
-              "kind": "method",
-              "name": "isApNameUnique",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "name",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "field",
-              "name": "accessPointsWithServer",
-              "type": {
-                "text": "string[]"
-              },
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "method",
-              "name": "show",
-              "privacy": "public",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
               }
             },
             {
@@ -1498,39 +2463,11 @@
             },
             {
               "kind": "method",
-              "name": "handleCreate",
+              "name": "handleUpdate",
               "privacy": "private",
               "return": {
                 "type": {
                   "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "getApNameError",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "string"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "value",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "renderServerAtSection",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult"
                 }
               }
             }
@@ -1544,407 +2481,16 @@
               "fieldName": "doc"
             },
             {
-              "name": "ied",
-              "type": {
-                "text": "Element"
-              },
-              "fieldName": "ied"
-            },
-            {
-              "name": "onConfirm",
-              "type": {
-                "text": "(data: AccessPointCreationData) => void"
-              },
-              "fieldName": "onConfirm"
-            }
-          ],
-          "mixins": [
-            {
-              "name": "ScopedElementsMixin",
-              "package": "@open-wc/scoped-elements/lit-element.js"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "customElement": true
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "AddAccessPointDialog",
-          "declaration": {
-            "name": "AddAccessPointDialog",
-            "module": "src/components/add-access-point-dialog.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/base-container.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Base class for all containers inside the IED Editor.",
-          "name": "BaseContainer",
-          "members": [
-            {
-              "kind": "field",
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "attribute": "doc"
-            },
-            {
-              "kind": "field",
-              "name": "editCount",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1",
-              "attribute": "editCount"
-            },
-            {
-              "kind": "field",
               "name": "element",
               "type": {
                 "text": "Element"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "nsdoc",
-              "type": {
-                "text": "Nsdoc"
               },
-              "attribute": "nsdoc"
-            },
-            {
-              "kind": "field",
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              },
-              "default": "[]",
-              "attribute": "ancestors"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "fieldName": "doc"
-            },
-            {
-              "name": "editCount",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1",
-              "fieldName": "editCount"
-            },
-            {
-              "name": "nsdoc",
-              "type": {
-                "text": "Nsdoc"
-              },
-              "fieldName": "nsdoc"
-            },
-            {
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              },
-              "default": "[]",
-              "fieldName": "ancestors"
-            }
-          ],
-          "mixins": [
-            {
-              "name": "ScopedElementsMixin",
-              "package": "@open-wc/scoped-elements/lit-element.js"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "customElement": true
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "BaseContainer",
-          "declaration": {
-            "name": "BaseContainer",
-            "module": "src/components/base-container.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/confirm-delete-dialog.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "A dialog component for creating virtual IEDs",
-          "name": "ConfirmDeleteDialog",
-          "members": [
-            {
-              "kind": "field",
-              "name": "scopedElements",
-              "type": {
-                "text": "object"
-              },
-              "static": true,
-              "default": "{ 'oscd-dialog': OscdDialog, 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filled-button': OscdFilledButton, }"
-            },
-            {
-              "kind": "field",
-              "name": "heading",
-              "type": {
-                "text": "string | undefined"
-              },
-              "privacy": "private",
-              "default": "''"
-            },
-            {
-              "kind": "field",
-              "name": "message",
-              "type": {
-                "text": "string | undefined"
-              },
-              "privacy": "private",
-              "default": "''"
-            },
-            {
-              "kind": "field",
-              "name": "onConfirm",
-              "type": {
-                "text": "() => void | undefined"
-              },
-              "privacy": "private"
-            },
-            {
-              "kind": "method",
-              "name": "confirmDelete",
-              "privacy": "public",
-              "parameters": [
-                {
-                  "name": "details",
-                  "type": {
-                    "text": "ConfirmDeleteDetail"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "field",
-              "name": "dialog",
-              "type": {
-                "text": "OscdDialog"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "close",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "handleConfirm",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            }
-          ],
-          "mixins": [
-            {
-              "name": "ScopedElementsMixin",
-              "package": "@open-wc/scoped-elements/lit-element.js"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "customElement": true
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "ConfirmDeleteDialog",
-          "declaration": {
-            "name": "ConfirmDeleteDialog",
-            "module": "src/components/confirm-delete-dialog.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/create-ied-dialog.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "A dialog component for creating virtual IEDs",
-          "name": "CreateIedDialog",
-          "members": [
-            {
-              "kind": "field",
-              "name": "scopedElements",
-              "type": {
-                "text": "object"
-              },
-              "static": true,
-              "default": "{ 'oscd-dialog': OscdDialog, 'oscd-filled-textfield': OscdFilledTextField, 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filled-button': OscdFilledButton, }"
-            },
-            {
-              "kind": "field",
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "attribute": "doc"
-            },
-            {
-              "kind": "field",
-              "name": "onConfirm",
-              "type": {
-                "text": "(iedName: string) => void"
-              },
-              "attribute": "onConfirm"
-            },
-            {
-              "kind": "field",
-              "name": "dialog",
-              "type": {
-                "text": "OscdDialog"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "newIedName",
-              "type": {
-                "text": "string"
-              },
-              "privacy": "private",
-              "default": "''"
-            },
-            {
-              "kind": "method",
-              "name": "isIedNameValid",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "name",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "getIedNameError",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "string"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "name",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "isIedNameUnique",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "name",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "show",
-              "privacy": "public",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "close",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "handleCreate",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "fieldName": "doc"
+              "fieldName": "element"
             },
             {
               "name": "onConfirm",
               "type": {
-                "text": "(iedName: string) => void"
+                "text": "(data: AccessPointEditData) => void"
               },
               "fieldName": "onConfirm"
             }
@@ -1965,17 +2511,41 @@
       "exports": [
         {
           "kind": "js",
-          "name": "CreateIedDialog",
+          "name": "validateApName",
           "declaration": {
-            "name": "CreateIedDialog",
-            "module": "src/components/create-ied-dialog.ts"
+            "name": "validateApName",
+            "module": "src/components/access-point/access-point-edit-dialog.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "renderApNameField",
+          "declaration": {
+            "name": "renderApNameField",
+            "module": "src/components/access-point/access-point-edit-dialog.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "renderDescField",
+          "declaration": {
+            "name": "renderDescField",
+            "module": "src/components/access-point/access-point-edit-dialog.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "AccessPointEditDialog",
+          "declaration": {
+            "name": "AccessPointEditDialog",
+            "module": "src/components/access-point/access-point-edit-dialog.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/da-container.ts",
+      "path": "src/components/da/da-container.ts",
       "declarations": [
         {
           "kind": "class",
@@ -2090,12 +2660,12 @@
             },
             {
               "kind": "field",
-              "name": "editCount",
+              "name": "docVersion",
               "type": {
                 "text": "number"
               },
               "default": "-1",
-              "attribute": "editCount",
+              "attribute": "docVersion",
               "inheritedFrom": {
                 "name": "BaseContainer",
                 "module": "src/components/base-container.ts"
@@ -2161,12 +2731,12 @@
               }
             },
             {
-              "name": "editCount",
+              "name": "docVersion",
               "type": {
                 "text": "number"
               },
               "default": "-1",
-              "fieldName": "editCount",
+              "fieldName": "docVersion",
               "inheritedFrom": {
                 "name": "BaseContainer",
                 "module": "src/components/base-container.ts"
@@ -2204,14 +2774,476 @@
           "name": "DAContainer",
           "declaration": {
             "name": "DAContainer",
-            "module": "src/components/da-container.ts"
+            "module": "src/components/da/da-container.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/do-container.ts",
+      "path": "src/components/ied/access-point-create-dialog.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A dialog component for adding new AccessPoints",
+          "name": "AccessPointCreateDialog",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-dialog': OscdDialog, 'oscd-filled-text-field': OscdFilledTextField, 'oscd-filled-button': OscdFilledButton, 'oscd-outlined-button': OscdOutlinedButton, 'oscd-switch': OscdSwitch, 'oscd-filled-select': OscdFilledSelect, 'oscd-select-option': OscdSelectOption, 'oscd-scl-text-field': OscdSclTextField, }"
+            },
+            {
+              "kind": "field",
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "attribute": "doc"
+            },
+            {
+              "kind": "field",
+              "name": "ied",
+              "type": {
+                "text": "Element"
+              },
+              "attribute": "ied"
+            },
+            {
+              "kind": "field",
+              "name": "onConfirm",
+              "type": {
+                "text": "(data: AccessPointCreateData) => void"
+              },
+              "attribute": "onConfirm"
+            },
+            {
+              "kind": "field",
+              "name": "apName",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "desc",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "createServerAt",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "serverAtApName",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "serverAtDesc",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "dialog",
+              "type": {
+                "text": "OscdDialog"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "apNameField",
+              "type": {
+                "text": "OscdFilledTextField"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "reset",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "handleCreate",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderServerAtSection",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "fieldName": "doc"
+            },
+            {
+              "name": "ied",
+              "type": {
+                "text": "Element"
+              },
+              "fieldName": "ied"
+            },
+            {
+              "name": "onConfirm",
+              "type": {
+                "text": "(data: AccessPointCreateData) => void"
+              },
+              "fieldName": "onConfirm"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "AccessPointCreateDialog",
+          "declaration": {
+            "name": "AccessPointCreateDialog",
+            "module": "src/components/ied/access-point-create-dialog.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/ied/ied-container.spec.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "ied-container",
+          "declaration": {
+            "name": "IedContainer",
+            "module": "/src/components/ied/ied-container.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/ied/ied-container.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "[[`IED`]] plugin subeditor for editing `IED` element.",
+          "name": "IedContainer",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-icon': OscdIcon, 'oscd-icon-button': OscdIconButton, 'oscd-action-pane': OscdActionPane, 'access-point-container': AccessPointContainer, 'access-point-create-dialog': AccessPointCreateDialog, }"
+            },
+            {
+              "kind": "field",
+              "name": "selectedLNClasses",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "attribute": "selectedLNClasses"
+            },
+            {
+              "kind": "field",
+              "name": "accessPointDialog",
+              "type": {
+                "text": "AccessPointCreateDialog"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "handleEditIed",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "createAccessPoint",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "data",
+                  "type": {
+                    "text": "AccessPointCreateData"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderServicesIcon",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "handleEditServices",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "services",
+                  "type": {
+                    "text": "Element"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "removeIED",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "header",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "attribute": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "docVersion",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "attribute": "docVersion",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "element",
+              "type": {
+                "text": "Element"
+              },
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "attribute": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "attribute": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "selectedLNClasses",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "fieldName": "selectedLNClasses"
+            },
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "fieldName": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "docVersion",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "fieldName": "docVersion",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "fieldName": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "fieldName": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "BaseContainer",
+            "module": "/src/components/base-container.js"
+          },
+          "tagName": "ied-container",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "IedContainer",
+          "declaration": {
+            "name": "IedContainer",
+            "module": "src/components/ied/ied-container.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/do/do-container.ts",
       "declarations": [
         {
           "kind": "class",
@@ -2303,12 +3335,12 @@
             },
             {
               "kind": "field",
-              "name": "editCount",
+              "name": "docVersion",
               "type": {
                 "text": "number"
               },
               "default": "-1",
-              "attribute": "editCount",
+              "attribute": "docVersion",
               "inheritedFrom": {
                 "name": "BaseContainer",
                 "module": "src/components/base-container.ts"
@@ -2374,12 +3406,12 @@
               }
             },
             {
-              "name": "editCount",
+              "name": "docVersion",
               "type": {
                 "text": "number"
               },
               "default": "-1",
-              "fieldName": "editCount",
+              "fieldName": "docVersion",
               "inheritedFrom": {
                 "name": "BaseContainer",
                 "module": "src/components/base-container.ts"
@@ -2417,511 +3449,14 @@
           "name": "DOContainer",
           "declaration": {
             "name": "DOContainer",
-            "module": "src/components/do-container.ts"
+            "module": "src/components/do/do-container.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/element-path.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "",
-          "name": "ElementPath",
-          "members": [
-            {
-              "kind": "field",
-              "name": "paths",
-              "type": {
-                "text": "string[]"
-              },
-              "default": "[]"
-            }
-          ],
-          "mixins": [
-            {
-              "name": "ScopedElementsMixin",
-              "package": "@open-wc/scoped-elements/lit-element.js"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "customElement": true
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "ElementPath",
-          "declaration": {
-            "name": "ElementPath",
-            "module": "src/components/element-path.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/ied-container.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "[[`IED`]] plugin subeditor for editing `IED` element.",
-          "name": "IedContainer",
-          "members": [
-            {
-              "kind": "field",
-              "name": "scopedElements",
-              "type": {
-                "text": "object"
-              },
-              "static": true,
-              "default": "{ 'oscd-icon': OscdIcon, 'oscd-icon-button': OscdIconButton, 'oscd-action-pane': OscdActionPane, 'access-point-container': AccessPointContainer, // 'add-access-point-dialog': AddAccessPointDialog, }"
-            },
-            {
-              "kind": "field",
-              "name": "selectedLNClasses",
-              "type": {
-                "text": "string[]"
-              },
-              "default": "[]",
-              "attribute": "selectedLNClasses"
-            },
-            {
-              "kind": "field",
-              "name": "addAccessPointDialog",
-              "type": {
-                "text": "OscdDialog"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "openEditWizard",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "renderServicesIcon",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "handleEditServices",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "services",
-                  "type": {
-                    "text": "Element"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "removeIED",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "header",
-              "privacy": "private"
-            },
-            {
-              "kind": "field",
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "attribute": "doc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "editCount",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1",
-              "attribute": "editCount",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "element",
-              "type": {
-                "text": "Element"
-              },
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "nsdoc",
-              "type": {
-                "text": "Nsdoc"
-              },
-              "attribute": "nsdoc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              },
-              "default": "[]",
-              "attribute": "ancestors",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "selectedLNClasses",
-              "type": {
-                "text": "string[]"
-              },
-              "default": "[]",
-              "fieldName": "selectedLNClasses"
-            },
-            {
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "fieldName": "doc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "name": "editCount",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1",
-              "fieldName": "editCount",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "name": "nsdoc",
-              "type": {
-                "text": "Nsdoc"
-              },
-              "fieldName": "nsdoc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              },
-              "default": "[]",
-              "fieldName": "ancestors",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            }
-          ],
-          "mixins": [
-            {
-              "name": "ScopedElementsMixin",
-              "package": "@open-wc/scoped-elements/lit-element.js"
-            }
-          ],
-          "superclass": {
-            "name": "BaseContainer",
-            "module": "/src/components/base-container.js"
-          }
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "IedContainer",
-          "declaration": {
-            "name": "IedContainer",
-            "module": "src/components/ied-container.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/ldevice-container.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "[[`IED`]] plugin subeditor for editing `LDevice` element.",
-          "name": "LDeviceContainer",
-          "members": [
-            {
-              "kind": "field",
-              "name": "scopedElements",
-              "type": {
-                "text": "object"
-              },
-              "static": true,
-              "default": "{ 'oscd-action-pane': OscdActionPane, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'ln-container': LNContainer, }"
-            },
-            {
-              "kind": "field",
-              "name": "selectedLNClasses",
-              "type": {
-                "text": "string[]"
-              },
-              "default": "[]",
-              "attribute": "selectedLNClasses"
-            },
-            {
-              "kind": "field",
-              "name": "toggleButton",
-              "type": {
-                "text": "OscdIconButton | undefined"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "openEditWizard",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "header",
-              "privacy": "private"
-            },
-            {
-              "kind": "field",
-              "name": "lnElements",
-              "type": {
-                "text": "Element[]"
-              },
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "method",
-              "name": "handleAddLN",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "data",
-                  "type": {
-                    "text": "unknown"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "removeLDevice",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "field",
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "attribute": "doc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "editCount",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1",
-              "attribute": "editCount",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "element",
-              "type": {
-                "text": "Element"
-              },
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "nsdoc",
-              "type": {
-                "text": "Nsdoc"
-              },
-              "attribute": "nsdoc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              },
-              "default": "[]",
-              "attribute": "ancestors",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "selectedLNClasses",
-              "type": {
-                "text": "string[]"
-              },
-              "default": "[]",
-              "fieldName": "selectedLNClasses"
-            },
-            {
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "fieldName": "doc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "name": "editCount",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1",
-              "fieldName": "editCount",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "name": "nsdoc",
-              "type": {
-                "text": "Nsdoc"
-              },
-              "fieldName": "nsdoc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              },
-              "default": "[]",
-              "fieldName": "ancestors",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            }
-          ],
-          "mixins": [
-            {
-              "name": "ScopedElementsMixin",
-              "package": "@open-wc/scoped-elements/lit-element.js"
-            }
-          ],
-          "superclass": {
-            "name": "BaseContainer",
-            "module": "/src/components/base-container.js"
-          }
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "LDeviceContainer",
-          "declaration": {
-            "name": "LDeviceContainer",
-            "module": "src/components/ldevice-container.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/ln-container.ts",
+      "path": "src/components/lnode/ln-container.ts",
       "declarations": [
         {
           "kind": "class",
@@ -3019,12 +3554,12 @@
             },
             {
               "kind": "field",
-              "name": "editCount",
+              "name": "docVersion",
               "type": {
                 "text": "number"
               },
               "default": "-1",
-              "attribute": "editCount",
+              "attribute": "docVersion",
               "inheritedFrom": {
                 "name": "BaseContainer",
                 "module": "src/components/base-container.ts"
@@ -3090,12 +3625,12 @@
               }
             },
             {
-              "name": "editCount",
+              "name": "docVersion",
               "type": {
                 "text": "number"
               },
               "default": "-1",
-              "fieldName": "editCount",
+              "fieldName": "docVersion",
               "inheritedFrom": {
                 "name": "BaseContainer",
                 "module": "src/components/base-container.ts"
@@ -3133,19 +3668,19 @@
           "name": "LNContainer",
           "declaration": {
             "name": "LNContainer",
-            "module": "src/components/ln-container.ts"
+            "module": "src/components/lnode/ln-container.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/server-container.ts",
+      "path": "src/components/ldevice/ldevice-container.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "[[`IED`]] plugin subeditor for editing `Server` element.",
-          "name": "ServerContainer",
+          "description": "[[`IED`]] plugin subeditor for editing `LDevice` element.",
+          "name": "LDeviceContainer",
           "members": [
             {
               "kind": "field",
@@ -3154,7 +3689,7 @@
                 "text": "object"
               },
               "static": true,
-              "default": "{ 'oscd-icon': OscdIcon, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon-button': OscdIconButton, 'oscd-action-pane': OscdActionPane, 'ldevice-container': LDeviceContainer, // 'add-access-point-dialog': AddAccessPointDialog, }"
+              "default": "{ 'oscd-action-pane': OscdActionPane, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'ln-container': LNContainer, }"
             },
             {
               "kind": "field",
@@ -3166,36 +3701,64 @@
               "attribute": "selectedLNClasses"
             },
             {
+              "kind": "field",
+              "name": "toggleButton",
+              "type": {
+                "text": "OscdIconButton | undefined"
+              }
+            },
+            {
               "kind": "method",
-              "name": "header",
+              "name": "openEditWizard",
               "privacy": "private",
               "return": {
                 "type": {
-                  "text": "TemplateResult"
+                  "text": "void"
                 }
               }
             },
             {
-              "kind": "field",
-              "name": "lDeviceElements",
-              "type": {
-                "text": "Element[]"
-              },
-              "privacy": "private",
-              "readonly": true
+              "kind": "method",
+              "name": "header",
+              "privacy": "private"
             },
             {
               "kind": "method",
-              "name": "handleAddLDevice",
+              "name": "getLnElements",
               "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Element[]"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "handleAddLN",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
               "parameters": [
                 {
-                  "name": "_data",
+                  "name": "data",
                   "type": {
                     "text": "unknown"
                   }
                 }
               ]
+            },
+            {
+              "kind": "method",
+              "name": "removeLDevice",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
             },
             {
               "kind": "field",
@@ -3211,12 +3774,12 @@
             },
             {
               "kind": "field",
-              "name": "editCount",
+              "name": "docVersion",
               "type": {
                 "text": "number"
               },
               "default": "-1",
-              "attribute": "editCount",
+              "attribute": "docVersion",
               "inheritedFrom": {
                 "name": "BaseContainer",
                 "module": "src/components/base-container.ts"
@@ -3280,12 +3843,213 @@
               }
             },
             {
-              "name": "editCount",
+              "name": "docVersion",
               "type": {
                 "text": "number"
               },
               "default": "-1",
-              "fieldName": "editCount",
+              "fieldName": "docVersion",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "fieldName": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "fieldName": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "BaseContainer",
+            "module": "/src/components/base-container.js"
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LDeviceContainer",
+          "declaration": {
+            "name": "LDeviceContainer",
+            "module": "src/components/ldevice/ldevice-container.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/server/server-container.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "[[`IED`]] plugin subeditor for editing `Server` element.",
+          "name": "ServerContainer",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-icon': OscdIcon, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon-button': OscdIconButton, 'oscd-action-pane': OscdActionPane, 'ldevice-container': LDeviceContainer, // 'add-access-point-dialog': AddAccessPointDialog, }"
+            },
+            {
+              "kind": "field",
+              "name": "selectedLNClasses",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "attribute": "selectedLNClasses"
+            },
+            {
+              "kind": "method",
+              "name": "header",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getLDeviceElements",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Element[]"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "handleCreateLDevice",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "_data",
+                  "type": {
+                    "text": "unknown"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "attribute": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "docVersion",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "attribute": "docVersion",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "element",
+              "type": {
+                "text": "Element"
+              },
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "attribute": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "attribute": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "selectedLNClasses",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "fieldName": "selectedLNClasses"
+            },
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "fieldName": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "docVersion",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "fieldName": "docVersion",
               "inheritedFrom": {
                 "name": "BaseContainer",
                 "module": "src/components/base-container.ts"
@@ -3333,7 +4097,7 @@
           "name": "ServerContainer",
           "declaration": {
             "name": "ServerContainer",
-            "module": "src/components/server-container.ts"
+            "module": "src/components/server/server-container.ts"
           }
         }
       ]

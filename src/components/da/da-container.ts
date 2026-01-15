@@ -6,8 +6,8 @@ import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPan
 import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
 import { OscdIconButton } from '@omicronenergy/oscd-ui/iconbutton/OscdIconButton.js';
 import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
-import { getValueElements, getInstanceDAElement } from '../foundation.js';
-import { BaseContainer } from './base-container.js';
+import { getValueElements, getInstanceDAElement } from '../../foundation.js';
+import { BaseContainer } from '../base-container.js';
 import { msg } from '@lit/localize';
 import { predefinedBasicTypeEnum } from '@omicronenergy/oscd-edit-dialog/patterns.js';
 
@@ -203,7 +203,7 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
           ? this.getBDAElements().map(
               bdaElement =>
                 html`<da-container
-                  .editCount=${this.editCount}
+                  .docVersion=${this.docVersion}
                   .doc=${this.doc}
                   .element=${bdaElement}
                   .instanceElement=${getInstanceDAElement(

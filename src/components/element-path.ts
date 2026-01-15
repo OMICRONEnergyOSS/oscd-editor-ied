@@ -7,7 +7,6 @@ export class ElementPath extends ScopedElementsMixin(LitElement) {
   paths: string[] = [];
 
   render(): TemplateResult {
-    console.log(JSON.stringify(this.paths));
     return html` <h3>${this.paths.join(' / ')}</h3> `;
   }
 

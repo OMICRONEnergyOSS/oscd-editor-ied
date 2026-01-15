@@ -12,7 +12,7 @@ import { newIedCreatedEvent } from '../foundation/events.js';
 import { OscdFilledButton } from '@omicronenergy/oscd-ui/button/OscdFilledButton.js';
 
 /** A dialog component for creating virtual IEDs */
-export class CreateIedDialog extends ScopedElementsMixin(LitElement) {
+export class VirtualIedCreateDialog extends ScopedElementsMixin(LitElement) {
   static scopedElements = {
     'oscd-dialog': OscdDialog,
     'oscd-filled-textfield': OscdFilledTextField,
@@ -90,6 +90,7 @@ export class CreateIedDialog extends ScopedElementsMixin(LitElement) {
         <div slot="headline">${msg('Create Virtual IED')}</div>
         <div slot="content" class="dialog-content">
           <oscd-filled-textfield
+            data-testid="ied-name-input"
             label=${msg('IED name')}
             .value=${this.newIedName}
             .error=${!!errorMessage}
@@ -118,6 +119,7 @@ export class CreateIedDialog extends ScopedElementsMixin(LitElement) {
           <oscd-filled-button
             slot="primaryAction"
             @click=${this.handleCreate}
+            data-testid="create-ied-button"
             ?disabled=${!isNameValid}
           >
             ${msg('Create')}

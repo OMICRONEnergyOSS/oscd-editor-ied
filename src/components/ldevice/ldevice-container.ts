@@ -1,14 +1,14 @@
-import { TemplateResult, html, nothing, PropertyValues, css } from 'lit';
-import { property, query, state } from 'lit/decorators.js';
+import { TemplateResult, html, nothing, css } from 'lit';
+import { property, query } from 'lit/decorators.js';
 import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
 import { msg } from '@lit/localize';
 
-import { BaseContainer } from './base-container.js';
+import { BaseContainer } from '../base-container.js';
 import { OscdIconButton } from '@omicronenergy/oscd-ui/iconbutton/OscdIconButton.js';
 import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
 import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
 import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
-import { LNContainer } from './ln-container.js';
+import { LNContainer } from '../lnode/ln-container.js';
 
 /** [[`IED`]] plugin subeditor for editing `LDevice` element. */
 export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
@@ -48,21 +48,7 @@ export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
     }`;
   }
 
-  protected firstUpdated(): void {
-    this.requestUpdate();
-  }
-
-  protected updated(_changedProperties: PropertyValues): void {
-    super.updated(_changedProperties);
-
-    // When the LN Classes filter is updated, we also want to trigger rendering for the LN Elements.
-    if (_changedProperties.has('selectedLNClasses')) {
-      this.requestUpdate('lnElements');
-    }
-  }
-
-  @state()
-  private get lnElements(): Element[] {
+  private getLnElements(): Element[] {
     return Array.from(this.element.querySelectorAll(':scope > LN,LN0')).filter(
       element => {
         const lnClass = element.getAttribute('lnClass') ?? '';
@@ -104,7 +90,7 @@ export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
   }
 
   render(): TemplateResult {
-    const lnElements = this.lnElements;
+    const lnElements = this.getLnElements();
 
     return html`<oscd-action-pane label="${this.header()}">
       <oscd-scl-icon slot="icon">logicalDeviceIcon</oscd-scl-icon>
@@ -147,7 +133,7 @@ export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
           ? lnElements.map(
               ln =>
                 html`<ln-container
-                  .editCount=${this.editCount}
+                  .docVersion=${this.docVersion}
                   .doc=${this.doc}
                   .element=${ln}
                   .nsdoc=${this.nsdoc}

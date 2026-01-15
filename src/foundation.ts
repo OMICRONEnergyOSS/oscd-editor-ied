@@ -59,8 +59,21 @@ export function createLLN0LNodeType(doc: XMLDocument, id: string): Insert[] {
  * @param name - The name for the new AccessPoint.
  * @returns The created AccessPoint element.
  */
-export function createAccessPoint(doc: XMLDocument, name: string): Element {
-  return createElement(doc, 'AccessPoint', { name });
+export function createAccessPoint(
+  doc: XMLDocument,
+  name: string,
+  desc: string | null,
+): Element {
+  return createElement(doc, 'AccessPoint', { name, ...(desc ? { desc } : {}) });
+}
+
+/**
+ * Create a Server element.
+ * @param doc - The XML document to create the ServerAt in.
+ * @returns The created Server element.
+ */
+export function createServer(doc: XMLDocument): Element {
+  return createElement(doc, 'Server', {});
 }
 
 /**

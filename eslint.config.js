@@ -90,6 +90,12 @@ export default [
   },
   eslintPluginPrettierRecommended,
   {
+    files: ['**/*.spec.ts', '**/*.test.ts'],
+    rules: {
+      '@typescript-eslint/no-unused-expressions': 'off',
+    },
+  },
+  {
     rules: {
       curly: ['error', 'all'],
     },
