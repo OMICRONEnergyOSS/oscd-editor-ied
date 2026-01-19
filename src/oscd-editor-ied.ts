@@ -18,14 +18,12 @@ import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
 import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
 
 import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
-import WizardDialog from '@omicronenergy/oscd-edit-dialog/OscdEditDialog.js';
 import { initializeNsdoc, Nsdoc } from './foundation/nsdoc.js';
 import { OpenscdApi } from './foundation/types.js';
 import { SelectItem } from '@omicronenergy/oscd-ui/selection-list/OscdSelectionList.js';
 import { IedContainer } from './components/ied/ied-container.js';
 import { ElementPath } from './components/element-path.js';
 import { msg } from '@lit/localize';
-import { compareNames } from '@omicronenergy/oscd-edit-dialog';
 import {
   ConfirmDeleteEvent,
   CreateElementEvent,
@@ -37,6 +35,8 @@ import {
 } from './foundation/events.js';
 import { ConfirmDeleteDialog } from './components/confirm-delete-dialog.js';
 import { VirtualIedCreateDialog } from './components/virtual-ied-create-dialog.js';
+import OscdSclDialogs from '@omicronenergy/oscd-scl-dialogs/OscdSclDialogs.js';
+import { compareNames } from '@omicronenergy/oscd-scl-dialogs';
 
 const PLUGIN_STATE_STORAGE_KEY = 'oscd-editor-ied-state';
 
@@ -85,7 +85,7 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
     'oscd-icon': OscdIcon,
     'element-path': ElementPath,
     'ied-container': IedContainer,
-    'oscd-edit-dialog': WizardDialog,
+    'oscd-scl-dialogs': OscdSclDialogs,
     'virtual-ied-create-dialog': VirtualIedCreateDialog,
     'confirm-delete-dialog': ConfirmDeleteDialog,
   };
@@ -175,7 +175,7 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
     return undefined;
   }
 
-  @query('oscd-edit-dialog') editDialog!: WizardDialog;
+  @query('oscd-scl-dialogs') sclDialog!: OscdSclDialogs;
 
   @query('virtual-ied-create-dialog') createIedDialog!: VirtualIedCreateDialog;
 
@@ -188,7 +188,7 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
     if (event.detail.tagName === 'IED') {
       this.createIedDialog.show();
     } else {
-      const edits = await this.editDialog.create(event.detail);
+      const edits = await this.sclDialog.create(event.detail);
       this.dispatchEvent(newEditEventV2(edits));
     }
   }
@@ -206,7 +206,7 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
   }
 
   async handleEditElement(event: EditElementEvent) {
-    const edits = await this.editDialog.edit(event.detail);
+    const edits = await this.sclDialog.edit(event.detail);
     this.dispatchEvent(newEditEventV2(edits));
   }
 
@@ -435,7 +435,7 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
   render(): TemplateResult {
     return html`<div>
       ${this.renderHeader()} ${this.renderSelectedIED()}
-      <oscd-edit-dialog></oscd-edit-dialog>
+      <oscd-scl-dialogs></oscd-scl-dialogs>
       <virtual-ied-create-dialog .doc=${this.doc}></virtual-ied-create-dialog>
       <confirm-delete-dialog></confirm-delete-dialog>
     </div>`;

@@ -8,6 +8,7 @@
 		</VoltageLevel>
 	</Substation>
 	<IED name="test" manufacturer="OpenSCD">
+		<Services><ConfLdName /></Services>
 		<AccessPoint name="AP1">
 			<Server>
 				<Authentication/>

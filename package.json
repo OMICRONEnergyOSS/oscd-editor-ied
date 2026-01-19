@@ -43,10 +43,10 @@
   },
   "dependencies": {
     "@lit/localize": "^0.12.2",
-    "@omicronenergy/oscd-edit-dialog": "^0.0.6",
     "@omicronenergy/oscd-editor-source": "^0.0.1",
     "@omicronenergy/oscd-menu-open": "^0.0.6",
     "@omicronenergy/oscd-menu-save": "^0.0.2",
+    "@omicronenergy/oscd-scl-dialogs": "file:../oscd-scl-dialogs",
     "@omicronenergy/oscd-shell": "^0.0.10",
     "@omicronenergy/oscd-ui": "file:../oscd-ui",
     "@open-wc/scoped-elements": "^3.0.5",

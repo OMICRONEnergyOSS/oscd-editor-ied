@@ -1,4 +1,4 @@
-import { createElement } from '@omicronenergy/oscd-edit-dialog';
+import { createElement } from '@omicronenergy/oscd-scl-dialogs';
 import { Insert } from '@openscd/oscd-api';
 import {
   createLLN0LNodeType,

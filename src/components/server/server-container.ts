@@ -1,7 +1,11 @@
 import { TemplateResult, html, nothing } from 'lit';
 import { property, query } from 'lit/decorators.js';
 
-import { findLLN0LNodeType, createLLN0LNodeType } from '../../foundation.js';
+import {
+  findLLN0LNodeType,
+  createLLN0LNodeType,
+  findInsertedElement,
+} from '../../foundation.js';
 
 import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
 import { BaseContainer } from '../base-container.js';
@@ -11,13 +15,10 @@ import { OscdIconButton } from '@omicronenergy/oscd-ui/iconbutton/OscdIconButton
 import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
 import { LDeviceContainer } from '../ldevice/ldevice-container.js';
 import { msg } from '@lit/localize';
-import { Insert } from '@openscd/oscd-api';
+import { EditV2 } from '@openscd/oscd-api';
 import { createElement } from '@openscd/scl-lib/dist/foundation/utils.js';
-import {
-  LDeviceCreateData,
-  LDeviceCreateDialog,
-} from './ldevice-create-dialog.js';
 import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
+import OscdSclDialogs from '@omicronenergy/oscd-scl-dialogs/OscdSclDialogs.js';
 
 /** [[`IED`]] plugin subeditor for editing `Server` element. */
 export class ServerContainer extends ScopedElementsMixin(BaseContainer) {
@@ -27,14 +28,14 @@ export class ServerContainer extends ScopedElementsMixin(BaseContainer) {
     'oscd-icon-button': OscdIconButton,
     'oscd-action-pane': OscdActionPane,
     'ldevice-container': LDeviceContainer,
-    'ldevice-create-dialog': LDeviceCreateDialog,
+    'oscd-scl-dialogs': OscdSclDialogs,
   };
 
   @property()
   selectedLNClasses: string[] = [];
 
-  @query('ldevice-create-dialog')
-  lDeviceDialog!: LDeviceCreateDialog;
+  @query('oscd-scl-dialogs')
+  private oscdSclDialogs!: OscdSclDialogs;
 
   private header(): TemplateResult {
     const name = this.element.tagName;
@@ -60,8 +61,26 @@ export class ServerContainer extends ScopedElementsMixin(BaseContainer) {
     );
   }
 
-  private handleCreateLDevice(data: LDeviceCreateData) {
-    const inserts: Insert[] = [];
+  private async handleCreateLDevice(event: Event) {
+    const trigger = event.currentTarget as OscdIconButton | null;
+    const createType = {
+      parent: this.element,
+      tagName: 'LDevice',
+    };
+
+    let createLDeviceEdit: EditV2[] | undefined;
+    try {
+      createLDeviceEdit = await this.oscdSclDialogs.create(createType);
+    } finally {
+      // Ensure focus doesn't return to the trigger after dialog closes (e.g., Escape).
+      setTimeout(() => trigger?.blur?.(), 0);
+    }
+
+    if (!createLDeviceEdit?.length) {
+      return;
+    }
+
+    const inserts: EditV2[] = [];
     const lln0Type = findLLN0LNodeType(this.doc);
     const lnTypeId = lln0Type?.getAttribute('id') || 'PlaceholderLLN0';
 
@@ -69,47 +88,47 @@ export class ServerContainer extends ScopedElementsMixin(BaseContainer) {
       const lnodeTypeInserts = createLLN0LNodeType(this.doc, lnTypeId);
       inserts.push(...lnodeTypeInserts);
     }
-    const lDevice = createElement(this.doc, 'LDevice', {
-      inst: data.inst,
-    });
+
+    const lDevice = findInsertedElement(createLDeviceEdit, 'LDevice');
 
     const ln0 = createElement(this.doc, 'LN0', {
       lnClass: 'LLN0',
       inst: '',
       lnType: lnTypeId,
     });
+    lDevice?.appendChild(ln0);
 
-    lDevice.appendChild(ln0);
-    inserts.push({ parent: this.element, node: lDevice, reference: null });
+    inserts.push(...createLDeviceEdit);
     this.dispatchEvent(newEditEventV2(inserts));
   }
 
   render() {
     return html`<oscd-action-pane .label=${this.header()}>
-      <oscd-scl-icon slot="icon">serverIcon</oscd-scl-icon>
-      ${this.element.tagName === 'Server'
-        ? html`<abbr slot="action" title=${msg('Add LDevice')}>
-            <oscd-icon-button @click=${() => this.lDeviceDialog.show()}>
-              <oscd-icon>playlist_add</oscd-icon>
-            </oscd-icon-button>
-          </abbr>`
-        : nothing}
-      ${this.getLDeviceElements().map(
-        server =>
-          html`<ldevice-container
-            .docVersion=${this.docVersion}
-            .doc=${this.doc}
-            .element=${server}
-            .nsdoc=${this.nsdoc}
-            .selectedLNClasses=${this.selectedLNClasses}
-            .ancestors=${[...this.ancestors, this.element]}
-          ></ldevice-container>`,
-      )}
-      <ldevice-create-dialog
-        .server=${this.element}
-        .onConfirm=${(data: LDeviceCreateData) =>
-          this.handleCreateLDevice(data)}
-      ></ldevice-create-dialog>
-    </oscd-action-pane>`;
+        <oscd-scl-icon slot="icon">serverIcon</oscd-scl-icon>
+        ${this.element.tagName === 'Server'
+          ? html`<abbr slot="action" title=${msg('Add LDevice')}>
+              <oscd-icon-button
+                @click=${(event: Event) => {
+                  event.stopImmediatePropagation();
+                  this.handleCreateLDevice(event);
+                }}
+              >
+                <oscd-icon>playlist_add</oscd-icon>
+              </oscd-icon-button>
+            </abbr>`
+          : nothing}
+        ${this.getLDeviceElements().map(
+          server =>
+            html`<ldevice-container
+              .docVersion=${this.docVersion}
+              .doc=${this.doc}
+              .element=${server}
+              .nsdoc=${this.nsdoc}
+              .selectedLNClasses=${this.selectedLNClasses}
+              .ancestors=${[...this.ancestors, this.element]}
+            ></ldevice-container>`,
+        )}
+      </oscd-action-pane>
+      <oscd-scl-dialogs></oscd-scl-dialogs> `;
   }
 }

@@ -1,7 +1,7 @@
 import {
   CreateWizard,
   EditWizard,
-} from '@omicronenergy/oscd-edit-dialog/OscdEditDialog.js';
+} from '@omicronenergy/oscd-scl-dialogs/OscdSclDialogs.js';
 
 export enum EVENTS {
   FULL_ELEMENT_PATH = 'full-element-path',

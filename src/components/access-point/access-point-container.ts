@@ -1,6 +1,6 @@
 /** [[`IED`]] plugin subeditor for editing `AccessPoint` element. */
 
-// import { wizards } from '@omicronenergy/oscd-edit-dialog/wizards.js';
+// import { wizards } from '@omicronenergy/oscd-scl-dialogs/wizards.js';
 import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
 import { TemplateResult, html, css } from 'lit';
 import { property, query } from 'lit/decorators.js';

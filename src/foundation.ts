@@ -1,4 +1,5 @@
-import { Insert } from '@openscd/oscd-api';
+import { EditV2, Insert } from '@openscd/oscd-api';
+import { isInsert } from '@openscd/oscd-api/utils.js';
 import { insertSelectedLNodeType } from '@openscd/scl-lib';
 import { createElement } from '@openscd/scl-lib/dist/foundation/utils.js';
 
@@ -13,6 +14,27 @@ export function findElement(
   tagName: string,
 ): Element | null {
   return ancestors.find(element => element.tagName === tagName) ?? null;
+}
+
+export function findInsertedElement(
+  edit: EditV2,
+  tagName: string,
+): Element | undefined {
+  if (isInsert(edit)) {
+    const node = edit.node;
+    return node instanceof Element && node.tagName === tagName
+      ? node
+      : undefined;
+  }
+  if (Array.isArray(edit)) {
+    for (const child of edit) {
+      const found = findInsertedElement(child, tagName);
+      if (found) {
+        return found;
+      }
+    }
+  }
+  return undefined;
 }
 
 /**

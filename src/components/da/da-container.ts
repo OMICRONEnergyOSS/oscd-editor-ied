@@ -9,7 +9,7 @@ import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
 import { getValueElements, getInstanceDAElement } from '../../foundation.js';
 import { BaseContainer } from '../base-container.js';
 import { msg } from '@lit/localize';
-import { predefinedBasicTypeEnum } from '@omicronenergy/oscd-edit-dialog/patterns.js';
+import { predefinedBasicTypeEnum } from '@omicronenergy/oscd-scl-dialogs/patterns.js';
 
 function getValueDisplayString(val: Element): string {
   const sGroup = val.getAttribute('sGroup');
