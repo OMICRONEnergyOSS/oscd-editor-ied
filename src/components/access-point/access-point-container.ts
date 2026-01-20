@@ -78,7 +78,7 @@ export class AccessPointContainer extends ScopedElementsMixin(BaseContainer) {
   }
 
   private removeAccessPoint(): void {
-    const name = this.element.getAttribute('name') ?? '';
+    const name = this.header();
     this.dispatchEvent(
       newConfirmDeleteEvent({
         heading: msg(`Delete`),
