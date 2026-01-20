@@ -9,6 +9,11 @@ import { query } from 'lit/decorators.js';
 import { msg } from '@lit/localize';
 import { DOContainer } from '../do/do-container.js';
 import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
+import {
+  newConfirmDeleteEvent,
+  newEditElementEvent,
+} from '../../foundation/events.js';
+import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
 
 /** [[`IED`]] plugin subeditor for editing `LN` and `LN0` element. */
 export class LNContainer extends ScopedElementsMixin(BaseContainer) {
@@ -62,23 +67,22 @@ export class LNContainer extends ScopedElementsMixin(BaseContainer) {
   }
 
   private openEditWizard(): void {
-    // const wizardType = this.element.tagName === 'LN' ? 'LN' : 'LN0';
-    // const wizard = wizards[wizardType].edit(this.element);
-    // if (wizard) {
-    //   this.dispatchEvent(newWizardEvent(wizard));
-    // }
-    console.log('Please implement me', this);
+    this.dispatchEvent(newEditElementEvent({ element: this.element }));
   }
 
-  private removeElement(): void {
-    // if (this.element.tagName === 'LN') {
-    //   this.dispatchEvent(
-    //     newActionEvent({
-    //       old: { parent: this.element.parentElement!, element: this.element },
-    //     }),
-    //   );
-    // }
-    console.log('Please implement me', this.element);
+  private removeLN(): void {
+    const name = this.header();
+    this.dispatchEvent(
+      newConfirmDeleteEvent({
+        heading: msg(`Delete`),
+        message: msg(
+          `Are you sure you want to delete LogicalNode "${name}" and all its content?`,
+        ),
+        onConfirm: () => {
+          this.dispatchEvent(newEditEventV2({ node: this.element }));
+        },
+      }),
+    );
   }
 
   render(): TemplateResult {
@@ -90,7 +94,7 @@ export class LNContainer extends ScopedElementsMixin(BaseContainer) {
               ? html`<oscd-icon-button
                   slot="action"
                   title="${msg('remove')}"
-                  @click=${() => this.removeElement()}
+                  @click=${() => this.removeLN()}
                 >
                   <oscd-icon>delete</oscd-icon>
                 </oscd-icon-button>`
