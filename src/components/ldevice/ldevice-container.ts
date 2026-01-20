@@ -9,8 +9,13 @@ import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
 import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
 import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
 import { LNContainer } from '../lnode/ln-container.js';
-import { newEditElementEvent } from '../../foundation/events.js';
+import {
+  newConfirmDeleteEvent,
+  newEditElementEvent,
+} from '../../foundation/events.js';
 import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
+import OscdSclDialogs from '@omicronenergy/oscd-scl-dialogs/OscdSclDialogs.js';
+import { EditV2 } from '@openscd/oscd-api';
 
 /** [[`IED`]] plugin subeditor for editing `LDevice` element. */
 export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
@@ -20,6 +25,7 @@ export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
     'oscd-scl-icon': OscdSclIcon,
     'oscd-icon': OscdIcon,
     'ln-container': LNContainer,
+    'oscd-scl-dialogs': OscdSclDialogs,
   };
 
   @property()
@@ -28,8 +34,8 @@ export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
   @query('#toggleButton')
   toggleButton!: OscdIconButton | undefined;
 
-  // @query('add-ln-dialog')
-  // addLnDialog!: AddLnDialog;
+  @query('oscd-scl-dialogs')
+  private oscdSclDialogs!: OscdSclDialogs;
 
   private handleEditLDevice(): void {
     this.dispatchEvent(newEditElementEvent({ element: this.element }));
@@ -55,33 +61,34 @@ export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
     );
   }
 
-  private handleAddLN(data: unknown): void {
-    // const getInst = lnInstGenerator(this.element, 'LN');
-    // const inserts = [];
+  private async handleAddLN(event: Event): Promise<void> {
+    const trigger = event.currentTarget as OscdIconButton | null;
+    let edits: EditV2[] | undefined;
+    const createType = {
+      parent: this.element,
+      tagName: 'LN',
+    };
+    try {
+      edits = await this.oscdSclDialogs.create(createType);
+    } finally {
+      // Ensure focus doesn't return to the trigger after dialog closes (e.g., Escape).
+      setTimeout(() => trigger?.blur?.(), 0);
+    }
 
-    // for (let i = 0; i < data.amount; i++) {
-    //   const inst = getInst(data.lnClass);
-    //   if (!inst) {
-    //     break;
-    //   }
-    //   const lnAttrs = {
-    //     lnClass: data.lnClass,
-    //     lnType: data.lnType,
-    //     inst: inst,
-    //     ...(data.prefix ? { prefix: data.prefix } : {}),
-    //   };
-    //   const ln = createElement(this.doc, 'LN', lnAttrs);
-    //   inserts.push({ parent: this.element, node: ln, reference: null });
-    // }
-
-    // this.dispatchEvent(newEditEventV2(inserts));
-    console.log('Please implement me', data, this);
+    this.dispatchEvent(newEditEventV2(edits));
   }
 
   private removeLDevice(): void {
+    const name = this.header();
     this.dispatchEvent(
-      newEditEventV2({
-        node: this.element,
+      newConfirmDeleteEvent({
+        heading: msg(`Delete`),
+        message: msg(
+          `Are you sure you want to delete LogicalDevice "${name}" and all its content?`,
+        ),
+        onConfirm: () => {
+          this.dispatchEvent(newEditEventV2({ node: this.element }));
+        },
       }),
     );
   }
@@ -90,60 +97,55 @@ export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
     const lnElements = this.getLnElements();
 
     return html`<oscd-action-pane label="${this.header()}">
-      <oscd-scl-icon slot="icon">logicalDeviceIcon</oscd-scl-icon>
-      <oscd-icon-button
-        slot="action"
-        title="${msg('remove')}"
-        @click=${() => this.removeLDevice()}
-      >
-        <oscd-icon>delete</oscd-icon>
-      </oscd-icon-button>
-      <abbr slot="action" title="${msg('edit')}">
-        <oscd-icon-button @click=${() => this.handleEditLDevice()}>
-          <oscd-icon>edit</oscd-icon>
-        </oscd-icon-button>
-      </abbr>
-      <abbr slot="action" title=${msg('iededitor.addLnDialog.title')}>
+        <oscd-scl-icon slot="icon">logicalDeviceIcon</oscd-scl-icon>
         <oscd-icon-button
-          @click=${() => {
-            console.log('Please implement me', this);
-            // this.addLnDialog.show();
-          }}
+          slot="action"
+          title="${msg('remove')}"
+          @click=${() => this.removeLDevice()}
         >
-          <oscd-icon>playlist_add</oscd-icon>
+          <oscd-icon>delete</oscd-icon>
         </oscd-icon-button>
-      </abbr>
-      ${lnElements.length > 0
-        ? html`<abbr slot="action" title="${msg('Toggle child elements')}">
-            <oscd-icon-button
-              toggle
-              id="toggleButton"
-              @click=${() => this.requestUpdate()}
-            >
-              <oscd-icon>keyboard_arrow_down</oscd-icon>
-              <oscd-icon slot="selected">keyboard_arrow_up</oscd-icon>
-            </oscd-icon-button>
-          </abbr>`
-        : nothing}
-      <div id="lnContainer">
-        ${this.toggleButton?.selected
-          ? lnElements.map(
-              ln =>
-                html`<ln-container
-                  .docVersion=${this.docVersion}
-                  .doc=${this.doc}
-                  .element=${ln}
-                  .nsdoc=${this.nsdoc}
-                  .ancestors=${[...this.ancestors, this.element]}
-                ></ln-container> `,
-            )
+        <abbr slot="action" title="${msg('edit')}">
+          <oscd-icon-button @click=${() => this.handleEditLDevice()}>
+            <oscd-icon>edit</oscd-icon>
+          </oscd-icon-button>
+        </abbr>
+        <abbr slot="action" title=${msg('Add LN')}>
+          <oscd-icon-button
+            @click=${(event: Event) => {
+              this.handleAddLN(event);
+            }}
+          >
+            <oscd-icon>playlist_add</oscd-icon>
+          </oscd-icon-button>
+        </abbr>
+        ${lnElements.length > 0
+          ? html`<abbr slot="action" title="${msg('Toggle child elements')}">
+              <oscd-icon-button
+                toggle
+                id="toggleButton"
+                @click=${() => this.requestUpdate()}
+              >
+                <oscd-icon>keyboard_arrow_down</oscd-icon>
+                <oscd-icon slot="selected">keyboard_arrow_up</oscd-icon>
+              </oscd-icon-button>
+            </abbr>`
           : nothing}
-      </div>
-      <add-ln-dialog
-        .doc=${this.doc}
-        .onConfirm=${(data: unknown) => this.handleAddLN(data)}
-      ></add-ln-dialog>
-    </oscd-action-pane>`;
+        <div id="lnContainer">
+          ${this.toggleButton?.selected
+            ? lnElements.map(
+                ln =>
+                  html`<ln-container
+                    .docVersion=${this.docVersion}
+                    .doc=${this.doc}
+                    .element=${ln}
+                    .nsdoc=${this.nsdoc}
+                    .ancestors=${[...this.ancestors, this.element]}
+                  ></ln-container> `,
+              )
+            : nothing}
+        </div> </oscd-action-pane
+      ><oscd-scl-dialogs></oscd-scl-dialogs>`;
   }
 
   static styles = css`
