@@ -8,11 +8,17 @@ import { OscdOutlinedButton } from '@omicronenergy/oscd-ui/button/OscdOutlinedBu
 import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
 import { OscdIconButton } from '@omicronenergy/oscd-ui/iconbutton/OscdIconButton.js';
 import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
-import { findDOTypeElement, getInstanceDAElement } from '../../foundation.js';
+import {
+  findDOTypeElement,
+  findElement,
+  getInstanceDAElement,
+} from '../../foundation.js';
 import { BaseContainer } from '../base-container.js';
 import { msg } from '@lit/localize';
 import { DAContainer } from '../da/da-container.js';
 import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
+import { DoInfoDialog } from './do-info-dialog.js';
+import { findLogicalNodeElement } from '../../foundation/virtual-ied.js';
 
 export class DOContainer extends ScopedElementsMixin(BaseContainer) {
   static scopedElements = {
@@ -23,6 +29,7 @@ export class DOContainer extends ScopedElementsMixin(BaseContainer) {
     'oscd-action-pane': OscdActionPane,
     'do-container': DOContainer,
     'da-container': DAContainer,
+    'do-info-dialog': DoInfoDialog,
   };
 
   /**
@@ -32,6 +39,7 @@ export class DOContainer extends ScopedElementsMixin(BaseContainer) {
   instanceElement!: Element;
 
   @query('#toggleButton') toggleButton: OscdIconButton | undefined;
+  @query('do-info-dialog') doInfoDialog!: DoInfoDialog;
 
   private header() {
     const name = this.element.getAttribute('name') ?? '';
@@ -86,75 +94,94 @@ export class DOContainer extends ScopedElementsMixin(BaseContainer) {
     return null;
   }
 
+  private openInfoDialog(): void {
+    const logicalNodeElement = findLogicalNodeElement(this.ancestors);
+    const lDeviceElement = findElement(this.ancestors, 'LDevice');
+    const accessPointElement = findElement(this.ancestors, 'AccessPoint');
+    const iedElement = findElement(this.ancestors, 'IED');
+    const doTypeElement = findDOTypeElement(this.element);
+
+    this.doInfoDialog.show({
+      nsdocDescription: this.nsdoc.getDataDescription(
+        this.element,
+        this.ancestors,
+      ).label,
+      doName: this.element.getAttribute('name') ?? '-',
+      doiDescription: this.instanceElement?.getAttribute('desc') ?? '-',
+      cdc: doTypeElement?.getAttribute('cdc') ?? '-',
+      lnPrefix: logicalNodeElement?.getAttribute('prefix') ?? '-',
+      lnClassLabel: logicalNodeElement
+        ? this.nsdoc.getDataDescription(logicalNodeElement, this.ancestors)
+            .label
+        : '-',
+      lnInst: logicalNodeElement?.getAttribute('inst') ?? '-',
+      lDevice:
+        lDeviceElement?.getAttribute('name') ??
+        lDeviceElement?.getAttribute('inst') ??
+        '-',
+      accessPoint: accessPointElement?.getAttribute('name') ?? '-',
+      ied: iedElement?.getAttribute('name') ?? '-',
+    });
+  }
+
   render(): TemplateResult {
     const daElements = this.getDAElements();
     const doElements = this.getSDOElements();
 
     return html`<oscd-action-pane
-      .label="${this.header()}"
-      icon="${this.instanceElement != null ? 'done' : ''}"
-    >
-      <abbr slot="action">
-        <oscd-icon-button
-          title=${this.nsdoc.getDataDescription(this.element).label}
-          @click=${() => {
-            // this.dispatchEvent(
-            //   newWizardEvent(
-            //     createDoInfoWizard(
-            //       this.element,
-            //       this.instanceElement,
-            //       this.ancestors,
-            //       this.nsdoc,
-            //     ),
-            //   ),
-            // );
-            console.log('Please implement me', this.element);
-          }}
-        >
-          <oscd-icon>info</oscd-icon>
-        </oscd-icon-button>
-      </abbr>
-      ${daElements.length > 0 || doElements.length > 0
-        ? html`<abbr slot="action" title="${msg('Toggle child elements')}">
-            <oscd-icon-button
-              toggle
-              id="toggleButton"
-              @click=${() => this.requestUpdate()}
-            >
-              <oscd-icon>keyboard_arrow_down</oscd-icon>
-              <oscd-icon slot="selected">keyboard_arrow_up</oscd-icon>
-            </oscd-icon-button>
-          </abbr>`
-        : nothing}
-      ${this.toggleButton?.selected
-        ? daElements.map(
-            daElement =>
-              html`<da-container
-                .docVersion=${this.docVersion}
-                .doc=${this.doc}
-                .element=${daElement}
-                .instanceElement=${getInstanceDAElement(
-                  this.instanceElement,
-                  daElement,
-                )}
-                .nsdoc=${this.nsdoc}
-                .ancestors=${[...this.ancestors, this.element]}
-              ></da-container>`,
-          )
-        : nothing}
-      ${this.toggleButton?.selected
-        ? doElements.map(
-            doElement =>
-              html`<do-container
-                .docVersion=${this.docVersion}
-                .doc=${this.doc}
-                .element=${doElement}
-                .instanceElement=${this.getInstanceDOElement(doElement)}
-                .nsdoc=${this.nsdoc}
-                .ancestors=${[...this.ancestors, this.element]}
-              ></do-container>`,
-          )
-        : nothing}
-    </oscd-action-pane> `;
+        .label="${this.header()}"
+        icon="${this.instanceElement != null ? 'done' : ''}"
+      >
+        <abbr slot="action">
+          <oscd-icon-button
+            title=${this.nsdoc.getDataDescription(this.element).label}
+            @click=${() => this.openInfoDialog()}
+          >
+            <oscd-icon>info</oscd-icon>
+          </oscd-icon-button>
+        </abbr>
+        ${daElements.length > 0 || doElements.length > 0
+          ? html`<abbr slot="action" title="${msg('Toggle child elements')}">
+              <oscd-icon-button
+                toggle
+                id="toggleButton"
+                @click=${() => this.requestUpdate()}
+              >
+                <oscd-icon>keyboard_arrow_down</oscd-icon>
+                <oscd-icon slot="selected">keyboard_arrow_up</oscd-icon>
+              </oscd-icon-button>
+            </abbr>`
+          : nothing}
+        ${this.toggleButton?.selected
+          ? daElements.map(
+              daElement =>
+                html`<da-container
+                  .docVersion=${this.docVersion}
+                  .doc=${this.doc}
+                  .element=${daElement}
+                  .instanceElement=${getInstanceDAElement(
+                    this.instanceElement,
+                    daElement,
+                  )}
+                  .nsdoc=${this.nsdoc}
+                  .ancestors=${[...this.ancestors, this.element]}
+                ></da-container>`,
+            )
+          : nothing}
+        ${this.toggleButton?.selected
+          ? doElements.map(
+              doElement =>
+                html`<do-container
+                  .docVersion=${this.docVersion}
+                  .doc=${this.doc}
+                  .element=${doElement}
+                  .instanceElement=${this.getInstanceDOElement(doElement)}
+                  .nsdoc=${this.nsdoc}
+                  .ancestors=${[...this.ancestors, this.element]}
+                ></do-container>`,
+            )
+          : nothing}
+      </oscd-action-pane>
+      <do-info-dialog></do-info-dialog>`;
   }
 }

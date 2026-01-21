@@ -6,10 +6,22 @@ import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPan
 import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
 import { OscdIconButton } from '@omicronenergy/oscd-ui/iconbutton/OscdIconButton.js';
 import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
-import { getValueElements, getInstanceDAElement } from '../../foundation.js';
+import {
+  findDOTypeElement,
+  findElement,
+  getValueElements,
+  getInstanceDAElement,
+} from '../../foundation.js';
 import { BaseContainer } from '../base-container.js';
 import { msg } from '@lit/localize';
-import { predefinedBasicTypeEnum } from '@omicronenergy/oscd-scl-dialogs/patterns.js';
+import {
+  determineUninitializedStructure,
+  initializeElements,
+} from '../../foundation/dai.js';
+import { DaiValueDialog } from './dai-value-dialog.js';
+import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
+import { DaInfoDialog } from './da-info-dialog.js';
+import { findLogicalNodeElement } from '../../foundation/virtual-ied.js';
 
 function getValueDisplayString(val: Element): string {
   const sGroup = val.getAttribute('sGroup');
@@ -19,6 +31,55 @@ function getValueDisplayString(val: Element): string {
   return `${prefix}${value}`;
 }
 
+function getInstanceValues(
+  instanceElement: Element | null,
+  multipleSettings: number | null,
+): string[] {
+  if (!instanceElement) {
+    return multipleSettings ? Array(multipleSettings).fill('') : [''];
+  }
+
+  const vals = Array.from(instanceElement.querySelectorAll('Val'));
+  if (multipleSettings && multipleSettings > 0) {
+    return Array.from({ length: multipleSettings }, (_, index) => {
+      const sGroup = `${index + 1}`;
+      const val = vals.find(v => v.getAttribute('sGroup') === sGroup);
+      return val?.textContent?.trim() ?? '';
+    });
+  }
+
+  const val = vals.find(v => !v.getAttribute('sGroup')) ?? vals[0];
+  return [val?.textContent?.trim() ?? ''];
+}
+
+const supportedDaiTypes = new Set([
+  'BOOLEAN',
+  'Enum',
+  'FLOAT32',
+  'FLOAT64',
+  'INT8',
+  'INT16',
+  'INT24',
+  'INT32',
+  'INT64',
+  'INT128',
+  'INT8U',
+  'INT16U',
+  'INT24U',
+  'INT32U',
+  'Timestamp',
+  'VisString32',
+  'VisString64',
+  'VisString65',
+  'VisString129',
+  'VisString255',
+  'ObjRef',
+  'Currency',
+  'Octet64',
+  'Octet6',
+  'Octet16',
+]);
+
 /** [[`IED`]] plugin subeditor for editing `(B)DA` element. */
 export class DAContainer extends ScopedElementsMixin(BaseContainer) {
   static scopedElements = {
@@ -27,6 +88,8 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
     'oscd-scl-icon': OscdSclIcon,
     'oscd-icon': OscdIcon,
     'da-container': DAContainer,
+    'dai-value-dialog': DaiValueDialog,
+    'da-info-dialog': DaInfoDialog,
   };
 
   /**
@@ -37,6 +100,12 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
 
   @query('#toggleButton')
   toggleButton: OscdIconButton | undefined;
+
+  @query('dai-value-dialog')
+  daiValueDialog!: DaiValueDialog;
+
+  @query('da-info-dialog')
+  daInfoDialog!: DaInfoDialog;
 
   private header(): TemplateResult {
     const name = this.element.getAttribute('name') ?? '';
@@ -85,33 +154,252 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
     return dataStructure;
   }
 
-  private openCreateWizard(): void {
-    // // Search the LN(0) Element to start creating the initialized structure.
-    // const lnElement = this.ancestors.filter(element =>
-    //   ['LN0', 'LN'].includes(element.tagName),
-    // )[0];
-    // const templateStructure = this.getTemplateStructure();
-    // // First determine where to start creating new elements (DOI/SDI/DAI)
-    // const [parentElement, uninitializedTemplateStructure] =
-    //   determineUninitializedStructure(lnElement, templateStructure);
-    // // Next create all missing elements (DOI/SDI/DAI)
-    // const newElement = initializeElements(uninitializedTemplateStructure);
+  private getMultipleSettingGroupCount(): number | null {
+    let daElement = this.element;
+    if (this.element.tagName === 'BDA') {
+      const daTypeId = this.element.parentElement?.getAttribute('id');
+      const root = this.element.getRootNode() as Document | Element;
+      const referencedDa = root.querySelector(
+        `DOType > DA[type="${daTypeId}"]`,
+      );
+      if (referencedDa) {
+        daElement = referencedDa;
+      }
+    }
 
-    // if (newElement) {
-    //   const wizard = createDAIWizard(parentElement, newElement, this.element);
-    //   if (wizard) {
-    //     this.dispatchEvent(newWizardEvent(wizard));
-    //   }
-    // }
-    console.log('Please implement me', this);
+    const fc = daElement.getAttribute('fc') ?? '';
+    const settingControl = this.element
+      .closest('IED')
+      ?.querySelector('SettingControl');
+    const numOfSGs = settingControl?.getAttribute('numOfSGs') ?? '';
+    const count = parseInt(numOfSGs);
+
+    if (
+      (fc === 'SG' || fc === 'SE') &&
+      numOfSGs !== '' &&
+      !Number.isNaN(count)
+    ) {
+      return count;
+    }
+
+    return null;
   }
 
-  private openEditWizard(val: Element): void {
-    // const wizard = wizards['DAI'].edit(this.element, val);
-    // if (wizard) {
-    //   this.dispatchEvent(newWizardEvent(wizard));
-    // }
-    console.log('Please implement me', this, val);
+  private getEnumValues(): string[] {
+    const enumTypeId = this.element.getAttribute('type');
+    if (!enumTypeId) {
+      return [];
+    }
+
+    return Array.from(
+      this.element.ownerDocument.querySelectorAll(
+        `EnumType[id="${enumTypeId}"] > EnumVal`,
+      ),
+    )
+      .filter(enumVal => enumVal.textContent && enumVal.textContent !== '')
+      .sort(
+        (left, right) =>
+          parseInt(left.getAttribute('ord') ?? '0') -
+          parseInt(right.getAttribute('ord') ?? '0'),
+      )
+      .map(enumVal => enumVal.textContent ?? '');
+  }
+
+  private buildValElement(value: string, sGroup?: number): Element {
+    const namespace =
+      this.element.ownerDocument.documentElement.namespaceURI ??
+      'http://www.iec.ch/61850/2003/SCL';
+    const val = this.element.ownerDocument.createElementNS(namespace, 'Val');
+    if (sGroup) {
+      val.setAttribute('sGroup', `${sGroup}`);
+    }
+    val.textContent = value;
+    return val;
+  }
+
+  private openCreateWizard(): void {
+    const bType = this.element.getAttribute('bType');
+    if (!bType || !supportedDaiTypes.has(bType)) {
+      return;
+    }
+
+    const lnElement = this.ancestors.find(element =>
+      ['LN0', 'LN'].includes(element.tagName),
+    );
+    if (!lnElement) {
+      return;
+    }
+
+    const templateStructure = this.getTemplateStructure();
+    const multipleSettings = this.getMultipleSettingGroupCount();
+    const templateValue = this.element
+      .querySelector('Val')
+      ?.textContent?.trim();
+
+    let parentElement = lnElement;
+    let insertElement: Element | null = null;
+    let targetDai: Element | null = null;
+
+    if (this.instanceElement?.tagName === 'DAI') {
+      parentElement = this.instanceElement;
+      targetDai = this.instanceElement;
+    } else {
+      const [parent, uninitializedTemplateStructure] =
+        determineUninitializedStructure(lnElement, templateStructure);
+      parentElement = parent;
+      insertElement = initializeElements(uninitializedTemplateStructure);
+      targetDai =
+        insertElement.tagName === 'DAI'
+          ? insertElement
+          : insertElement.querySelector('DAI');
+    }
+
+    if (!targetDai) {
+      return;
+    }
+
+    this.daiValueDialog.show({
+      title: `Create DAI "${targetDai.getAttribute('name') ?? ''}"`,
+      bType,
+      enumValues: bType === 'Enum' ? this.getEnumValues() : [],
+      values: getInstanceValues(this.instanceElement, multipleSettings),
+      templateValue,
+      multipleSettings,
+      onConfirm: values => {
+        if (insertElement) {
+          Array.from(targetDai!.querySelectorAll('Val')).forEach(val =>
+            val.remove(),
+          );
+          if (multipleSettings) {
+            values.forEach((value, index) => {
+              targetDai!.append(this.buildValElement(value, index + 1));
+            });
+          } else {
+            targetDai!.append(this.buildValElement(values[0] ?? ''));
+          }
+
+          this.dispatchEvent(
+            newEditEventV2({
+              parent: parentElement,
+              node: insertElement,
+              reference: null,
+            }),
+          );
+          return;
+        }
+
+        const edits = [
+          ...Array.from(targetDai!.querySelectorAll('Val')).map(val => ({
+            node: val,
+          })),
+          ...(multipleSettings
+            ? values.map((value, index) => ({
+                parent: targetDai!,
+                node: this.buildValElement(value, index + 1),
+                reference: null,
+              }))
+            : [
+                {
+                  parent: targetDai!,
+                  node: this.buildValElement(values[0] ?? ''),
+                  reference: null,
+                },
+              ]),
+        ];
+
+        this.dispatchEvent(newEditEventV2(edits));
+      },
+    });
+  }
+
+  private openEditWizard(_val: Element): void {
+    const bType = this.element.getAttribute('bType');
+    if (!bType || !supportedDaiTypes.has(bType)) {
+      return;
+    }
+    if (!this.instanceElement) {
+      return;
+    }
+
+    const multipleSettings = this.getMultipleSettingGroupCount();
+    const templateValue = this.element
+      .querySelector('Val')
+      ?.textContent?.trim();
+
+    this.daiValueDialog.show({
+      title: `Edit DAI "${this.instanceElement.getAttribute('name') ?? ''}"`,
+      bType,
+      enumValues: bType === 'Enum' ? this.getEnumValues() : [],
+      values: getInstanceValues(this.instanceElement, multipleSettings),
+      templateValue,
+      multipleSettings,
+      onConfirm: values => {
+        const edits = [
+          ...Array.from(this.instanceElement!.querySelectorAll('Val')).map(
+            existingVal => ({
+              node: existingVal,
+            }),
+          ),
+          ...(multipleSettings
+            ? values.map((value, index) => ({
+                parent: this.instanceElement!,
+                node: this.buildValElement(value, index + 1),
+                reference: null,
+              }))
+            : [
+                {
+                  parent: this.instanceElement!,
+                  node: this.buildValElement(values[0] ?? ''),
+                  reference: null,
+                },
+              ]),
+        ];
+
+        this.dispatchEvent(newEditEventV2(edits));
+      },
+    });
+  }
+
+  private openInfoDialog(): void {
+    const iedElement = findElement(this.ancestors, 'IED');
+    const accessPointElement = findElement(this.ancestors, 'AccessPoint');
+    const lDeviceElement = findElement(this.ancestors, 'LDevice');
+    const logicalNodeElement = findLogicalNodeElement(this.ancestors);
+    const doElement = findElement(this.ancestors, 'DO');
+    const doTypeElement = findDOTypeElement(doElement);
+
+    const valueElement = this.instanceElement ?? this.element;
+    const values = getValueElements(valueElement);
+    const daValue =
+      values.length > 0
+        ? values.map(val => val.textContent ?? '').join(', ')
+        : '-';
+
+    this.daInfoDialog.show({
+      nsdocDescription: this.nsdoc.getDataDescription(
+        this.element,
+        this.ancestors,
+      ).label,
+      daName: this.element.getAttribute('name') ?? '-',
+      daiDescription: this.instanceElement?.getAttribute('desc') ?? '-',
+      daFc: this.element.getAttribute('fc') ?? '-',
+      daBType: this.element.getAttribute('bType') ?? '-',
+      daValue,
+      doName: doElement?.getAttribute('name') ?? '-',
+      doCdc: doTypeElement?.getAttribute('cdc') ?? '-',
+      lnPrefix: logicalNodeElement?.getAttribute('prefix') ?? '-',
+      lnClassLabel: logicalNodeElement
+        ? this.nsdoc.getDataDescription(logicalNodeElement, this.ancestors)
+            .label
+        : '-',
+      lnInst: logicalNodeElement?.getAttribute('inst') ?? '-',
+      lDevice:
+        lDeviceElement?.getAttribute('name') ??
+        lDeviceElement?.getAttribute('inst') ??
+        '-',
+      accessPoint: accessPointElement?.getAttribute('name') ?? '-',
+      ied: iedElement?.getAttribute('name') ?? '-',
+    });
   }
 
   private renderVal(): TemplateResult[] {
@@ -128,10 +416,7 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
               </div>
               <div style="display: flex; align-items: center;">
                 <oscd-icon-button
-                  ?disabled=${!bType ||
-                  !predefinedBasicTypeEnum[
-                    bType as keyof typeof predefinedBasicTypeEnum
-                  ]}
+                  ?disabled=${!bType || !supportedDaiTypes.has(bType)}
                   @click=${() => this.openEditWizard(val)}
                 >
                   <oscd-icon>edit</oscd-icon>
@@ -146,10 +431,7 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
             </div>
             <div style="display: flex; align-items: center;">
               <oscd-icon-button
-                ?disabled=${!bType ||
-                !predefinedBasicTypeEnum[
-                  bType as keyof typeof predefinedBasicTypeEnum
-                ]}
+                ?disabled=${!bType || !supportedDaiTypes.has(bType)}
                 @click=${() => this.openCreateWizard()}
               >
                 <oscd-icon>add</oscd-icon>
@@ -171,18 +453,7 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
           <oscd-icon-button
             title=${this.nsdoc.getDataDescription(this.element, this.ancestors)
               .label}
-            @click=${() =>
-              // this.dispatchEvent(
-              //   newWizardEvent(
-              //     createDaInfoWizard(
-              //       this.element,
-              //       this.instanceElement,
-              //       this.ancestors,
-              //       this.nsdoc,
-              //     ),
-              //   ),
-              // )
-              console.log('Please implement me', this.element)}
+            @click=${() => this.openInfoDialog()}
           >
             <oscd-icon>info</oscd-icon>
           </oscd-icon-button>
@@ -217,6 +488,8 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
             )
           : nothing}
       </oscd-action-pane>
+      <dai-value-dialog></dai-value-dialog>
+      <da-info-dialog></da-info-dialog>
     `;
   }
 
