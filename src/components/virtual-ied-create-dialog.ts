@@ -26,10 +26,29 @@ export class VirtualIedCreateDialog extends ScopedElementsMixin(LitElement) {
   @property({ type: Function })
   onConfirm!: (iedName: string) => void;
 
-  @query('oscd-dialog') dialog!: OscdDialog;
-
   @state()
   private newIedName = '';
+
+  @query('oscd-dialog') dialog!: OscdDialog;
+
+  public show(): void {
+    this.newIedName = '';
+    this.dialog.show();
+  }
+
+  private close(): void {
+    this.dialog.close();
+    this.newIedName = '';
+  }
+
+  private handleCreate(): void {
+    if (this.isIedNameValid(this.newIedName)) {
+      const edits = createVirtualIED(this.newIedName, this.doc);
+      this.dispatchEvent(newEditEventV2(edits));
+      this.dispatchEvent(newIedCreatedEvent({ iedName: this.newIedName }));
+      this.close();
+    }
+  }
 
   private isIedNameValid(name: string): boolean {
     const trimmedName = name.trim();
@@ -60,25 +79,6 @@ export class VirtualIedCreateDialog extends ScopedElementsMixin(LitElement) {
       .filter(n => n !== null) as string[];
 
     return !existingNames.includes(name);
-  }
-
-  public show(): void {
-    this.newIedName = '';
-    this.dialog.show();
-  }
-
-  private close(): void {
-    this.dialog.close();
-    this.newIedName = '';
-  }
-
-  private handleCreate(): void {
-    if (this.isIedNameValid(this.newIedName)) {
-      const edits = createVirtualIED(this.newIedName, this.doc);
-      this.dispatchEvent(newEditEventV2(edits));
-      this.dispatchEvent(newIedCreatedEvent({ iedName: this.newIedName }));
-      this.close();
-    }
   }
 
   render(): TemplateResult {

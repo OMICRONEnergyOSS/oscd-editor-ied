@@ -137,19 +137,14 @@ export class AccessPointEditDialog extends ScopedElementsMixin(LitElement) {
   @state()
   private desc: string | null = null;
 
-  public show(): void {
-    this.apName = this.element.getAttribute('name') ?? '';
-    this.desc = this.element.getAttribute('desc') ?? null;
-    this.dialog.show();
-  }
-
   @query('oscd-dialog') dialog!: OscdDialog;
 
   @query('#apName') apNameField!: OscdFilledTextField;
 
-  private reset(): void {
-    this.apName = '';
-    this.desc = null;
+  public show(): void {
+    this.apName = this.element.getAttribute('name') ?? '';
+    this.desc = this.element.getAttribute('desc') ?? null;
+    this.dialog.show();
   }
 
   private close(): void {
@@ -166,6 +161,11 @@ export class AccessPointEditDialog extends ScopedElementsMixin(LitElement) {
       this.onConfirm(data);
       this.close();
     }
+  }
+
+  private reset(): void {
+    this.apName = '';
+    this.desc = null;
   }
 
   render(): TemplateResult {

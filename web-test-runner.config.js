@@ -63,6 +63,11 @@ function defaultGetImageDiff({ baselineImage, image, options }) {
 }
 
 export default /** @type {import("@web/test-runner").TestRunnerConfig} */ ({
+  coverageConfig: {
+    include: ['dist/**/*.js'],
+    exclude: ['**/node_modules/**', '**/__wds-outside-root__/**'],
+  },
+
   plugins: [
     visualRegressionPlugin({
       update: process.argv.includes('--update-visual-baseline'),

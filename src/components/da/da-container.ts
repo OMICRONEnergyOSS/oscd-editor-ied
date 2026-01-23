@@ -96,124 +96,14 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
   @property({ attribute: false })
   instanceElement!: Element;
 
-  @query('#toggleButton')
-  toggleButton: OscdIconButton | undefined;
+  @property({ type: Boolean })
+  expanded = false;
 
   @query('dai-value-dialog')
   daiValueDialog!: DaiValueDialog;
 
   @query('da-info-dialog')
   daInfoDialog!: DaInfoDialog;
-
-  private header(): TemplateResult {
-    const name = this.element.getAttribute('name') ?? '';
-    const bType = this.element.getAttribute('bType') ?? nothing;
-    const fc = this.element.getAttribute('fc');
-
-    if (this.instanceElement) {
-      return html`<b>${name}</b> ${MDASH} ${bType}${fc ? html` [${fc}]` : ``}`;
-    } else {
-      return html`${name} ${MDASH} ${bType}${fc ? html` [${fc}]` : ``}`;
-    }
-  }
-
-  /**
-   * Get the nested (B)DA element(s) if available.
-   * @returns The nested (B)DA element(s) of this (B)DA container.
-   */
-  private getBDAElements(): Element[] {
-    const type = this.element!.getAttribute('type') ?? undefined;
-    const doType = this.element!.closest('SCL')!.querySelector(
-      `:root > DataTypeTemplates > DAType[id="${type}"]`,
-    );
-    if (doType != null) {
-      return Array.from(doType!.querySelectorAll(':scope > BDA'));
-    }
-    return [];
-  }
-
-  /**
-   * Use the list of ancestor to retrieve the list from DO to the current (B)DA Element.
-   * This structure is used to create the initialized structure from (DOI/SDI/DAI).
-   *
-   * @returns The list from the DO Element to the current (B)DA Element.
-   */
-  private getTemplateStructure(): Element[] {
-    // Search for the DO Element, this will be the starting point.
-    const doElement = this.ancestors.filter(
-      element => element.tagName == 'DO',
-    )[0];
-    // From the DO Element and below we need all the elements (BDA, SDO, DA)
-    const dataStructure = this.ancestors.slice(
-      this.ancestors.indexOf(doElement),
-    );
-    // Add the current DA Element also to the list.
-    dataStructure.push(this.element);
-    return dataStructure;
-  }
-
-  private getMultipleSettingGroupCount(): number | null {
-    let daElement = this.element;
-    if (this.element.tagName === 'BDA') {
-      const daTypeId = this.element.parentElement?.getAttribute('id');
-      const root = this.element.getRootNode() as Document | Element;
-      const referencedDa = root.querySelector(
-        `DOType > DA[type="${daTypeId}"]`,
-      );
-      if (referencedDa) {
-        daElement = referencedDa;
-      }
-    }
-
-    const fc = daElement.getAttribute('fc') ?? '';
-    const settingControl = this.element
-      .closest('IED')
-      ?.querySelector('SettingControl');
-    const numOfSGs = settingControl?.getAttribute('numOfSGs') ?? '';
-    const count = parseInt(numOfSGs);
-
-    if (
-      (fc === 'SG' || fc === 'SE') &&
-      numOfSGs !== '' &&
-      !Number.isNaN(count)
-    ) {
-      return count;
-    }
-
-    return null;
-  }
-
-  private getEnumValues(): string[] {
-    const enumTypeId = this.element.getAttribute('type');
-    if (!enumTypeId) {
-      return [];
-    }
-
-    return Array.from(
-      this.element.ownerDocument.querySelectorAll(
-        `EnumType[id="${enumTypeId}"] > EnumVal`,
-      ),
-    )
-      .filter(enumVal => enumVal.textContent && enumVal.textContent !== '')
-      .sort(
-        (left, right) =>
-          parseInt(left.getAttribute('ord') ?? '0') -
-          parseInt(right.getAttribute('ord') ?? '0'),
-      )
-      .map(enumVal => enumVal.textContent ?? '');
-  }
-
-  private buildValElement(value: string, sGroup?: number): Element {
-    const namespace =
-      this.element.ownerDocument.documentElement.namespaceURI ??
-      'http://www.iec.ch/61850/2003/SCL';
-    const val = this.element.ownerDocument.createElementNS(namespace, 'Val');
-    if (sGroup) {
-      val.setAttribute('sGroup', `${sGroup}`);
-    }
-    val.textContent = value;
-    return val;
-  }
 
   private openCreateWizard(): void {
     const bType = this.element.getAttribute('bType');
@@ -362,6 +252,120 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
     this.daInfoDialog.show();
   }
 
+  private toggleExpanded(): void {
+    this.expanded = !this.expanded;
+  }
+
+  private header(): TemplateResult {
+    const name = this.element.getAttribute('name') ?? '';
+    const bType = this.element.getAttribute('bType') ?? nothing;
+    const fc = this.element.getAttribute('fc');
+
+    if (this.instanceElement) {
+      return html`<b>${name}</b> ${MDASH} ${bType}${fc ? html` [${fc}]` : ``}`;
+    } else {
+      return html`${name} ${MDASH} ${bType}${fc ? html` [${fc}]` : ``}`;
+    }
+  }
+
+  /**
+   * Get the nested (B)DA element(s) if available.
+   * @returns The nested (B)DA element(s) of this (B)DA container.
+   */
+  private getBDAElements(): Element[] {
+    const type = this.element!.getAttribute('type') ?? undefined;
+    const doType = this.element!.closest('SCL')!.querySelector(
+      `:root > DataTypeTemplates > DAType[id="${type}"]`,
+    );
+    if (doType != null) {
+      return Array.from(doType!.querySelectorAll(':scope > BDA'));
+    }
+    return [];
+  }
+
+  /**
+   * Use the list of ancestor to retrieve the list from DO to the current (B)DA Element.
+   * This structure is used to create the initialized structure from (DOI/SDI/DAI).
+   *
+   * @returns The list from the DO Element to the current (B)DA Element.
+   */
+  private getTemplateStructure(): Element[] {
+    // Search for the DO Element, this will be the starting point.
+    const doElement = this.ancestors.filter(
+      element => element.tagName == 'DO',
+    )[0];
+    // From the DO Element and below we need all the elements (BDA, SDO, DA)
+    const dataStructure = this.ancestors.slice(
+      this.ancestors.indexOf(doElement),
+    );
+    // Add the current DA Element also to the list.
+    dataStructure.push(this.element);
+    return dataStructure;
+  }
+
+  private getMultipleSettingGroupCount(): number | null {
+    let daElement = this.element;
+    if (this.element.tagName === 'BDA') {
+      const daTypeId = this.element.parentElement?.getAttribute('id');
+      const root = this.element.getRootNode() as Document | Element;
+      const referencedDa = root.querySelector(
+        `DOType > DA[type="${daTypeId}"]`,
+      );
+      if (referencedDa) {
+        daElement = referencedDa;
+      }
+    }
+
+    const fc = daElement.getAttribute('fc') ?? '';
+    const settingControl = this.element
+      .closest('IED')
+      ?.querySelector('SettingControl');
+    const numOfSGs = settingControl?.getAttribute('numOfSGs') ?? '';
+    const count = parseInt(numOfSGs);
+
+    if (
+      (fc === 'SG' || fc === 'SE') &&
+      numOfSGs !== '' &&
+      !Number.isNaN(count)
+    ) {
+      return count;
+    }
+
+    return null;
+  }
+
+  private getEnumValues(): string[] {
+    const enumTypeId = this.element.getAttribute('type');
+    if (!enumTypeId) {
+      return [];
+    }
+
+    return Array.from(
+      this.element.ownerDocument.querySelectorAll(
+        `EnumType[id="${enumTypeId}"] > EnumVal`,
+      ),
+    )
+      .filter(enumVal => enumVal.textContent && enumVal.textContent !== '')
+      .sort(
+        (left, right) =>
+          parseInt(left.getAttribute('ord') ?? '0') -
+          parseInt(right.getAttribute('ord') ?? '0'),
+      )
+      .map(enumVal => enumVal.textContent ?? '');
+  }
+
+  private buildValElement(value: string, sGroup?: number): Element {
+    const namespace =
+      this.element.ownerDocument.documentElement.namespaceURI ??
+      'http://www.iec.ch/61850/2003/SCL';
+    const val = this.element.ownerDocument.createElementNS(namespace, 'Val');
+    if (sGroup) {
+      val.setAttribute('sGroup', `${sGroup}`);
+    }
+    val.textContent = value;
+    return val;
+  }
+
   private renderVal(): TemplateResult[] {
     const bType = this.element!.getAttribute('bType');
     const element = this.instanceElement ?? this.element;
@@ -423,14 +427,15 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
               <oscd-icon-button
                 id="toggleButton"
                 toggle
-                @click=${() => this.requestUpdate()}
+                .selected=${this.expanded}
+                @click=${this.toggleExpanded}
               >
                 <oscd-icon>keyboard_arrow_down</oscd-icon>
                 <oscd-icon slot="selected">keyboard_arrow_up</oscd-icon>
               </oscd-icon-button>
             </abbr>`
           : html`${this.renderVal()}`}
-        ${this.toggleButton?.selected && bType === 'Struct'
+        ${this.expanded && bType === 'Struct'
           ? this.getBDAElements().map(
               bdaElement =>
                 html`<da-container

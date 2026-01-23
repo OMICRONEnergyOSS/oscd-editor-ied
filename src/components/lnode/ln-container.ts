@@ -5,7 +5,7 @@ import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
 import { OscdIconButton } from '@omicronenergy/oscd-ui/iconbutton/OscdIconButton.js';
 import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
 import { html, nothing, TemplateResult } from 'lit';
-import { query } from 'lit/decorators.js';
+import { property } from 'lit/decorators.js';
 import { msg } from '@lit/localize';
 import { DOContainer } from '../do/do-container.js';
 import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
@@ -26,8 +26,31 @@ export class LNContainer extends ScopedElementsMixin(BaseContainer) {
     'do-container': DOContainer,
   };
 
-  @query('#toggleButton')
-  toggleButton!: OscdIconButton | undefined;
+  @property({ type: Boolean })
+  expanded = false;
+
+  private openEditWizard(): void {
+    this.dispatchEvent(newEditElementEvent({ element: this.element }));
+  }
+
+  private removeLN(): void {
+    const name = this.header();
+    this.dispatchEvent(
+      newConfirmDeleteEvent({
+        heading: msg(`Delete`),
+        message: msg(
+          `Are you sure you want to delete LogicalNode "${name}" and all its content?`,
+        ),
+        onConfirm: () => {
+          this.dispatchEvent(newEditEventV2({ node: this.element }));
+        },
+      }),
+    );
+  }
+
+  private toggleExpanded(): void {
+    this.expanded = !this.expanded;
+  }
 
   private header(): string {
     const prefix = this.element.getAttribute('prefix');
@@ -66,25 +89,6 @@ export class LNContainer extends ScopedElementsMixin(BaseContainer) {
     return this.element.querySelector(`:scope > DOI[name="${doName}"]`);
   }
 
-  private openEditWizard(): void {
-    this.dispatchEvent(newEditElementEvent({ element: this.element }));
-  }
-
-  private removeLN(): void {
-    const name = this.header();
-    this.dispatchEvent(
-      newConfirmDeleteEvent({
-        heading: msg(`Delete`),
-        message: msg(
-          `Are you sure you want to delete LogicalNode "${name}" and all its content?`,
-        ),
-        onConfirm: () => {
-          this.dispatchEvent(newEditEventV2({ node: this.element }));
-        },
-      }),
-    );
-  }
-
   render(): TemplateResult {
     const doElements = this.getDOElements();
 
@@ -112,14 +116,15 @@ export class LNContainer extends ScopedElementsMixin(BaseContainer) {
               <oscd-icon-button
                 toggle
                 id="toggleButton"
-                @click=${() => this.requestUpdate()}
+                .selected=${this.expanded}
+                @click=${this.toggleExpanded}
               >
                 <oscd-icon>keyboard_arrow_down</oscd-icon>
                 <oscd-icon slot="selected">keyboard_arrow_up</oscd-icon>
               </oscd-icon-button>
             </abbr>`
         : nothing}
-      ${this.toggleButton?.selected
+      ${this.expanded
         ? doElements.map(
             dO =>
               html`<do-container

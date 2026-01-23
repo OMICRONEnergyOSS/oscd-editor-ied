@@ -70,14 +70,6 @@ export class AccessPointCreateDialog extends ScopedElementsMixin(LitElement) {
     this.dialog.show();
   }
 
-  private reset(): void {
-    this.apName = '';
-    this.desc = null;
-    this.createServerAt = false;
-    this.serverAtApName = '';
-    this.serverAtDesc = '';
-  }
-
   private close(): void {
     this.dialog.close();
   }
@@ -97,6 +89,14 @@ export class AccessPointCreateDialog extends ScopedElementsMixin(LitElement) {
       this.onConfirm(data);
       this.close();
     }
+  }
+
+  private reset(): void {
+    this.apName = '';
+    this.desc = null;
+    this.createServerAt = false;
+    this.serverAtApName = '';
+    this.serverAtDesc = '';
   }
 
   private renderServerAtSection(): TemplateResult {

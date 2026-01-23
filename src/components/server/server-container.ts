@@ -37,30 +37,6 @@ export class ServerContainer extends ScopedElementsMixin(BaseContainer) {
   @query('oscd-scl-dialogs')
   private oscdSclDialogs!: OscdSclDialogs;
 
-  private header(): TemplateResult {
-    const name = this.element.tagName;
-    const desc = this.element.getAttribute('desc');
-    const ref =
-      name === 'ServerAt' ? ` (${this.element.getAttribute('apName')})` : '';
-
-    return html`${name}${ref}${desc ? ` \u2014 ${desc}` : ''}`;
-  }
-
-  private getLDeviceElements(): Element[] {
-    return Array.from(this.element.querySelectorAll(':scope > LDevice')).filter(
-      element => {
-        return (
-          Array.from(element.querySelectorAll(':scope > LN,LN0')).filter(
-            element => {
-              const lnClass = element.getAttribute('lnClass') ?? '';
-              return this.selectedLNClasses.includes(lnClass);
-            },
-          ).length > 0
-        );
-      },
-    );
-  }
-
   private async handleCreateLDevice(event: Event) {
     const trigger = event.currentTarget as OscdIconButton | null;
     const createType = {
@@ -100,6 +76,30 @@ export class ServerContainer extends ScopedElementsMixin(BaseContainer) {
 
     inserts.push(...createLDeviceEdit);
     this.dispatchEvent(newEditEventV2(inserts));
+  }
+
+  private header(): TemplateResult {
+    const name = this.element.tagName;
+    const desc = this.element.getAttribute('desc');
+    const ref =
+      name === 'ServerAt' ? ` (${this.element.getAttribute('apName')})` : '';
+
+    return html`${name}${ref}${desc ? ` \u2014 ${desc}` : ''}`;
+  }
+
+  private getLDeviceElements(): Element[] {
+    return Array.from(this.element.querySelectorAll(':scope > LDevice')).filter(
+      element => {
+        return (
+          Array.from(element.querySelectorAll(':scope > LN,LN0')).filter(
+            element => {
+              const lnClass = element.getAttribute('lnClass') ?? '';
+              return this.selectedLNClasses.includes(lnClass);
+            },
+          ).length > 0
+        );
+      },
+    );
   }
 
   render() {

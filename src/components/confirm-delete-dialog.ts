@@ -25,14 +25,14 @@ export class ConfirmDeleteDialog extends ScopedElementsMixin(LitElement) {
   @state()
   private onConfirm?: () => void;
 
+  @query('oscd-dialog') dialog!: OscdDialog;
+
   public confirmDelete(details: ConfirmDeleteDetail) {
     this.heading = details.heading;
     this.message = details.message;
     this.onConfirm = details.onConfirm;
     this.dialog.show();
   }
-
-  @query('oscd-dialog') dialog!: OscdDialog;
 
   private close(): void {
     this.dialog.close();

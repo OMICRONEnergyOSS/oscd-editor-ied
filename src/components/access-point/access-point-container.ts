@@ -34,33 +34,8 @@ export class AccessPointContainer extends ScopedElementsMixin(BaseContainer) {
   @property()
   selectedLNClasses: string[] = [];
 
-  private getLnElements(): Element[] {
-    return Array.from(this.element.querySelectorAll(':scope > LN')).filter(
-      element => {
-        const lnClass = element.getAttribute('lnClass') ?? '';
-        return this.selectedLNClasses.includes(lnClass);
-      },
-    );
-  }
-
   @query('access-point-edit-dialog')
   accessPointDialog!: AccessPointEditDialog;
-
-  private renderServicesIcon(): TemplateResult {
-    const services: Element | null = this.element.querySelector('Services');
-
-    if (!services) {
-      return html``;
-    }
-
-    return html` <oscd-icon-button
-      slot="action"
-      title="${msg('Show Services the IED/AccessPoint provides')}"
-      @click=${() => this.openSettingsWizard(services)}
-    >
-      <oscd-icon>settings</oscd-icon>
-    </oscd-icon-button>`;
-  }
 
   private openSettingsWizard(services: Element): void {
     // const wizard = editServicesWizard(services);
@@ -68,13 +43,6 @@ export class AccessPointContainer extends ScopedElementsMixin(BaseContainer) {
     //   this.dispatchEvent(newWizardEvent(wizard));
     // }
     console.log('Please implement me', this, services);
-  }
-
-  private header() {
-    const name = this.element.getAttribute('name') ?? '';
-    const desc = this.element.getAttribute('desc');
-
-    return `${name}${desc ? ` \u2014 ${desc}` : ''}`;
   }
 
   private removeAccessPoint(): void {
@@ -102,6 +70,38 @@ export class AccessPointContainer extends ScopedElementsMixin(BaseContainer) {
         },
       }),
     );
+  }
+
+  private header() {
+    const name = this.element.getAttribute('name') ?? '';
+    const desc = this.element.getAttribute('desc');
+
+    return `${name}${desc ? ` \u2014 ${desc}` : ''}`;
+  }
+
+  private getLnElements(): Element[] {
+    return Array.from(this.element.querySelectorAll(':scope > LN')).filter(
+      element => {
+        const lnClass = element.getAttribute('lnClass') ?? '';
+        return this.selectedLNClasses.includes(lnClass);
+      },
+    );
+  }
+
+  private renderServicesIcon(): TemplateResult {
+    const services: Element | null = this.element.querySelector('Services');
+
+    if (!services) {
+      return html``;
+    }
+
+    return html` <oscd-icon-button
+      slot="action"
+      title="${msg('Show Services the IED/AccessPoint provides')}"
+      @click=${() => this.openSettingsWizard(services)}
+    >
+      <oscd-icon>settings</oscd-icon>
+    </oscd-icon-button>`;
   }
 
   override render() {

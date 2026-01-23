@@ -79,25 +79,6 @@ export class IedContainer extends ScopedElementsMixin(BaseContainer) {
     this.dispatchEvent(newEditEventV2(inserts));
   }
 
-  private renderServicesIcon(): TemplateResult {
-    const services: Element | null = this.element.querySelector('Services');
-
-    if (!services) {
-      return html``;
-    }
-
-    return html` <abbr
-      slot="action"
-      title="${msg('Show Services the IED/AccessPoint provides')}"
-    >
-      <oscd-icon-button
-        disabled
-        @click=${() => this.handleEditServices(services)}
-        ><oscd-icon>settings</oscd-icon></oscd-icon-button
-      >
-    </abbr>`;
-  }
-
   private handleEditServices(services: Element): void {
     console.log(
       'Please implement me',
@@ -126,6 +107,25 @@ export class IedContainer extends ScopedElementsMixin(BaseContainer) {
     const desc = this.element.getAttribute('desc');
 
     return `${name}${desc ? ` \u2014 ${desc}` : ''}`;
+  }
+
+  private renderServicesIcon(): TemplateResult {
+    const services: Element | null = this.element.querySelector('Services');
+
+    if (!services) {
+      return html``;
+    }
+
+    return html` <abbr
+      slot="action"
+      title="${msg('Show Services the IED/AccessPoint provides')}"
+    >
+      <oscd-icon-button
+        disabled
+        @click=${() => this.handleEditServices(services)}
+        ><oscd-icon>settings</oscd-icon></oscd-icon-button
+      >
+    </abbr>`;
   }
 
   render() {

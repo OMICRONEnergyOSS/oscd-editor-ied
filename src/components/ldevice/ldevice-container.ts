@@ -31,14 +31,50 @@ export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
   @property()
   selectedLNClasses: string[] = [];
 
-  @query('#toggleButton')
-  toggleButton!: OscdIconButton | undefined;
+  @property({ type: Boolean })
+  expanded = false;
 
   @query('oscd-scl-dialogs')
   private oscdSclDialogs!: OscdSclDialogs;
 
+  private async handleAddLN(event: Event): Promise<void> {
+    const trigger = event.currentTarget as OscdIconButton | null;
+    let edits: EditV2[] | undefined;
+    const createType = {
+      parent: this.element,
+      tagName: 'LN',
+    };
+    try {
+      edits = await this.oscdSclDialogs.create(createType);
+    } finally {
+      // Ensure focus doesn't return to the trigger after dialog closes (e.g., Escape).
+      setTimeout(() => trigger?.blur?.(), 0);
+    }
+
+    this.dispatchEvent(newEditEventV2(edits));
+  }
+
   private handleEditLDevice(): void {
     this.dispatchEvent(newEditElementEvent({ element: this.element }));
+  }
+
+  private removeLDevice(): void {
+    const name = this.header();
+    this.dispatchEvent(
+      newConfirmDeleteEvent({
+        heading: msg(`Delete`),
+        message: msg(
+          `Are you sure you want to delete LogicalDevice "${name}" and all its content?`,
+        ),
+        onConfirm: () => {
+          this.dispatchEvent(newEditEventV2({ node: this.element }));
+        },
+      }),
+    );
+  }
+
+  private toggleExpanded(): void {
+    this.expanded = !this.expanded;
   }
 
   private header() {
@@ -58,38 +94,6 @@ export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
         const lnClass = element.getAttribute('lnClass') ?? '';
         return this.selectedLNClasses.includes(lnClass);
       },
-    );
-  }
-
-  private async handleAddLN(event: Event): Promise<void> {
-    const trigger = event.currentTarget as OscdIconButton | null;
-    let edits: EditV2[] | undefined;
-    const createType = {
-      parent: this.element,
-      tagName: 'LN',
-    };
-    try {
-      edits = await this.oscdSclDialogs.create(createType);
-    } finally {
-      // Ensure focus doesn't return to the trigger after dialog closes (e.g., Escape).
-      setTimeout(() => trigger?.blur?.(), 0);
-    }
-
-    this.dispatchEvent(newEditEventV2(edits));
-  }
-
-  private removeLDevice(): void {
-    const name = this.header();
-    this.dispatchEvent(
-      newConfirmDeleteEvent({
-        heading: msg(`Delete`),
-        message: msg(
-          `Are you sure you want to delete LogicalDevice "${name}" and all its content?`,
-        ),
-        onConfirm: () => {
-          this.dispatchEvent(newEditEventV2({ node: this.element }));
-        },
-      }),
     );
   }
 
@@ -124,7 +128,8 @@ export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
               <oscd-icon-button
                 toggle
                 id="toggleButton"
-                @click=${() => this.requestUpdate()}
+                .selected=${this.expanded}
+                @click=${this.toggleExpanded}
               >
                 <oscd-icon>keyboard_arrow_down</oscd-icon>
                 <oscd-icon slot="selected">keyboard_arrow_up</oscd-icon>
@@ -132,7 +137,7 @@ export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
             </abbr>`
           : nothing}
         <div id="lnContainer">
-          ${this.toggleButton?.selected
+          ${this.expanded
             ? lnElements.map(
                 ln =>
                   html`<ln-container

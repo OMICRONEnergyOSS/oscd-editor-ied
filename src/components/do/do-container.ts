@@ -37,8 +37,18 @@ export class DOContainer extends ScopedElementsMixin(BaseContainer) {
   @property({ attribute: false })
   instanceElement!: Element;
 
-  @query('#toggleButton') toggleButton: OscdIconButton | undefined;
+  @property({ type: Boolean })
+  expanded = false;
+
   @query('do-info-dialog') doInfoDialog!: DoInfoDialog;
+
+  private openInfoDialog(): void {
+    this.doInfoDialog.show();
+  }
+
+  private toggleExpanded(): void {
+    this.expanded = !this.expanded;
+  }
 
   private header() {
     const name = this.element.getAttribute('name') ?? '';
@@ -93,10 +103,6 @@ export class DOContainer extends ScopedElementsMixin(BaseContainer) {
     return null;
   }
 
-  private openInfoDialog(): void {
-    this.doInfoDialog.show();
-  }
-
   render(): TemplateResult {
     const daElements = this.getDAElements();
     const doElements = this.getSDOElements();
@@ -123,14 +129,15 @@ export class DOContainer extends ScopedElementsMixin(BaseContainer) {
               <oscd-icon-button
                 toggle
                 id="toggleButton"
-                @click=${() => this.requestUpdate()}
+                .selected=${this.expanded}
+                @click=${this.toggleExpanded}
               >
                 <oscd-icon>keyboard_arrow_down</oscd-icon>
                 <oscd-icon slot="selected">keyboard_arrow_up</oscd-icon>
               </oscd-icon-button>
             </abbr>`
           : nothing}
-        ${this.toggleButton?.selected
+        ${this.expanded
           ? daElements.map(
               daElement =>
                 html`<da-container
@@ -146,7 +153,7 @@ export class DOContainer extends ScopedElementsMixin(BaseContainer) {
                 ></da-container>`,
             )
           : nothing}
-        ${this.toggleButton?.selected
+        ${this.expanded
           ? doElements.map(
               doElement =>
                 html`<do-container
