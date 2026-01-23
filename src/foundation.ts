@@ -3,6 +3,10 @@ import { isInsert } from '@openscd/oscd-api/utils.js';
 import { insertSelectedLNodeType } from '@openscd/scl-lib';
 import { createElement } from '@openscd/scl-lib/dist/foundation/utils.js';
 
+export const MDASH = '\u2014'; // em dash '—' (longer dash)
+export const NDASH = '\u2013'; // en dash '–' (little bit shorter dash)
+export const MISSING_VALUE = MDASH;
+
 /**
  * Search for an element with a passed tag-name in the list of ancestors passed.
  * @param ancestors - The list of elements to search in for an LN or LN0 element.

@@ -445,8 +445,6 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
     * {
       /* patch theme colors defined in shell until we can correct them */
       --md-icon-button-disabled-icon-color: var(--oscd-base00);
-      --md-filled-text-field-disabled-input-text-opacity: 0.8;
-      --md-filled-text-field-disabled-label-text-opacity: 0.8;
     }
     :host {
       position: relative;

@@ -8,17 +8,16 @@ import { OscdOutlinedButton } from '@omicronenergy/oscd-ui/button/OscdOutlinedBu
 import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
 import { OscdIconButton } from '@omicronenergy/oscd-ui/iconbutton/OscdIconButton.js';
 import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
-import {
-  findDOTypeElement,
-  findElement,
-  getInstanceDAElement,
-} from '../../foundation.js';
 import { BaseContainer } from '../base-container.js';
 import { msg } from '@lit/localize';
 import { DAContainer } from '../da/da-container.js';
 import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
 import { DoInfoDialog } from './do-info-dialog.js';
-import { findLogicalNodeElement } from '../../foundation/virtual-ied.js';
+import {
+  findDOTypeElement,
+  getInstanceDAElement,
+  MDASH,
+} from '../../foundation.js';
 
 export class DOContainer extends ScopedElementsMixin(BaseContainer) {
   static scopedElements = {
@@ -46,9 +45,9 @@ export class DOContainer extends ScopedElementsMixin(BaseContainer) {
     const desc = this.element.getAttribute('desc');
 
     if (this.instanceElement != null) {
-      return html`<b>${name}${desc ? html` &mdash; ${desc}` : nothing}</b>`;
+      return html`<b>${name}${desc ? html` ${MDASH} ${desc}` : nothing}</b>`;
     } else {
-      return html`${name}${desc ? html` &mdash; ${desc}` : nothing}`;
+      return html`${name}${desc ? html` ${MDASH} ${desc}` : nothing}`;
     }
   }
 
@@ -95,38 +94,16 @@ export class DOContainer extends ScopedElementsMixin(BaseContainer) {
   }
 
   private openInfoDialog(): void {
-    const logicalNodeElement = findLogicalNodeElement(this.ancestors);
-    const lDeviceElement = findElement(this.ancestors, 'LDevice');
-    const accessPointElement = findElement(this.ancestors, 'AccessPoint');
-    const iedElement = findElement(this.ancestors, 'IED');
-    const doTypeElement = findDOTypeElement(this.element);
-
-    this.doInfoDialog.show({
-      nsdocDescription: this.nsdoc.getDataDescription(
-        this.element,
-        this.ancestors,
-      ).label,
-      doName: this.element.getAttribute('name') ?? '-',
-      doiDescription: this.instanceElement?.getAttribute('desc') ?? '-',
-      cdc: doTypeElement?.getAttribute('cdc') ?? '-',
-      lnPrefix: logicalNodeElement?.getAttribute('prefix') ?? '-',
-      lnClassLabel: logicalNodeElement
-        ? this.nsdoc.getDataDescription(logicalNodeElement, this.ancestors)
-            .label
-        : '-',
-      lnInst: logicalNodeElement?.getAttribute('inst') ?? '-',
-      lDevice:
-        lDeviceElement?.getAttribute('name') ??
-        lDeviceElement?.getAttribute('inst') ??
-        '-',
-      accessPoint: accessPointElement?.getAttribute('name') ?? '-',
-      ied: iedElement?.getAttribute('name') ?? '-',
-    });
+    this.doInfoDialog.show();
   }
 
   render(): TemplateResult {
     const daElements = this.getDAElements();
     const doElements = this.getSDOElements();
+    const nsdocDescription = this.nsdoc.getDataDescription(
+      this.element,
+      this.ancestors,
+    ).label;
 
     return html`<oscd-action-pane
         .label="${this.header()}"
@@ -134,7 +111,8 @@ export class DOContainer extends ScopedElementsMixin(BaseContainer) {
       >
         <abbr slot="action">
           <oscd-icon-button
-            title=${this.nsdoc.getDataDescription(this.element).label}
+            title=${nsdocDescription}
+            aria-label=${nsdocDescription}
             @click=${() => this.openInfoDialog()}
           >
             <oscd-icon>info</oscd-icon>
@@ -182,6 +160,11 @@ export class DOContainer extends ScopedElementsMixin(BaseContainer) {
             )
           : nothing}
       </oscd-action-pane>
-      <do-info-dialog></do-info-dialog>`;
+      <do-info-dialog
+        .ancestors=${this.ancestors}
+        .nsdoc=${this.nsdoc}
+        .templateElement=${this.element}
+        .instanceElement=${this.instanceElement}
+      ></do-info-dialog>`;
   }
 }

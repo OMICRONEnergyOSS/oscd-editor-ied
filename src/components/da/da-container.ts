@@ -7,10 +7,9 @@ import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
 import { OscdIconButton } from '@omicronenergy/oscd-ui/iconbutton/OscdIconButton.js';
 import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
 import {
-  findDOTypeElement,
-  findElement,
   getValueElements,
   getInstanceDAElement,
+  MDASH,
 } from '../../foundation.js';
 import { BaseContainer } from '../base-container.js';
 import { msg } from '@lit/localize';
@@ -21,7 +20,6 @@ import {
 import { DaiValueDialog } from './dai-value-dialog.js';
 import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
 import { DaInfoDialog } from './da-info-dialog.js';
-import { findLogicalNodeElement } from '../../foundation/virtual-ied.js';
 
 function getValueDisplayString(val: Element): string {
   const sGroup = val.getAttribute('sGroup');
@@ -113,9 +111,9 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
     const fc = this.element.getAttribute('fc');
 
     if (this.instanceElement) {
-      return html`<b>${name}</b> &mdash; ${bType}${fc ? html` [${fc}]` : ``}`;
+      return html`<b>${name}</b> ${MDASH} ${bType}${fc ? html` [${fc}]` : ``}`;
     } else {
-      return html`${name} &mdash; ${bType}${fc ? html` [${fc}]` : ``}`;
+      return html`${name} ${MDASH} ${bType}${fc ? html` [${fc}]` : ``}`;
     }
   }
 
@@ -361,45 +359,7 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
   }
 
   private openInfoDialog(): void {
-    const iedElement = findElement(this.ancestors, 'IED');
-    const accessPointElement = findElement(this.ancestors, 'AccessPoint');
-    const lDeviceElement = findElement(this.ancestors, 'LDevice');
-    const logicalNodeElement = findLogicalNodeElement(this.ancestors);
-    const doElement = findElement(this.ancestors, 'DO');
-    const doTypeElement = findDOTypeElement(doElement);
-
-    const valueElement = this.instanceElement ?? this.element;
-    const values = getValueElements(valueElement);
-    const daValue =
-      values.length > 0
-        ? values.map(val => val.textContent ?? '').join(', ')
-        : '-';
-
-    this.daInfoDialog.show({
-      nsdocDescription: this.nsdoc.getDataDescription(
-        this.element,
-        this.ancestors,
-      ).label,
-      daName: this.element.getAttribute('name') ?? '-',
-      daiDescription: this.instanceElement?.getAttribute('desc') ?? '-',
-      daFc: this.element.getAttribute('fc') ?? '-',
-      daBType: this.element.getAttribute('bType') ?? '-',
-      daValue,
-      doName: doElement?.getAttribute('name') ?? '-',
-      doCdc: doTypeElement?.getAttribute('cdc') ?? '-',
-      lnPrefix: logicalNodeElement?.getAttribute('prefix') ?? '-',
-      lnClassLabel: logicalNodeElement
-        ? this.nsdoc.getDataDescription(logicalNodeElement, this.ancestors)
-            .label
-        : '-',
-      lnInst: logicalNodeElement?.getAttribute('inst') ?? '-',
-      lDevice:
-        lDeviceElement?.getAttribute('name') ??
-        lDeviceElement?.getAttribute('inst') ??
-        '-',
-      accessPoint: accessPointElement?.getAttribute('name') ?? '-',
-      ied: iedElement?.getAttribute('name') ?? '-',
-    });
+    this.daInfoDialog.show();
   }
 
   private renderVal(): TemplateResult[] {
@@ -489,7 +449,12 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
           : nothing}
       </oscd-action-pane>
       <dai-value-dialog></dai-value-dialog>
-      <da-info-dialog></da-info-dialog>
+      <da-info-dialog
+        .ancestors=${this.ancestors}
+        .nsdoc=${this.nsdoc}
+        .templateElement=${this.element}
+        .instanceElement=${this.instanceElement}
+      ></da-info-dialog>
     `;
   }
 

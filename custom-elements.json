@@ -1088,6 +1088,104 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/info-dialog.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Read-only info dialog composed of grouped label/value fields.",
+          "name": "InfoDialog",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-dialog': OscdDialog, 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filled-text-field': OscdFilledTextField, }"
+            },
+            {
+              "kind": "field",
+              "name": "infoGroups",
+              "type": {
+                "text": "InfoGroup[]"
+              },
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "headline",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Show Info'",
+              "attribute": "headline"
+            },
+            {
+              "kind": "field",
+              "name": "dialog",
+              "type": {
+                "text": "OscdDialog"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "headline",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Show Info'",
+              "fieldName": "headline"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "InfoDialog",
+          "declaration": {
+            "name": "InfoDialog",
+            "module": "src/components/info-dialog.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/virtual-ied-create-dialog.ts",
       "declarations": [
         {
@@ -1257,6 +1355,75 @@
           "declaration": {
             "name": "VirtualIedCreateDialog",
             "module": "src/components/virtual-ied-create-dialog.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/foundation/dai.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "determineUninitializedStructure",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "parentElement",
+              "type": {
+                "text": "Element"
+              },
+              "description": "The element to search from for DOI/SDI"
+            },
+            {
+              "name": "templateStructure",
+              "type": {
+                "text": "Element[]"
+              },
+              "description": "The templates structure with DO/DA/BDA Elements."
+            }
+          ],
+          "description": "Determine which part of the template structure still needs to be initialized."
+        },
+        {
+          "kind": "function",
+          "name": "initializeElements",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "uninitializedTemplateStructure",
+              "type": {
+                "text": "Element[]"
+              },
+              "description": "Template elements to initialize."
+            }
+          ],
+          "description": "Create a new instance structure defined by the array of template elements passed."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "determineUninitializedStructure",
+          "declaration": {
+            "name": "determineUninitializedStructure",
+            "module": "src/foundation/dai.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "initializeElements",
+          "declaration": {
+            "name": "initializeElements",
+            "module": "src/foundation/dai.ts"
           }
         }
       ]
@@ -2590,7 +2757,7 @@
                 "text": "object"
               },
               "static": true,
-              "default": "{ 'oscd-action-pane': OscdActionPane, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'da-container': DAContainer, }"
+              "default": "{ 'oscd-action-pane': OscdActionPane, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'da-container': DAContainer, 'dai-value-dialog': DaiValueDialog, 'da-info-dialog': DaInfoDialog, }"
             },
             {
               "kind": "field",
@@ -2605,6 +2772,20 @@
               "name": "toggleButton",
               "type": {
                 "text": "OscdIconButton | undefined"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "daiValueDialog",
+              "type": {
+                "text": "DaiValueDialog"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "daInfoDialog",
+              "type": {
+                "text": "DaInfoDialog"
               }
             },
             {
@@ -2641,6 +2822,51 @@
             },
             {
               "kind": "method",
+              "name": "getMultipleSettingGroupCount",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number | null"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getEnumValues",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string[]"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "buildValElement",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Element"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "sGroup",
+                  "optional": true,
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
               "name": "openCreateWizard",
               "privacy": "private",
               "return": {
@@ -2660,12 +2886,22 @@
               },
               "parameters": [
                 {
-                  "name": "val",
+                  "name": "_val",
                   "type": {
                     "text": "Element"
                   }
                 }
               ]
+            },
+            {
+              "kind": "method",
+              "name": "openInfoDialog",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
             },
             {
               "kind": "method",
@@ -2812,12 +3048,12 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/do/do-container.ts",
+      "path": "src/components/da/da-info-dialog.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "",
-          "name": "DOContainer",
+          "description": "Read-only info dialog for a DA/DAI",
+          "name": "DaInfoDialog",
           "members": [
             {
               "kind": "field",
@@ -2826,129 +3062,51 @@
                 "text": "object"
               },
               "static": true,
-              "default": "{ 'oscd-outlined-button': OscdOutlinedButton, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'oscd-action-pane': OscdActionPane, 'do-container': DOContainer, 'da-container': DAContainer, }"
+              "default": "{ 'oscd-dialog': OscdDialog, 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filled-text-field': OscdFilledTextField, }"
             },
             {
               "kind": "field",
-              "name": "instanceElement",
+              "name": "data",
               "type": {
-                "text": "Element"
+                "text": "DaInfoData | null"
               },
-              "description": "The optional DOI of this DO."
+              "privacy": "private",
+              "default": "null"
             },
             {
               "kind": "field",
-              "name": "toggleButton",
+              "name": "dialog",
               "type": {
-                "text": "OscdIconButton | undefined"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "header",
+                "text": "OscdDialog"
+              },
               "privacy": "private"
             },
             {
               "kind": "method",
-              "name": "getSDOElements",
-              "privacy": "private",
+              "name": "show",
+              "privacy": "public",
               "return": {
                 "type": {
-                  "text": ""
-                }
-              },
-              "description": "Get the nested SDO element(s)."
-            },
-            {
-              "kind": "method",
-              "name": "getDAElements",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": ""
-                }
-              },
-              "description": "Get the nested (B)DA element(s)."
-            },
-            {
-              "kind": "method",
-              "name": "getInstanceDOElement",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": ""
+                  "text": "void"
                 }
               },
               "parameters": [
                 {
-                  "name": "dO",
+                  "name": "data",
                   "type": {
-                    "text": "Element"
-                  },
-                  "description": "The (S)DO object to search with."
+                    "text": "DaInfoData"
+                  }
                 }
-              ],
-              "description": "Get the instance element (SDI) of a (S)DO element (if available)"
+              ]
             },
             {
-              "kind": "field",
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "attribute": "doc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "docVersion",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1",
-              "attribute": "docVersion",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "element",
-              "type": {
-                "text": "Element"
-              },
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "nsdoc",
-              "type": {
-                "text": "Nsdoc"
-              },
-              "attribute": "nsdoc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              },
-              "default": "[]",
-              "attribute": "ancestors",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
+              "kind": "method",
+              "name": "close",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
               }
             }
           ],
@@ -2959,66 +3117,244 @@
             }
           ],
           "superclass": {
-            "name": "BaseContainer",
-            "module": "/src/components/base-container.js"
+            "name": "LitElement",
+            "package": "lit"
           },
-          "attributes": [
-            {
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "fieldName": "doc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "name": "docVersion",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1",
-              "fieldName": "docVersion",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "name": "nsdoc",
-              "type": {
-                "text": "Nsdoc"
-              },
-              "fieldName": "nsdoc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              },
-              "default": "[]",
-              "fieldName": "ancestors",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            }
-          ]
+          "customElement": true
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "DOContainer",
+          "name": "DaInfoDialog",
           "declaration": {
-            "name": "DOContainer",
-            "module": "src/components/do/do-container.ts"
+            "name": "DaInfoDialog",
+            "module": "src/components/da/da-info-dialog.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/da/dai-value-dialog.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "DaiValueDialog",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-dialog': OscdDialog, 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filled-button': OscdFilledButton, 'oscd-filled-text-field': OscdFilledTextField, 'oscd-filled-select': OscdFilledSelect, 'oscd-select-option': OscdSelectOption, }"
+            },
+            {
+              "kind": "field",
+              "name": "data",
+              "type": {
+                "text": "DaiDialogData | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "values",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "dateValues",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "timeValues",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "dialog",
+              "type": {
+                "text": "OscdDialog"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "data",
+                  "type": {
+                    "text": "DaiDialogData"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "confirm",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "setValue",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "setDateValue",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "setTimeValue",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderValueField",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderFields",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult[]"
+                }
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DaiValueDialog",
+          "declaration": {
+            "name": "DaiValueDialog",
+            "module": "src/components/da/dai-value-dialog.ts"
           }
         }
       ]
@@ -3487,6 +3823,334 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/do/do-container.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "DOContainer",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-outlined-button': OscdOutlinedButton, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'oscd-action-pane': OscdActionPane, 'do-container': DOContainer, 'da-container': DAContainer, 'do-info-dialog': DoInfoDialog, }"
+            },
+            {
+              "kind": "field",
+              "name": "instanceElement",
+              "type": {
+                "text": "Element"
+              },
+              "description": "The optional DOI of this DO."
+            },
+            {
+              "kind": "field",
+              "name": "toggleButton",
+              "type": {
+                "text": "OscdIconButton | undefined"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "doInfoDialog",
+              "type": {
+                "text": "DoInfoDialog"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "header",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "getSDOElements",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "description": "Get the nested SDO element(s)."
+            },
+            {
+              "kind": "method",
+              "name": "getDAElements",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "description": "Get the nested (B)DA element(s)."
+            },
+            {
+              "kind": "method",
+              "name": "getInstanceDOElement",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "parameters": [
+                {
+                  "name": "dO",
+                  "type": {
+                    "text": "Element"
+                  },
+                  "description": "The (S)DO object to search with."
+                }
+              ],
+              "description": "Get the instance element (SDI) of a (S)DO element (if available)"
+            },
+            {
+              "kind": "method",
+              "name": "openInfoDialog",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "attribute": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "docVersion",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "attribute": "docVersion",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "element",
+              "type": {
+                "text": "Element"
+              },
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "attribute": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "attribute": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "BaseContainer",
+            "module": "/src/components/base-container.js"
+          },
+          "attributes": [
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "fieldName": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "docVersion",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "fieldName": "docVersion",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "fieldName": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "fieldName": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DOContainer",
+          "declaration": {
+            "name": "DOContainer",
+            "module": "src/components/do/do-container.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/do/do-info-dialog.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Read-only info dialog for a DO/DOI",
+          "name": "DoInfoDialog",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'info-dialog': InfoDialog, }"
+            },
+            {
+              "kind": "field",
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "templateElement",
+              "type": {
+                "text": "Element"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "instanceElement",
+              "type": {
+                "text": "Element"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "infoGroups",
+              "type": {
+                "text": "InfoGroup[]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "infoDialog",
+              "type": {
+                "text": "InfoDialog"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DoInfoDialog",
+          "declaration": {
+            "name": "DoInfoDialog",
+            "module": "src/components/do/do-info-dialog.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/ldevice/ldevice-container.ts",
       "declarations": [
         {
@@ -3501,7 +4165,7 @@
                 "text": "object"
               },
               "static": true,
-              "default": "{ 'oscd-action-pane': OscdActionPane, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'ln-container': LNContainer, }"
+              "default": "{ 'oscd-action-pane': OscdActionPane, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'ln-container': LNContainer, 'oscd-scl-dialogs': OscdSclDialogs, }"
             },
             {
               "kind": "field",
@@ -3518,6 +4182,14 @@
               "type": {
                 "text": "OscdIconButton | undefined"
               }
+            },
+            {
+              "kind": "field",
+              "name": "oscdSclDialogs",
+              "type": {
+                "text": "OscdSclDialogs"
+              },
+              "privacy": "private"
             },
             {
               "kind": "method",
@@ -3550,14 +4222,14 @@
               "privacy": "private",
               "return": {
                 "type": {
-                  "text": "void"
+                  "text": "Promise<void>"
                 }
               },
               "parameters": [
                 {
-                  "name": "data",
+                  "name": "event",
                   "type": {
-                    "text": "unknown"
+                    "text": "Event"
                   }
                 }
               ]
@@ -3791,7 +4463,7 @@
             },
             {
               "kind": "method",
-              "name": "removeElement",
+              "name": "removeLN",
               "privacy": "private",
               "return": {
                 "type": {
