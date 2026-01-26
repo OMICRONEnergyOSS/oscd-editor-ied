@@ -9,12 +9,82 @@
     </Substation>
     <IED name="test" manufacturer="OpenSCD">
         <Services>
-            <ConfLdName />
+            <ConfLdName/>
         </Services>
         <AccessPoint name="AP1">
             <Server>
                 <Authentication/>
                 <LDevice inst="LD1">
+                    <LN0 lnClass="LLN0" inst="" lnType="PlaceholderLLN0"/>
+                    <LN lnType="URPC74x_CTR-P" lnClass="TCTR" prefix="I01A" inst="1">
+                        <DOI name="AmpSv">
+                            <SDI name="sVC">
+                                <DAI name="offset">
+                                    <Val>1.1</Val>
+                                </DAI>
+                                <DAI name="scaleFactor">
+                                    <Val>3.2</Val>
+                                </DAI>
+                            </SDI>
+                            <SDI name="instMag">
+                                <DAI name="i">
+                                    <Val>3000</Val>
+                                </DAI>
+                            </SDI>
+                            <SDI name="SubBeh">
+                                <DAI name="stVal">
+                                    <Val>on</Val>
+                                </DAI>
+                            </SDI>
+                        </DOI>
+                    </LN>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="test2" manufacturer="OpenSCD">
+        <Services>
+            <ConfLdName/>
+        </Services>
+        <AccessPoint name="AP2">
+            <Server>
+                <Authentication/>
+                <LDevice inst="LD2">
+                    <LN0 lnClass="LLN0" inst="" lnType="PlaceholderLLN0"/>
+                    <LN lnType="URPC74x_CTR-P" lnClass="TCTR" prefix="I01A" inst="1">
+                        <DOI name="AmpSv">
+                            <SDI name="sVC">
+                                <DAI name="offset">
+                                    <Val>1.1</Val>
+                                </DAI>
+                                <DAI name="scaleFactor">
+                                    <Val>3.2</Val>
+                                </DAI>
+                            </SDI>
+                            <SDI name="instMag">
+                                <DAI name="i">
+                                    <Val>3000</Val>
+                                </DAI>
+                            </SDI>
+                            <SDI name="SubBeh">
+                                <DAI name="stVal">
+                                    <Val>on</Val>
+                                </DAI>
+                            </SDI>
+                        </DOI>
+                    </LN>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="test3" manufacturer="OpenSCD">
+        <Services>
+            <ConfLdName/>
+        </Services>
+        <AccessPoint name="AP3">
+            <Server>
+                <Authentication/>
+                <LDevice inst="LD3">
                     <LN0 lnClass="LLN0" inst="" lnType="PlaceholderLLN0"/>
                     <LN lnType="URPC74x_CTR-P" lnClass="TCTR" prefix="I01A" inst="1">
                         <DOI name="AmpSv">

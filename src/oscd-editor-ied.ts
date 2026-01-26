@@ -278,11 +278,13 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
     }
 
     const currentSelection = this.selectedIEDs[0];
-    const iedExists = currentSelection
-      ? this.doc?.querySelector(`IED[name="${currentSelection}"]`)
+    const selectedName = currentSelection?.getAttribute('name') ?? '';
+    const selectedIED = selectedName
+      ? this.doc?.querySelector(`IED[name="${selectedName}"]`)
       : null;
 
-    if (iedExists) {
+    if (selectedIED) {
+      this.selectedIEDs = [selectedIED];
       return;
     }
 

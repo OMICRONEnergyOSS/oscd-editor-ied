@@ -8,17 +8,21 @@ import { Plugin } from '@openscd/oscd-api';
 import { typeIn } from './test-utils/actions.js';
 import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
 import { OscdFilledButton } from '@omicronenergy/oscd-ui/button/OscdFilledButton.js';
+import { IedContainer } from './components/ied/ied-container.js';
+import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
 
 customElements.define('oscd-editor-ied', OscdEditorIED);
 
 describe('oscd-editor-ied', () => {
   let oscdEditorIED: OscdEditorIED & LitElement & Plugin;
   let harness: PluginTestHarness;
+  let doc: XMLDocument;
 
   beforeEach(async () => {
     oscdEditorIED = await fixture(html`<oscd-editor-ied></oscd-editor-ied>`);
     harness = new PluginTestHarness(oscdEditorIED);
-    harness.setDoc('testdoc.scd', parseDoc(testDocs.withIED));
+    doc = parseDoc(testDocs.withIED);
+    harness.setDoc('testdoc.scd', doc);
     await oscdEditorIED.updateComplete;
   });
 
@@ -76,5 +80,50 @@ describe('oscd-editor-ied', () => {
     await oscdEditorIED.updateComplete;
 
     expect(getNamedElement(oscdEditorIED.doc, 'IED', 'IED_NEW')).to.exist;
+  });
+
+  it('keeps the selected IED after document has been edited', async () => {
+    const ied2 = getNamedElement(oscdEditorIED.doc, 'IED', 'IED2')!;
+    const ap2 = getNamedElement(doc, 'AccessPoint', 'AP2')!;
+
+    oscdEditorIED.selectedIEDs = [ied2];
+    await oscdEditorIED.updateComplete;
+
+    const initialContainer = oscdEditorIED.shadowRoot?.querySelector(
+      'ied-container',
+    ) as IedContainer;
+    const initialPane = initialContainer.shadowRoot?.querySelector(
+      'oscd-action-pane',
+    ) as OscdActionPane;
+    expect(initialPane.label).to.equal('IED2');
+
+    // Lets trigger an edit by deleting the AP2
+    const newAPEdits = {
+      element: ap2,
+      attributes: { name: 'AP_Deux' },
+    };
+    oscdEditorIED.dispatchEvent(newEditEventV2(newAPEdits));
+    await oscdEditorIED.updateComplete;
+
+    const updatedContainer = oscdEditorIED.shadowRoot?.querySelector(
+      'ied-container',
+    ) as IedContainer;
+    const updatedPane = updatedContainer.shadowRoot?.querySelector(
+      'oscd-action-pane',
+    ) as OscdActionPane;
+    expect(updatedPane.label).to.equal('IED2');
+
+    const accessPointContainers =
+      updatedContainer.shadowRoot?.querySelectorAll('access-point-container') ??
+      [];
+    const accessPointLabels = Array.from(accessPointContainers).map(
+      container =>
+        (
+          container.shadowRoot?.querySelector(
+            'oscd-action-pane',
+          ) as OscdActionPane
+        ).label,
+    );
+    expect(accessPointLabels).to.include('AP_Deux');
   });
 });
