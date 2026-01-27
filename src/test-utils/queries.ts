@@ -22,3 +22,10 @@ export function getFirstChildElement(
     ) ?? null
   );
 }
+
+export function getFirstBySelector(
+  doc: XMLDocument,
+  selector: string,
+): Element | null {
+  return doc.querySelector(selector);
+}

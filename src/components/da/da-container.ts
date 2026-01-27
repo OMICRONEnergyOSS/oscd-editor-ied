@@ -94,7 +94,7 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
    * The optional DAI of this (B)DA.
    */
   @property({ attribute: false })
-  instanceElement!: Element;
+  instanceElement: Element | null = null;
 
   @property({ type: Boolean })
   expanded = false;
@@ -150,7 +150,9 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
       title: `Create DAI "${targetDai.getAttribute('name') ?? ''}"`,
       bType,
       enumValues: bType === 'Enum' ? this.getEnumValues() : [],
-      values: getInstanceValues(this.instanceElement, multipleSettings),
+      values: this.instanceElement
+        ? getInstanceValues(this.instanceElement, multipleSettings)
+        : [],
       templateValue,
       multipleSettings,
       onConfirm: values => {

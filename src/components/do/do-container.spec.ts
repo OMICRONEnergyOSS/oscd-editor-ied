@@ -2,9 +2,10 @@ import { expect, fixture, html } from '@open-wc/testing';
 import { DOContainer } from './do-container.js';
 import { DoInfoDialog } from './do-info-dialog.js';
 import { Nsdoc } from '../../foundation/nsdoc.js';
-import { MISSING_VALUE } from '../../foundation.js';
 import { OscdFilledTextField } from '@omicronenergy/oscd-ui/textfield/OscdFilledTextField.js';
 import { parseDoc, testDocs } from '../../test-utils/test-files.js';
+import { getFirstBySelector } from '../../test-utils/queries.js';
+import { getAncestors } from '../../test-utils/test-harness.js';
 
 customElements.define('do-container', DOContainer);
 
@@ -14,30 +15,27 @@ const nsdocStub: Nsdoc = {
   }),
 };
 
-function getFirst(doc: XMLDocument, selector: string): Element {
-  const element = doc.querySelector(selector);
-  if (!element) {
-    throw new Error(`Missing element for ${selector}`);
-  }
-  return element;
-}
-
 describe('do-container', () => {
   it('opens the info dialog and renders the expected fields', async () => {
     const doc = parseDoc(testDocs.withIED_instanciated);
 
-    const doElement = getFirst(doc, 'LNodeType > DO');
-    const doiElement = getFirst(doc, 'LN0 > DOI');
-    const ancestors = Array.from(
-      doc.querySelectorAll('IED, AccessPoint, LDevice, LN0'),
-    );
+    const doElement = getFirstBySelector(doc, 'LNodeType > DO');
+    const doiElement = getFirstBySelector(doc, 'LN0 > DOI');
+    expect(doElement, 'Missing element for LNodeType > DO').to.exist;
+    expect(doiElement, 'Missing element for LN0 > DOI').to.exist;
+    const ancestors = getAncestors(doc, [
+      'IED',
+      'AccessPoint',
+      'LDevice',
+      'LN0',
+    ]);
 
     const container = await fixture<DOContainer>(html`
       <do-container
         .doc=${doc}
         .docVersion=${0}
-        .element=${doElement}
-        .instanceElement=${doiElement}
+        .element=${doElement!}
+        .instanceElement=${doiElement!}
         .nsdoc=${nsdocStub}
         .ancestors=${ancestors}
       ></do-container>
@@ -54,7 +52,10 @@ describe('do-container', () => {
     expect(infoDialog.templateElement).to.equal(doElement);
     expect(infoDialog.instanceElement).to.equal(doiElement);
 
-    const nsdocLabel = nsdocStub.getDataDescription(doElement, ancestors).label;
+    const nsdocLabel = nsdocStub.getDataDescription(
+      doElement!,
+      ancestors,
+    ).label;
     const infoButton = container.shadowRoot?.querySelector(
       `oscd-icon-button[title="${nsdocLabel}"]`,
     ) as HTMLElement;
@@ -91,19 +92,24 @@ describe('do-container', () => {
 
   it('hides the toggle button when no child elements exist', async () => {
     const doc = parseDoc(testDocs.withIED_instanciated);
-    const doElement = getFirst(doc, 'LNodeType > DO');
-    doElement.setAttribute('type', 'MissingType');
-    const doiElement = getFirst(doc, 'LN0 > DOI');
-    const ancestors = Array.from(
-      doc.querySelectorAll('IED, AccessPoint, LDevice, LN0'),
-    );
+    const doElement = getFirstBySelector(doc, 'LNodeType > DO');
+    expect(doElement, 'Missing element for LNodeType > DO').to.exist;
+    doElement?.setAttribute('type', 'MissingType');
+    const doiElement = getFirstBySelector(doc, 'LN0 > DOI');
+    expect(doiElement, 'Missing element for LN0 > DOI').to.exist;
+    const ancestors = getAncestors(doc, [
+      'IED',
+      'AccessPoint',
+      'LDevice',
+      'LN0',
+    ]);
 
     const container = await fixture<DOContainer>(html`
       <do-container
         .doc=${doc}
         .docVersion=${0}
-        .element=${doElement}
-        .instanceElement=${doiElement}
+        .element=${doElement!}
+        .instanceElement=${doiElement!}
         .nsdoc=${nsdocStub}
         .ancestors=${ancestors}
       ></do-container>
@@ -118,19 +124,25 @@ describe('do-container', () => {
   it('renders DA and DO containers after expanding the action pane', async () => {
     const doc = parseDoc(testDocs.withIED_instanciated);
 
-    const doElement = getFirst(doc, 'LNodeType > DO');
-    const doiElement = getFirst(doc, 'LN0 > DOI');
-    const sdiElement = getFirst(doc, 'LN0 > DOI > SDI');
-    const ancestors = Array.from(
-      doc.querySelectorAll('IED, AccessPoint, LDevice, LN0'),
-    );
+    const doElement = getFirstBySelector(doc, 'LNodeType > DO');
+    const doiElement = getFirstBySelector(doc, 'LN0 > DOI');
+    const sdiElement = getFirstBySelector(doc, 'LN0 > DOI > SDI');
+    expect(doElement, 'Missing element for LNodeType > DO').to.exist;
+    expect(doiElement, 'Missing element for LN0 > DOI').to.exist;
+    expect(sdiElement, 'Missing element for LN0 > DOI > SDI').to.exist;
+    const ancestors = getAncestors(doc, [
+      'IED',
+      'AccessPoint',
+      'LDevice',
+      'LN0',
+    ]);
 
     const container = await fixture<DOContainer>(html`
       <do-container
         .doc=${doc}
         .docVersion=${0}
-        .element=${doElement}
-        .instanceElement=${doiElement}
+        .element=${doElement!}
+        .instanceElement=${doiElement!}
         .nsdoc=${nsdocStub}
         .ancestors=${ancestors}
       ></do-container>

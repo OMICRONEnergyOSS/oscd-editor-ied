@@ -11,21 +11,15 @@ function timeout(ms: number) {
 }
 mocha.timeout(2000 * factor);
 import OscdEditorIED from './oscd-editor-ied.js';
+import { parseDoc, testDocs } from './test-utils/test-files.js';
 
 customElements.define('oscd-editor-ied', OscdEditorIED);
-
-const sclXmlDocString = `<?xml version="1.0" encoding="UTF-8"?><SCL version="2007" revision="B" xmlns="http://www.iec.ch/61850/2003/SCL" xmlns:ens1="http://example.org/somePreexistingExtensionNamespace">
-  <Substation ens1:foo="a" name="A1" desc="test substation"></Substation>
-</SCL>`;
 
 describe('oscd-editor-ied', () => {
   let plugin: OscdEditorIED;
 
   beforeEach(async () => {
-    const sclDoc = new DOMParser().parseFromString(
-      sclXmlDocString,
-      'application/xml',
-    );
+    const sclDoc = parseDoc(testDocs.withIED);
     plugin = await fixture(html`<oscd-editor-ied></oscd-editor-ied>`);
     plugin.docs = {
       'test.scd': sclDoc,

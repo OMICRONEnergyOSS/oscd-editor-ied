@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable import-x/no-extraneous-dependencies */
 import { EditV2, CommitOptions, Commit, Plugin } from '@openscd/oscd-api';
 import { XMLEditor } from '@openscd/oscd-editor';
@@ -5,6 +6,27 @@ import { LitElement } from 'lit';
 
 import sinon from 'sinon';
 import { ConfirmDeleteEvent, EVENTS } from '../foundation/events.js';
+import { expect } from '@open-wc/testing';
+
+function getElement(
+  baseElement: Element | XMLDocument,
+  tagName: string,
+): Element {
+  const element = baseElement.querySelector(tagName);
+  expect(element, `Missing element for ${tagName}`).to.exist;
+  return element!;
+}
+
+export function getAncestors(doc: XMLDocument, tags: string[]): Element[] {
+  const ancestors: Element[] = [];
+  tags.forEach(tag => {
+    const baseElement = ancestors.length
+      ? ancestors[ancestors.length - 1]
+      : doc;
+    ancestors.push(getElement(baseElement, tag));
+  });
+  return ancestors;
+}
 
 export class ComponentTestHarness {
   element: LitElement;
