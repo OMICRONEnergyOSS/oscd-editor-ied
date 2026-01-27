@@ -44,8 +44,6 @@ type PluginState = {
   selectedIEDsByName?: string[];
 };
 
-type SelectedItemsChangedEvent = CustomEvent<{ selectedItems: string[] }>;
-
 function getIEDSelectItem(element: Element, selected: boolean): SelectItem {
   const name = element.getAttribute('name');
   const descr = element.getAttribute('desc');
@@ -382,9 +380,11 @@ export default class IedPlugin extends ScopedElementsMixin(LitElement) {
         .items=${this.lnClassList.map(lnClass =>
           getLnClassSelectItem(lnClass, this.selectedLNClasses, this.nsdoc),
         )}
-        @selected-items-changed="${(e: SelectedItemsChangedEvent) => {
-          this.selectedLNClasses = e.detail.selectedItems;
-        }}"
+        @filter-button-dialog-close=${(e: FilterButtonDialogCloseEvent) => {
+          this.selectedLNClasses = e.detail.selectedElements
+            .map(element => element.getAttribute('lnClass') ?? '')
+            .filter(name => name !== '');
+        }}
       >
         <oscd-scl-icon slot="icon">lNIcon</oscd-scl-icon>
       </oscd-filter-button>
