@@ -17,6 +17,7 @@ export const testDocs = {
 		</VoltageLevel>
 	</Substation>
 	<IED name="IED1" manufacturer="OpenSCD">
+		<SettingControl numOfSGs="2"/>
 		<AccessPoint name="AP1">
 			<Server>
 				<Authentication/>
@@ -85,10 +86,14 @@ export const testDocs = {
 			<DA name="q" fc="ST" qchg="true" bType="Quality"/>
 			<DA name="t" fc="ST" bType="Timestamp"/>
 			<SDO name="Sub1" type="SubType"/>
+			<DA name="Sub2" bType="Struct" type="SubDaType"/>
 		</DOType>
 		<DOType id="SubType" cdc="ENS">
 			<DA name="subDa" fc="ST" bType="Enum"/>
 		</DOType>
+		<DAType id="SubDaType">
+			<BDA name="subBda" bType="Enum" type="stVal$oscd$_48ba16345b8e7f5b"/>
+		</DAType>
 		<EnumType id="stVal$oscd$_48ba16345b8e7f5b">
 			<EnumVal ord="1">on</EnumVal>
 			<EnumVal ord="2">blocked</EnumVal>

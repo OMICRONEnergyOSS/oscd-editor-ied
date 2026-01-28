@@ -1971,6 +1971,29 @@
               }
             }
           ]
+        },
+        {
+          "kind": "function",
+          "name": "getFirstBySelector",
+          "return": {
+            "type": {
+              "text": "Element | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              }
+            },
+            {
+              "name": "selector",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
         }
       ],
       "exports": [
@@ -1987,6 +2010,14 @@
           "name": "getFirstChildElement",
           "declaration": {
             "name": "getFirstChildElement",
+            "module": "src/test-utils/queries.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "getFirstBySelector",
+          "declaration": {
+            "name": "getFirstBySelector",
             "module": "src/test-utils/queries.ts"
           }
         }
@@ -2045,6 +2076,29 @@
       "kind": "javascript-module",
       "path": "src/test-utils/test-harness.ts",
       "declarations": [
+        {
+          "kind": "function",
+          "name": "getAncestors",
+          "return": {
+            "type": {
+              "text": "Element[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              }
+            },
+            {
+              "name": "tags",
+              "type": {
+                "text": "string[]"
+              }
+            }
+          ]
+        },
         {
           "kind": "class",
           "description": "",
@@ -2256,6 +2310,14 @@
         }
       ],
       "exports": [
+        {
+          "kind": "js",
+          "name": "getAncestors",
+          "declaration": {
+            "name": "getAncestors",
+            "module": "src/test-utils/test-harness.ts"
+          }
+        },
         {
           "kind": "js",
           "name": "ComponentTestHarness",
@@ -2782,6 +2844,703 @@
           "declaration": {
             "name": "AccessPointEditDialog",
             "module": "src/components/access-point/access-point-edit-dialog.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/da/da-container.spec.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "da-container",
+          "declaration": {
+            "name": "DAContainer",
+            "module": "/src/components/da/da-container.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/da/da-container.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "[[`IED`]] plugin subeditor for editing `(B)DA` element.",
+          "name": "DAContainer",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-action-pane': OscdActionPane, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'da-container': DAContainer, 'dai-value-dialog': DaiValueDialog, 'da-info-dialog': DaInfoDialog, }"
+            },
+            {
+              "kind": "field",
+              "name": "instanceElement",
+              "type": {
+                "text": "Element | null"
+              },
+              "default": "null",
+              "description": "The optional DAI of this (B)DA."
+            },
+            {
+              "kind": "field",
+              "name": "expanded",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "expanded"
+            },
+            {
+              "kind": "field",
+              "name": "daiValueDialog",
+              "type": {
+                "text": "DaiValueDialog"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "daInfoDialog",
+              "type": {
+                "text": "DaInfoDialog"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "openCreateWizard",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "openEditWizard",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "_val",
+                  "type": {
+                    "text": "Element"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "openInfoDialog",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggleExpanded",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "header",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getBDAElements",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "description": "Get the nested (B)DA element(s) if available."
+            },
+            {
+              "kind": "method",
+              "name": "getTemplateStructure",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "description": "Use the list of ancestor to retrieve the list from DO to the current (B)DA Element.\nThis structure is used to create the initialized structure from (DOI/SDI/DAI)."
+            },
+            {
+              "kind": "method",
+              "name": "getMultipleSettingGroupCount",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number | null"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getEnumValues",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string[]"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "buildValElement",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Element"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "sGroup",
+                  "optional": true,
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderVal",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult[]"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "attribute": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "docVersion",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "attribute": "docVersion",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "element",
+              "type": {
+                "text": "Element"
+              },
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "attribute": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "attribute": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "expanded",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "expanded"
+            },
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "fieldName": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "docVersion",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "fieldName": "docVersion",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "fieldName": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "fieldName": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "BaseContainer",
+            "module": "/src/components/base-container.js"
+          },
+          "tagName": "da-container",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DAContainer",
+          "declaration": {
+            "name": "DAContainer",
+            "module": "src/components/da/da-container.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/da/da-info-dialog.spec.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/da/da-info-dialog.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "buildDaInfoGroups",
+          "return": {
+            "type": {
+              "text": "InfoGroup[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "{\n  ancestors,\n  nsdoc,\n  templateElement,\n  instanceElement,\n}",
+              "type": {
+                "text": "InfoContext"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "class",
+          "description": "Read-only info dialog for a DA/DAI",
+          "name": "DaInfoDialog",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'info-dialog': InfoDialog, }"
+            },
+            {
+              "kind": "field",
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "templateElement",
+              "type": {
+                "text": "Element"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "instanceElement",
+              "type": {
+                "text": "Element | null"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "infoGroups",
+              "type": {
+                "text": "InfoGroup[]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "infoDialog",
+              "type": {
+                "text": "InfoDialog"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "buildDaInfoGroups",
+          "declaration": {
+            "name": "buildDaInfoGroups",
+            "module": "src/components/da/da-info-dialog.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "DaInfoDialog",
+          "declaration": {
+            "name": "DaInfoDialog",
+            "module": "src/components/da/da-info-dialog.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/da/dai-value-dialog.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "DaiValueDialog",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-dialog': OscdDialog, 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filled-button': OscdFilledButton, 'oscd-filled-text-field': OscdFilledTextField, 'oscd-filled-select': OscdFilledSelect, 'oscd-select-option': OscdSelectOption, }"
+            },
+            {
+              "kind": "field",
+              "name": "data",
+              "type": {
+                "text": "DaiDialogData | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "values",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "dateValues",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "timeValues",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "dialog",
+              "type": {
+                "text": "OscdDialog"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "data",
+                  "type": {
+                    "text": "DaiDialogData"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "confirm",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "setValue",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "setDateValue",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "setTimeValue",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderValueField",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderFields",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult[]"
+                }
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DaiValueDialog",
+          "declaration": {
+            "name": "DaiValueDialog",
+            "module": "src/components/da/dai-value-dialog.ts"
           }
         }
       ]
@@ -3646,941 +4405,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/da/da-container.spec.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "custom-element-definition",
-          "name": "da-container",
-          "declaration": {
-            "name": "DAContainer",
-            "module": "/src/components/da/da-container.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/da/da-container.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "[[`IED`]] plugin subeditor for editing `(B)DA` element.",
-          "name": "DAContainer",
-          "members": [
-            {
-              "kind": "field",
-              "name": "scopedElements",
-              "type": {
-                "text": "object"
-              },
-              "static": true,
-              "default": "{ 'oscd-action-pane': OscdActionPane, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'da-container': DAContainer, 'dai-value-dialog': DaiValueDialog, 'da-info-dialog': DaInfoDialog, }"
-            },
-            {
-              "kind": "field",
-              "name": "instanceElement",
-              "type": {
-                "text": "Element"
-              },
-              "description": "The optional DAI of this (B)DA."
-            },
-            {
-              "kind": "field",
-              "name": "expanded",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "expanded"
-            },
-            {
-              "kind": "field",
-              "name": "daiValueDialog",
-              "type": {
-                "text": "DaiValueDialog"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "daInfoDialog",
-              "type": {
-                "text": "DaInfoDialog"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "openCreateWizard",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "openEditWizard",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "_val",
-                  "type": {
-                    "text": "Element"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "openInfoDialog",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "toggleExpanded",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "header",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "getBDAElements",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": ""
-                }
-              },
-              "description": "Get the nested (B)DA element(s) if available."
-            },
-            {
-              "kind": "method",
-              "name": "getTemplateStructure",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": ""
-                }
-              },
-              "description": "Use the list of ancestor to retrieve the list from DO to the current (B)DA Element.\nThis structure is used to create the initialized structure from (DOI/SDI/DAI)."
-            },
-            {
-              "kind": "method",
-              "name": "getMultipleSettingGroupCount",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "number | null"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "getEnumValues",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "string[]"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "buildValElement",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "Element"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "value",
-                  "type": {
-                    "text": "string"
-                  }
-                },
-                {
-                  "name": "sGroup",
-                  "optional": true,
-                  "type": {
-                    "text": "number"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "renderVal",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult[]"
-                }
-              }
-            },
-            {
-              "kind": "field",
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "attribute": "doc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "docVersion",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1",
-              "attribute": "docVersion",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "element",
-              "type": {
-                "text": "Element"
-              },
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "nsdoc",
-              "type": {
-                "text": "Nsdoc"
-              },
-              "attribute": "nsdoc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              },
-              "default": "[]",
-              "attribute": "ancestors",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "expanded",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "expanded"
-            },
-            {
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "fieldName": "doc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "name": "docVersion",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1",
-              "fieldName": "docVersion",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "name": "nsdoc",
-              "type": {
-                "text": "Nsdoc"
-              },
-              "fieldName": "nsdoc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              },
-              "default": "[]",
-              "fieldName": "ancestors",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            }
-          ],
-          "mixins": [
-            {
-              "name": "ScopedElementsMixin",
-              "package": "@open-wc/scoped-elements/lit-element.js"
-            }
-          ],
-          "superclass": {
-            "name": "BaseContainer",
-            "module": "/src/components/base-container.js"
-          },
-          "tagName": "da-container",
-          "customElement": true
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "DAContainer",
-          "declaration": {
-            "name": "DAContainer",
-            "module": "src/components/da/da-container.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/da/da-info-dialog.spec.ts",
-      "declarations": [],
-      "exports": []
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/da/da-info-dialog.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "buildDaInfoGroups",
-          "return": {
-            "type": {
-              "text": "InfoGroup[]"
-            }
-          },
-          "parameters": [
-            {
-              "name": "{\n  ancestors,\n  nsdoc,\n  templateElement,\n  instanceElement,\n}",
-              "type": {
-                "text": "InfoContext"
-              }
-            }
-          ]
-        },
-        {
-          "kind": "class",
-          "description": "Read-only info dialog for a DA/DAI",
-          "name": "DaInfoDialog",
-          "members": [
-            {
-              "kind": "field",
-              "name": "scopedElements",
-              "type": {
-                "text": "object"
-              },
-              "static": true,
-              "default": "{ 'info-dialog': InfoDialog, }"
-            },
-            {
-              "kind": "field",
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "nsdoc",
-              "type": {
-                "text": "Nsdoc"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "templateElement",
-              "type": {
-                "text": "Element"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "instanceElement",
-              "type": {
-                "text": "Element | null"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "infoGroups",
-              "type": {
-                "text": "InfoGroup[]"
-              },
-              "privacy": "private",
-              "default": "[]"
-            },
-            {
-              "kind": "field",
-              "name": "infoDialog",
-              "type": {
-                "text": "InfoDialog"
-              },
-              "privacy": "private"
-            },
-            {
-              "kind": "method",
-              "name": "show",
-              "privacy": "public",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            }
-          ],
-          "mixins": [
-            {
-              "name": "ScopedElementsMixin",
-              "package": "@open-wc/scoped-elements/lit-element.js"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "customElement": true
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "buildDaInfoGroups",
-          "declaration": {
-            "name": "buildDaInfoGroups",
-            "module": "src/components/da/da-info-dialog.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "DaInfoDialog",
-          "declaration": {
-            "name": "DaInfoDialog",
-            "module": "src/components/da/da-info-dialog.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/da/dai-value-dialog.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "",
-          "name": "DaiValueDialog",
-          "members": [
-            {
-              "kind": "field",
-              "name": "scopedElements",
-              "type": {
-                "text": "object"
-              },
-              "static": true,
-              "default": "{ 'oscd-dialog': OscdDialog, 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filled-button': OscdFilledButton, 'oscd-filled-text-field': OscdFilledTextField, 'oscd-filled-select': OscdFilledSelect, 'oscd-select-option': OscdSelectOption, }"
-            },
-            {
-              "kind": "field",
-              "name": "data",
-              "type": {
-                "text": "DaiDialogData | null"
-              },
-              "privacy": "private",
-              "default": "null"
-            },
-            {
-              "kind": "field",
-              "name": "values",
-              "type": {
-                "text": "string[]"
-              },
-              "privacy": "private",
-              "default": "[]"
-            },
-            {
-              "kind": "field",
-              "name": "dateValues",
-              "type": {
-                "text": "string[]"
-              },
-              "privacy": "private",
-              "default": "[]"
-            },
-            {
-              "kind": "field",
-              "name": "timeValues",
-              "type": {
-                "text": "string[]"
-              },
-              "privacy": "private",
-              "default": "[]"
-            },
-            {
-              "kind": "field",
-              "name": "dialog",
-              "type": {
-                "text": "OscdDialog"
-              },
-              "privacy": "private"
-            },
-            {
-              "kind": "method",
-              "name": "show",
-              "privacy": "public",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "data",
-                  "type": {
-                    "text": "DaiDialogData"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "close",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "confirm",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "setValue",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "index",
-                  "type": {
-                    "text": "number"
-                  }
-                },
-                {
-                  "name": "value",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "setDateValue",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "index",
-                  "type": {
-                    "text": "number"
-                  }
-                },
-                {
-                  "name": "value",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "setTimeValue",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "index",
-                  "type": {
-                    "text": "number"
-                  }
-                },
-                {
-                  "name": "value",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "renderValueField",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "index",
-                  "type": {
-                    "text": "number"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "renderFields",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult[]"
-                }
-              }
-            }
-          ],
-          "mixins": [
-            {
-              "name": "ScopedElementsMixin",
-              "package": "@open-wc/scoped-elements/lit-element.js"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "customElement": true
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "DaiValueDialog",
-          "declaration": {
-            "name": "DaiValueDialog",
-            "module": "src/components/da/dai-value-dialog.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/lnode/ln-container.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "[[`IED`]] plugin subeditor for editing `LN` and `LN0` element.",
-          "name": "LNContainer",
-          "members": [
-            {
-              "kind": "field",
-              "name": "scopedElements",
-              "type": {
-                "text": "object"
-              },
-              "static": true,
-              "default": "{ 'oscd-outlined-button': OscdOutlinedButton, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-action-pane': OscdActionPane, 'oscd-icon': OscdIcon, 'do-container': DOContainer, }"
-            },
-            {
-              "kind": "field",
-              "name": "expanded",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "expanded"
-            },
-            {
-              "kind": "method",
-              "name": "openEditWizard",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "removeLN",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "toggleExpanded",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "header",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "string"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "getDOElements",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": ""
-                }
-              },
-              "description": "Get the DO child elements of this LN(0) section."
-            },
-            {
-              "kind": "method",
-              "name": "getInstanceElement",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": ""
-                }
-              },
-              "parameters": [
-                {
-                  "name": "dO",
-                  "type": {
-                    "text": "Element"
-                  },
-                  "description": "The DO object to use."
-                }
-              ],
-              "description": "Get the instance element (DOI) of a DO element (if available)"
-            },
-            {
-              "kind": "field",
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "attribute": "doc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "docVersion",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1",
-              "attribute": "docVersion",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "element",
-              "type": {
-                "text": "Element"
-              },
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "nsdoc",
-              "type": {
-                "text": "Nsdoc"
-              },
-              "attribute": "nsdoc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              },
-              "default": "[]",
-              "attribute": "ancestors",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "expanded",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "expanded"
-            },
-            {
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "fieldName": "doc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "name": "docVersion",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1",
-              "fieldName": "docVersion",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "name": "nsdoc",
-              "type": {
-                "text": "Nsdoc"
-              },
-              "fieldName": "nsdoc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              },
-              "default": "[]",
-              "fieldName": "ancestors",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            }
-          ],
-          "mixins": [
-            {
-              "name": "ScopedElementsMixin",
-              "package": "@open-wc/scoped-elements/lit-element.js"
-            }
-          ],
-          "superclass": {
-            "name": "BaseContainer",
-            "module": "/src/components/base-container.js"
-          }
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "LNContainer",
-          "declaration": {
-            "name": "LNContainer",
-            "module": "src/components/lnode/ln-container.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/components/ldevice/ldevice-container.ts",
       "declarations": [
         {
@@ -4831,6 +4655,245 @@
           "declaration": {
             "name": "LDeviceContainer",
             "module": "src/components/ldevice/ldevice-container.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/lnode/ln-container.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "[[`IED`]] plugin subeditor for editing `LN` and `LN0` element.",
+          "name": "LNContainer",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-outlined-button': OscdOutlinedButton, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-action-pane': OscdActionPane, 'oscd-icon': OscdIcon, 'do-container': DOContainer, }"
+            },
+            {
+              "kind": "field",
+              "name": "expanded",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "expanded"
+            },
+            {
+              "kind": "method",
+              "name": "openEditWizard",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "removeLN",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggleExpanded",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "header",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getDOElements",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "description": "Get the DO child elements of this LN(0) section."
+            },
+            {
+              "kind": "method",
+              "name": "getInstanceElement",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "parameters": [
+                {
+                  "name": "dO",
+                  "type": {
+                    "text": "Element"
+                  },
+                  "description": "The DO object to use."
+                }
+              ],
+              "description": "Get the instance element (DOI) of a DO element (if available)"
+            },
+            {
+              "kind": "field",
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "attribute": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "docVersion",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "attribute": "docVersion",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "element",
+              "type": {
+                "text": "Element"
+              },
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "attribute": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "attribute": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "expanded",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "expanded"
+            },
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "fieldName": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "docVersion",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "fieldName": "docVersion",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "fieldName": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "fieldName": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "BaseContainer",
+            "module": "/src/components/base-container.js"
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LNContainer",
+          "declaration": {
+            "name": "LNContainer",
+            "module": "src/components/lnode/ln-container.ts"
           }
         }
       ]
