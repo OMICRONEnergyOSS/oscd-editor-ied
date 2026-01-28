@@ -3,7 +3,7 @@ import { Nsdoc } from '../../foundation/nsdoc.js';
 import { MISSING_VALUE } from '../../foundation.js';
 import { buildDoInfoGroups } from './do-info-dialog.js';
 import { parseDoc, testDocs } from '../../test-utils/test-files.js';
-import { getFirstBySelector } from '../../test-utils/queries.js';
+import { getFirstAndAssertBySelector } from '../../test-utils/queries.js';
 import { getAncestors } from '../../test-utils/test-harness.js';
 
 const nsdocStub: Nsdoc = {
@@ -16,10 +16,8 @@ describe('do-info-dialog', () => {
   it('builds detailed groups for DO info', () => {
     const doc = parseDoc(testDocs.withIED_instanciated);
 
-    const doElement = getFirstBySelector(doc, 'LNodeType > DO');
-    const doiElement = getFirstBySelector(doc, 'LN0 > DOI');
-    expect(doElement, 'Missing element for LNodeType > DO').to.exist;
-    expect(doiElement, 'Missing element for LN0 > DOI').to.exist;
+    const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+    const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
     const ancestors = getAncestors(doc, [
       'IED',
       'AccessPoint',
@@ -30,8 +28,8 @@ describe('do-info-dialog', () => {
     const groups = buildDoInfoGroups({
       ancestors,
       nsdoc: nsdocStub,
-      templateElement: doElement!,
-      instanceElement: doiElement!,
+      templateElement: doElement,
+      instanceElement: doiElement,
       detailed: true,
     });
 
@@ -52,12 +50,10 @@ describe('do-info-dialog', () => {
 
   it('omits detailed-only fields when detailed is false', () => {
     const doc = parseDoc(testDocs.withIED_instanciated);
-    const ln0 = getFirstBySelector(doc, 'LN0');
-    expect(ln0, 'Missing element for LN0').to.exist;
-    ln0?.removeAttribute('prefix');
+    const ln0 = getFirstAndAssertBySelector(doc, 'LN0');
+    ln0.removeAttribute('prefix');
 
-    const doElement = getFirstBySelector(doc, 'LNodeType > DO');
-    expect(doElement, 'Missing element for LNodeType > DO').to.exist;
+    const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
     const ancestors = getAncestors(doc, [
       'IED',
       'AccessPoint',
@@ -68,7 +64,7 @@ describe('do-info-dialog', () => {
     const groups = buildDoInfoGroups({
       ancestors,
       nsdoc: nsdocStub,
-      templateElement: doElement!,
+      templateElement: doElement,
       detailed: false,
     });
 

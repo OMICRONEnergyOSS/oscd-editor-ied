@@ -4,7 +4,7 @@ import { DoInfoDialog } from './do-info-dialog.js';
 import { Nsdoc } from '../../foundation/nsdoc.js';
 import { OscdFilledTextField } from '@omicronenergy/oscd-ui/textfield/OscdFilledTextField.js';
 import { parseDoc, testDocs } from '../../test-utils/test-files.js';
-import { getFirstBySelector } from '../../test-utils/queries.js';
+import { getFirstAndAssertBySelector } from '../../test-utils/queries.js';
 import { getAncestors } from '../../test-utils/test-harness.js';
 
 customElements.define('do-container', DOContainer);
@@ -19,10 +19,8 @@ describe('do-container', () => {
   it('opens the info dialog and renders the expected fields', async () => {
     const doc = parseDoc(testDocs.withIED_instanciated);
 
-    const doElement = getFirstBySelector(doc, 'LNodeType > DO');
-    const doiElement = getFirstBySelector(doc, 'LN0 > DOI');
-    expect(doElement, 'Missing element for LNodeType > DO').to.exist;
-    expect(doiElement, 'Missing element for LN0 > DOI').to.exist;
+    const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+    const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
     const ancestors = getAncestors(doc, [
       'IED',
       'AccessPoint',
@@ -34,8 +32,8 @@ describe('do-container', () => {
       <do-container
         .doc=${doc}
         .docVersion=${0}
-        .element=${doElement!}
-        .instanceElement=${doiElement!}
+        .element=${doElement}
+        .instanceElement=${doiElement}
         .nsdoc=${nsdocStub}
         .ancestors=${ancestors}
       ></do-container>
@@ -52,10 +50,7 @@ describe('do-container', () => {
     expect(infoDialog.templateElement).to.equal(doElement);
     expect(infoDialog.instanceElement).to.equal(doiElement);
 
-    const nsdocLabel = nsdocStub.getDataDescription(
-      doElement!,
-      ancestors,
-    ).label;
+    const nsdocLabel = nsdocStub.getDataDescription(doElement, ancestors).label;
     const infoButton = container.shadowRoot?.querySelector(
       `oscd-icon-button[title="${nsdocLabel}"]`,
     ) as HTMLElement;
@@ -92,11 +87,9 @@ describe('do-container', () => {
 
   it('hides the toggle button when no child elements exist', async () => {
     const doc = parseDoc(testDocs.withIED_instanciated);
-    const doElement = getFirstBySelector(doc, 'LNodeType > DO');
-    expect(doElement, 'Missing element for LNodeType > DO').to.exist;
-    doElement?.setAttribute('type', 'MissingType');
-    const doiElement = getFirstBySelector(doc, 'LN0 > DOI');
-    expect(doiElement, 'Missing element for LN0 > DOI').to.exist;
+    const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+    doElement.setAttribute('type', 'MissingType');
+    const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
     const ancestors = getAncestors(doc, [
       'IED',
       'AccessPoint',
@@ -108,8 +101,8 @@ describe('do-container', () => {
       <do-container
         .doc=${doc}
         .docVersion=${0}
-        .element=${doElement!}
-        .instanceElement=${doiElement!}
+        .element=${doElement}
+        .instanceElement=${doiElement}
         .nsdoc=${nsdocStub}
         .ancestors=${ancestors}
       ></do-container>
@@ -124,12 +117,9 @@ describe('do-container', () => {
   it('renders DA and DO containers after expanding the action pane', async () => {
     const doc = parseDoc(testDocs.withIED_instanciated);
 
-    const doElement = getFirstBySelector(doc, 'LNodeType > DO');
-    const doiElement = getFirstBySelector(doc, 'LN0 > DOI');
-    const sdiElement = getFirstBySelector(doc, 'LN0 > DOI > SDI');
-    expect(doElement, 'Missing element for LNodeType > DO').to.exist;
-    expect(doiElement, 'Missing element for LN0 > DOI').to.exist;
-    expect(sdiElement, 'Missing element for LN0 > DOI > SDI').to.exist;
+    const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+    const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
+    const sdiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI > SDI');
     const ancestors = getAncestors(doc, [
       'IED',
       'AccessPoint',
@@ -141,8 +131,8 @@ describe('do-container', () => {
       <do-container
         .doc=${doc}
         .docVersion=${0}
-        .element=${doElement!}
-        .instanceElement=${doiElement!}
+        .element=${doElement}
+        .instanceElement=${doiElement}
         .nsdoc=${nsdocStub}
         .ancestors=${ancestors}
       ></do-container>

@@ -29,3 +29,14 @@ export function getFirstBySelector(
 ): Element | null {
   return doc.querySelector(selector);
 }
+
+export function getFirstAndAssertBySelector(
+  doc: XMLDocument,
+  selector: string,
+): Element {
+  const element = doc.querySelector(selector);
+  if (!element) {
+    throw new Error(`Expected element for selector: ${selector}`);
+  }
+  return element;
+}

@@ -3,7 +3,7 @@ import { Nsdoc } from '../../foundation/nsdoc.js';
 import { MISSING_VALUE } from '../../foundation.js';
 import { buildDaInfoGroups } from './da-info-dialog.js';
 import { parseDoc, testDocs } from '../../test-utils/test-files.js';
-import { getFirstBySelector } from '../../test-utils/queries.js';
+import { getFirstAndAssertBySelector } from '../../test-utils/queries.js';
 import { getAncestors } from '../../test-utils/test-harness.js';
 
 const nsdocStub: Nsdoc = {
@@ -16,12 +16,12 @@ describe('da-info-dialog', () => {
   it('builds groups for DA info with instance values', () => {
     const doc = parseDoc(testDocs.withIED_instanciated);
 
-    const daElement = getFirstBySelector(doc, 'DOType > DA[name="stVal"]');
-    const doElement = getFirstBySelector(doc, 'LNodeType > DO');
-    const doiElement = getFirstBySelector(doc, 'LN0 > DOI');
-    expect(daElement, 'Missing element for DOType > DA[name="stVal"]').to.exist;
-    expect(doElement, 'Missing element for LNodeType > DO').to.exist;
-    expect(doiElement, 'Missing element for LN0 > DOI').to.exist;
+    const daElement = getFirstAndAssertBySelector(
+      doc,
+      'DOType > DA[name="stVal"]',
+    );
+    const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+    const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
     const daiElement = doc.createElementNS(
       doc.documentElement.namespaceURI,
       'DAI',
@@ -31,17 +31,17 @@ describe('da-info-dialog', () => {
     const val = doc.createElementNS(doc.documentElement.namespaceURI, 'Val');
     val.textContent = 'on';
     daiElement.appendChild(val);
-    doiElement?.appendChild(daiElement);
+    doiElement.appendChild(daiElement);
 
     const ancestors = [
       ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN0']),
-      doElement!,
+      doElement,
     ];
 
     const groups = buildDaInfoGroups({
       ancestors,
       nsdoc: nsdocStub,
-      templateElement: daElement!,
+      templateElement: daElement,
       instanceElement: daiElement,
     });
 
@@ -69,20 +69,20 @@ describe('da-info-dialog', () => {
   it('uses missing value placeholders when no instance values exist', () => {
     const doc = parseDoc(testDocs.withIED_instanciated);
 
-    const daElement = getFirstBySelector(doc, 'DOType > DA[name="stVal"]');
-    const doElement = getFirstBySelector(doc, 'LNodeType > DO');
-    expect(daElement, 'Missing element for DOType > DA[name="stVal"]').to.exist;
-    expect(doElement, 'Missing element for LNodeType > DO').to.exist;
-
+    const daElement = getFirstAndAssertBySelector(
+      doc,
+      'DOType > DA[name="stVal"]',
+    );
+    const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
     const ancestors = [
       ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN0']),
-      doElement!,
+      doElement,
     ];
 
     const groups = buildDaInfoGroups({
       ancestors,
       nsdoc: nsdocStub,
-      templateElement: daElement!,
+      templateElement: daElement,
       instanceElement: null,
     });
 
