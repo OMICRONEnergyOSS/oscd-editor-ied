@@ -10,7 +10,7 @@ import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
 import { OscdIconButton } from '@omicronenergy/oscd-ui/iconbutton/OscdIconButton.js';
 import { ServerContainer } from '../server/server-container.js';
 import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
-import { LDeviceContainer } from '../ldevice/ldevice-container.js';
+import { LNContainer } from '../lnode/ln-container.js';
 import { msg } from '@lit/localize';
 
 import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
@@ -27,7 +27,7 @@ export class AccessPointContainer extends ScopedElementsMixin(BaseContainer) {
     'oscd-icon-button': OscdIconButton,
     'oscd-action-pane': OscdActionPane,
     'server-container': ServerContainer,
-    'ln-container': LDeviceContainer,
+    'ln-container': LNContainer,
     'access-point-edit-dialog': AccessPointEditDialog,
   };
 

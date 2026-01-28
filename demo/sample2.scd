@@ -41,6 +41,9 @@
                 </LDevice>
             </Server>
         </AccessPoint>
+        <AccessPoint name="AP1_LN">
+            <LN lnType="GGIO_Test" lnClass="GGIO" inst="1"/>
+        </AccessPoint>
     </IED>
     <IED name="test2" manufacturer="OpenSCD">
         <Services>
