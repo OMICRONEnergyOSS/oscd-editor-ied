@@ -79,7 +79,7 @@ export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
 
   private header() {
     const nameOrInst =
-      this.element.getAttribute('nane') ?? this.element.getAttribute('inst');
+      this.element.getAttribute('name') ?? this.element.getAttribute('inst');
     const desc = this.element.getAttribute('desc');
     const ldName = this.element.getAttribute('ldName');
 
