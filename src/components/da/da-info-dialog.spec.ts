@@ -21,17 +21,10 @@ describe('da-info-dialog', () => {
       'DOType > DA[name="stVal"]',
     );
     const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
-    const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
-    const daiElement = doc.createElementNS(
-      doc.documentElement.namespaceURI,
-      'DAI',
+    const daiElement = getFirstAndAssertBySelector(
+      doc,
+      'LN0 > DOI > DAI[name="stVal"]',
     );
-    daiElement.setAttribute('name', 'stVal');
-    daiElement.setAttribute('desc', 'ValueDesc');
-    const val = doc.createElementNS(doc.documentElement.namespaceURI, 'Val');
-    val.textContent = 'on';
-    daiElement.appendChild(val);
-    doiElement.appendChild(daiElement);
 
     const ancestors = [
       ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN0']),

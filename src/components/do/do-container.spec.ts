@@ -1,11 +1,10 @@
-import { expect, fixture, html } from '@open-wc/testing';
+import { expect, fixture, html, waitUntil } from '@open-wc/testing';
 import { DOContainer } from './do-container.js';
-import { DoInfoDialog } from './do-info-dialog.js';
 import { Nsdoc } from '../../foundation/nsdoc.js';
-import { OscdFilledTextField } from '@omicronenergy/oscd-ui/textfield/OscdFilledTextField.js';
 import { parseDoc, testDocs } from '../../test-utils/test-files.js';
 import { getFirstAndAssertBySelector } from '../../test-utils/queries.js';
 import { getAncestors } from '../../test-utils/test-harness.js';
+import { InfoDialog } from '../info-dialog.js';
 
 customElements.define('do-container', DOContainer);
 
@@ -16,147 +15,173 @@ const nsdocStub: Nsdoc = {
 };
 
 describe('do-container', () => {
-  it('opens the info dialog and renders the expected fields', async () => {
-    const doc = parseDoc(testDocs.withIED_instanciated);
+  describe('visual', () => {
+    it('renders the header label and info icon', async () => {
+      const doc = parseDoc(testDocs.withIED_instanciated);
 
-    const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
-    const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
-    const ancestors = getAncestors(doc, [
-      'IED',
-      'AccessPoint',
-      'LDevice',
-      'LN0',
-    ]);
+      const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+      const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
+      const ancestors = getAncestors(doc, [
+        'IED',
+        'AccessPoint',
+        'LDevice',
+        'LN0',
+      ]);
 
-    const container = await fixture<DOContainer>(html`
-      <do-container
-        .doc=${doc}
-        .docVersion=${0}
-        .element=${doElement}
-        .instanceElement=${doiElement}
-        .nsdoc=${nsdocStub}
-        .ancestors=${ancestors}
-      ></do-container>
-    `);
+      const container = await fixture<DOContainer>(html`
+        <do-container
+          .doc=${doc}
+          .docVersion=${0}
+          .element=${doElement}
+          .instanceElement=${doiElement}
+          .nsdoc=${nsdocStub}
+          .ancestors=${ancestors}
+        ></do-container>
+      `);
 
-    await container.updateComplete;
+      await container.updateComplete;
 
-    const infoDialog = container.shadowRoot?.querySelector(
-      'do-info-dialog',
-    ) as DoInfoDialog;
+      const header = container.shadowRoot?.querySelector(
+        'oscd-action-pane',
+      ) as HTMLElement | null;
+      expect(header).to.exist;
 
-    expect(infoDialog.ancestors).to.equal(ancestors);
-    expect(infoDialog.nsdoc).to.equal(nsdocStub);
-    expect(infoDialog.templateElement).to.equal(doElement);
-    expect(infoDialog.instanceElement).to.equal(doiElement);
+      const nsdocLabel = nsdocStub.getDataDescription(
+        doElement,
+        ancestors,
+      ).label;
+      const infoButton = container.shadowRoot?.querySelector(
+        `oscd-icon-button[title="${nsdocLabel}"]`,
+      ) as HTMLElement | null;
+      expect(infoButton).to.exist;
+    });
 
-    const nsdocLabel = nsdocStub.getDataDescription(doElement, ancestors).label;
-    const infoButton = container.shadowRoot?.querySelector(
-      `oscd-icon-button[title="${nsdocLabel}"]`,
-    ) as HTMLElement;
+    it('hides the toggle button when no child elements exist', async () => {
+      const doc = parseDoc(testDocs.withIED_instanciated);
+      const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+      doElement.setAttribute('type', 'MissingType');
+      const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
+      const ancestors = getAncestors(doc, [
+        'IED',
+        'AccessPoint',
+        'LDevice',
+        'LN0',
+      ]);
 
-    expect(infoButton).to.exist;
-    infoButton.click();
-    await infoDialog.updateComplete;
+      const container = await fixture<DOContainer>(html`
+        <do-container
+          .doc=${doc}
+          .docVersion=${0}
+          .element=${doElement}
+          .instanceElement=${doiElement}
+          .nsdoc=${nsdocStub}
+          .ancestors=${ancestors}
+        ></do-container>
+      `);
 
-    const infoDialogInner = infoDialog.shadowRoot?.querySelector(
-      'info-dialog',
-    ) as HTMLElement;
-    expect(infoDialogInner).to.exist;
+      await container.updateComplete;
 
-    const fields =
-      infoDialogInner.shadowRoot?.querySelectorAll('oscd-filled-text-field') ??
-      [];
-    const fieldValues = Array.from(fields).map(field =>
-      (field as OscdFilledTextField).value?.toString(),
-    );
-
-    expect(fieldValues).to.deep.equal([
-      'DO-label',
-      'Beh',
-      'Behavior',
-      'ENS',
-      'L',
-      'LN0-label',
-      '',
-      'LD1',
-      'AP1',
-      'IED1',
-    ]);
+      const toggleButton = container.shadowRoot?.querySelector('#toggleButton');
+      expect(toggleButton).to.not.exist;
+    });
   });
 
-  it('hides the toggle button when no child elements exist', async () => {
-    const doc = parseDoc(testDocs.withIED_instanciated);
-    const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
-    doElement.setAttribute('type', 'MissingType');
-    const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
-    const ancestors = getAncestors(doc, [
-      'IED',
-      'AccessPoint',
-      'LDevice',
-      'LN0',
-    ]);
+  describe('header actions', () => {
+    it('opens the info dialog when clicking the info icon', async () => {
+      const doc = parseDoc(testDocs.withIED_instanciated);
 
-    const container = await fixture<DOContainer>(html`
-      <do-container
-        .doc=${doc}
-        .docVersion=${0}
-        .element=${doElement}
-        .instanceElement=${doiElement}
-        .nsdoc=${nsdocStub}
-        .ancestors=${ancestors}
-      ></do-container>
-    `);
+      const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+      const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
+      const ancestors = getAncestors(doc, [
+        'IED',
+        'AccessPoint',
+        'LDevice',
+        'LN0',
+      ]);
 
-    await container.updateComplete;
+      const container = await fixture<DOContainer>(html`
+        <do-container
+          .doc=${doc}
+          .docVersion=${0}
+          .element=${doElement}
+          .instanceElement=${doiElement}
+          .nsdoc=${nsdocStub}
+          .ancestors=${ancestors}
+        ></do-container>
+      `);
 
-    const toggleButton = container.shadowRoot?.querySelector('#toggleButton');
-    expect(toggleButton).to.not.exist;
+      await container.updateComplete;
+
+      const infoDialog = container.doInfoDialog;
+      expect(infoDialog).to.exist;
+      const innerInfoDialog = infoDialog.shadowRoot?.querySelector(
+        'info-dialog',
+      ) as InfoDialog | null;
+      expect(innerInfoDialog).to.exist;
+      const oscdDialog = innerInfoDialog!.shadowRoot?.querySelector(
+        'oscd-dialog',
+      ) as { open?: boolean } | null;
+      expect(oscdDialog).to.exist;
+
+      const nsdocLabel = nsdocStub.getDataDescription(
+        doElement,
+        ancestors,
+      ).label;
+      const infoButton = container.shadowRoot?.querySelector(
+        `oscd-icon-button[title="${nsdocLabel}"]`,
+      ) as HTMLElement | null;
+      expect(infoButton).to.exist;
+      infoButton!.click();
+
+      await waitUntil(() => oscdDialog?.open === true);
+    });
   });
 
-  it('renders DA and DO containers after expanding the action pane', async () => {
-    const doc = parseDoc(testDocs.withIED_instanciated);
+  describe('content interactions', () => {
+    it('renders DA and DO containers after expanding the action pane', async () => {
+      const doc = parseDoc(testDocs.withIED_instanciated);
 
-    const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
-    const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
-    const sdiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI > SDI');
-    const ancestors = getAncestors(doc, [
-      'IED',
-      'AccessPoint',
-      'LDevice',
-      'LN0',
-    ]);
+      const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+      const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
+      const sdiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI > SDI');
+      const ancestors = getAncestors(doc, [
+        'IED',
+        'AccessPoint',
+        'LDevice',
+        'LN0',
+      ]);
 
-    const container = await fixture<DOContainer>(html`
-      <do-container
-        .doc=${doc}
-        .docVersion=${0}
-        .element=${doElement}
-        .instanceElement=${doiElement}
-        .nsdoc=${nsdocStub}
-        .ancestors=${ancestors}
-      ></do-container>
-    `);
+      const container = await fixture<DOContainer>(html`
+        <do-container
+          .doc=${doc}
+          .docVersion=${0}
+          .element=${doElement}
+          .instanceElement=${doiElement}
+          .nsdoc=${nsdocStub}
+          .ancestors=${ancestors}
+        ></do-container>
+      `);
 
-    await container.updateComplete;
+      await container.updateComplete;
 
-    const toggleButton = container.shadowRoot?.querySelector(
-      '#toggleButton',
-    ) as HTMLElement;
-    expect(toggleButton).to.exist;
+      const toggleButton = container.shadowRoot?.querySelector(
+        '#toggleButton',
+      ) as HTMLElement;
+      expect(toggleButton).to.exist;
 
-    toggleButton.click();
-    await container.updateComplete;
-    expect(container.expanded).to.be.true;
+      toggleButton.click();
+      await container.updateComplete;
+      expect(container.expanded).to.be.true;
 
-    const daContainers =
-      container.shadowRoot?.querySelectorAll('da-container') ?? [];
-    expect(daContainers.length).to.equal(3);
+      const daContainers =
+        container.shadowRoot?.querySelectorAll('da-container') ?? [];
+      expect(daContainers.length).to.equal(5);
 
-    const doContainers =
-      container.shadowRoot?.querySelectorAll('do-container') ?? [];
-    expect(doContainers.length).to.equal(1);
-    const nestedDoContainer = doContainers[0] as DOContainer;
-    expect(nestedDoContainer.instanceElement).to.equal(sdiElement);
+      const doContainers =
+        container.shadowRoot?.querySelectorAll('do-container') ?? [];
+      expect(doContainers.length).to.equal(1);
+      const nestedDoContainer = doContainers[0] as DOContainer;
+      expect(nestedDoContainer.instanceElement).to.equal(sdiElement);
+    });
   });
 });

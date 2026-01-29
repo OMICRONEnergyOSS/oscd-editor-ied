@@ -17,12 +17,13 @@ export const testDocs = {
 		</VoltageLevel>
 	</Substation>
 	<IED name="IED1" manufacturer="OpenSCD">
-		<SettingControl numOfSGs="2"/>
 		<AccessPoint name="AP1">
 			<Server>
 				<Authentication/>
 				<LDevice inst="LD1">
-					<LN0 lnClass="LLN0" inst="" lnType="PlaceholderLLN0"/>
+					<LN0 lnClass="LLN0" inst="" lnType="PlaceholderLLN0">
+						<SettingControl numOfSGs="2"/>
+					</LN0>
 				</LDevice>
 			</Server>
 		</AccessPoint>
@@ -39,9 +40,9 @@ export const testDocs = {
 	</IED>
 	<DataTypeTemplates>
 		<LNodeType lnClass="LLN0" id="PlaceholderLLN0">
-			<DO name="Beh" type="Beh$oscd$_c6ed035c8137b35a"/>
+			<DO name="Beh" type="Beh_Test"/>
 		</LNodeType>
-		<DOType cdc="ENS" id="Beh$oscd$_c6ed035c8137b35a">
+		<DOType cdc="ENS" id="Beh_Test">
 			<DA name="stVal" fc="ST" dchg="true" dupd="true" bType="Enum" type="stVal$oscd$_48ba16345b8e7f5b"/>
 			<DA name="q" fc="ST" qchg="true" bType="Quality"/>
 			<DA name="t" fc="ST" bType="Timestamp"/>
@@ -69,8 +70,16 @@ export const testDocs = {
 				<Authentication/>
 				<LDevice inst="LD1">
 					<LN0 lnClass="LLN0" inst="" lnType="PlaceholderLLN0" prefix="L">
+						<SettingControl numOfSGs="2"/>
 						<DOI name="Beh" desc="Behavior">
 							<SDI name="Sub1" desc="SubDesc"/>
+							<DAI name="stVal" desc="ValueDesc">
+								<Val>on</Val>
+							</DAI>
+							<DAI name="stValSG">
+								<Val sGroup="1">v1</Val>
+								<Val sGroup="2">v2</Val>
+							</DAI>
 						</DOI>
 					</LN0>
 				</LDevice>
@@ -79,10 +88,11 @@ export const testDocs = {
 	</IED>
 	<DataTypeTemplates>
 		<LNodeType lnClass="LLN0" id="PlaceholderLLN0">
-			<DO name="Beh" desc="DoDesc" type="Beh$oscd$_c6ed035c8137b35a"/>
+			<DO name="Beh" desc="DoDesc" type="Beh_Test"/>
 		</LNodeType>
-		<DOType cdc="ENS" id="Beh$oscd$_c6ed035c8137b35a">
+		<DOType cdc="ENS" id="Beh_Test">
 			<DA name="stVal" fc="ST" dchg="true" dupd="true" bType="Enum" type="stVal$oscd$_48ba16345b8e7f5b"/>
+			<DA name="stValSG" fc="SG" bType="Enum" type="stVal$oscd$_48ba16345b8e7f5b"/>
 			<DA name="q" fc="ST" qchg="true" bType="Quality"/>
 			<DA name="t" fc="ST" bType="Timestamp"/>
 			<SDO name="Sub1" type="SubType"/>

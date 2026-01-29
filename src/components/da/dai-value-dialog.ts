@@ -1,6 +1,6 @@
 import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
 import { LitElement, TemplateResult, html, css, nothing } from 'lit';
-import { query, state } from 'lit/decorators.js';
+import { property, query, state } from 'lit/decorators.js';
 import { msg } from '@lit/localize';
 
 import { OscdDialog } from '@omicronenergy/oscd-ui/dialog/OscdDialog.js';
@@ -9,16 +9,6 @@ import { OscdFilledButton } from '@omicronenergy/oscd-ui/button/OscdFilledButton
 import { OscdFilledTextField } from '@omicronenergy/oscd-ui/textfield/OscdFilledTextField.js';
 import { OscdFilledSelect } from '@omicronenergy/oscd-ui/select/OscdFilledSelect.js';
 import { OscdSelectOption } from '@omicronenergy/oscd-ui/select/OscdSelectOption.js';
-
-type DaiDialogData = {
-  title: string;
-  bType: string;
-  enumValues: string[];
-  values: string[];
-  templateValue?: string | null;
-  multipleSettings: number | null;
-  onConfirm: (values: string[]) => void;
-};
 
 const stringTypeLengths: Record<string, number> = {
   VisString32: 32,
@@ -89,50 +79,53 @@ export class DaiValueDialog extends ScopedElementsMixin(LitElement) {
     'oscd-select-option': OscdSelectOption,
   };
 
-  @state() private data: DaiDialogData | null = null;
+  @property({ type: String }) dialogTitle = '';
+  @property({ type: String }) bType = '';
+  @property({ type: Array }) enumValues: string[] = [];
+  @property({ type: Array }) values: string[] = [];
+  @property({ type: String }) templateValue: string | null = null;
+  @property({ type: Number }) multipleSettings: number | null = null;
+  // eslint-disable-next-line class-methods-use-this
+  @property({ attribute: false })
+  onConfirm: (values: string[]) => void = () => undefined;
 
-  @state() private values: string[] = [];
+  @state() private formValues: string[] = [];
   @state() private dateValues: string[] = [];
   @state() private timeValues: string[] = [];
 
   @query('oscd-dialog') private dialog!: OscdDialog;
 
-  public show(data: DaiDialogData): void {
-    this.data = data;
-    this.values = [...data.values];
-    this.dateValues = data.values.map(value => getDateValue(value) ?? '');
-    this.timeValues = data.values.map(value => getTimeValue(value) ?? '');
+  public show(): void {
+    this.formValues = [...this.values];
+    this.dateValues = this.values.map(value => getDateValue(value) ?? '');
+    this.timeValues = this.values.map(value => getTimeValue(value) ?? '');
     this.dialog.show();
   }
 
   private close(): void {
     this.dialog.close();
-    this.data = null;
-    this.values = [];
+    this.formValues = [];
     this.dateValues = [];
     this.timeValues = [];
   }
 
   private confirm(): void {
-    if (!this.data) {
-      return;
-    }
     const values =
-      this.data.bType === 'Timestamp'
+      this.bType === 'Timestamp'
         ? this.dateValues.map((date, index) => {
             const time = this.timeValues[index] || '00:00:00';
             const normalizedDate = date || '0000-00-00';
             return `${normalizedDate}T${time}.000`;
           })
-        : this.values.map(value => value ?? '');
-    this.data.onConfirm(values);
+        : this.formValues.map(value => value ?? '');
+    this.onConfirm(values);
     this.close();
   }
 
   private setValue(index: number, value: string): void {
-    const updated = [...this.values];
+    const updated = [...this.formValues];
     updated[index] = value;
-    this.values = updated;
+    this.formValues = updated;
   }
 
   private setDateValue(index: number, value: string): void {
@@ -148,11 +141,8 @@ export class DaiValueDialog extends ScopedElementsMixin(LitElement) {
   }
 
   private renderValueField(index: number): TemplateResult {
-    if (!this.data) {
-      return html``;
-    }
-    const { bType, enumValues } = this.data;
-    const label = this.data.multipleSettings
+    const { bType, enumValues } = this;
+    const label = this.multipleSettings
       ? `Val for sGroup ${index + 1}`
       : msg('Val');
 
@@ -160,7 +150,7 @@ export class DaiValueDialog extends ScopedElementsMixin(LitElement) {
       return html`
         <oscd-filled-select
           label=${label}
-          .value=${this.values[index] ?? ''}
+          .value=${this.formValues[index] ?? ''}
           @change=${(e: Event) =>
             this.setValue(index, (e.target as HTMLSelectElement).value)}
         >
@@ -174,7 +164,7 @@ export class DaiValueDialog extends ScopedElementsMixin(LitElement) {
       return html`
         <oscd-filled-select
           label=${label}
-          .value=${this.values[index] ?? ''}
+          .value=${this.formValues[index] ?? ''}
           @change=${(e: Event) =>
             this.setValue(index, (e.target as HTMLSelectElement).value)}
         >
@@ -191,7 +181,7 @@ export class DaiValueDialog extends ScopedElementsMixin(LitElement) {
     if (bType === 'Timestamp') {
       return html`
         <oscd-filled-text-field
-          label=${this.data.multipleSettings
+          label=${this.multipleSettings
             ? `Val (Date) for sGroup ${index + 1}`
             : msg('Val (Date)')}
           type="date"
@@ -200,7 +190,7 @@ export class DaiValueDialog extends ScopedElementsMixin(LitElement) {
             this.setDateValue(index, (e.target as HTMLInputElement).value)}
         ></oscd-filled-text-field>
         <oscd-filled-text-field
-          label=${this.data.multipleSettings
+          label=${this.multipleSettings
             ? `Val (Time) for sGroup ${index + 1}`
             : msg('Val (Time)')}
           type="time"
@@ -222,7 +212,7 @@ export class DaiValueDialog extends ScopedElementsMixin(LitElement) {
         label=${label}
         type=${type}
         step=${isNumeric ? step : nothing}
-        .value=${this.values[index] ?? ''}
+        .value=${this.formValues[index] ?? ''}
         maxlength=${maxLength ?? nothing}
         @input=${(e: Event) =>
           this.setValue(index, (e.target as HTMLInputElement).value)}
@@ -231,10 +221,7 @@ export class DaiValueDialog extends ScopedElementsMixin(LitElement) {
   }
 
   private renderFields(): TemplateResult[] {
-    if (!this.data) {
-      return [];
-    }
-    const count = this.data.multipleSettings ?? 1;
+    const count = this.multipleSettings ?? 1;
     return Array.from(
       { length: count },
       (_, index) =>
@@ -245,13 +232,13 @@ export class DaiValueDialog extends ScopedElementsMixin(LitElement) {
   render(): TemplateResult {
     return html`
       <oscd-dialog @closed=${this.close}>
-        <div slot="headline">${this.data?.title ?? ''}</div>
+        <div slot="headline">${this.dialogTitle}</div>
         <div slot="content" class="dialog-content">
           ${this.renderFields()}
-          ${this.data?.templateValue
+          ${this.templateValue
             ? html`<oscd-filled-text-field
                 label=${msg('DA template value')}
-                .value=${this.data.templateValue}
+                .value=${this.templateValue}
                 disabled
               ></oscd-filled-text-field>`
             : nothing}

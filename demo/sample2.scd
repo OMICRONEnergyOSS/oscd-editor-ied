@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<SCL xmlns="http://www.iec.ch/61850/2003/SCL" xmlns:esld="https://transpower.co.nz/SCL/SSD/SLD/v0" version="2007" revision="B">
+<SCL xmlns="http://www.iec.ch/61850/2003/SCL" xmlns:esld="https://transpower.co.nz/SCL/SSD/SLD/v0" version="2007" revision="B5">
     <Header id="development sample"/>
     <Substation name="S1" esld:w="50" esld:h="25">
         <VoltageLevel name="V1" esld:x="1" esld:y="1" esld:lx="1" esld:ly="1" esld:w="48" esld:h="22">
@@ -15,7 +15,9 @@
             <Server>
                 <Authentication/>
                 <LDevice inst="LD1">
-                    <LN0 lnClass="LLN0" inst="" lnType="PlaceholderLLN0"/>
+                    <LN0 lnClass="LLN0" inst="" lnType="PlaceholderLLN0">
+                        <SettingControl numOfSGs="5"/>
+                    </LN0>
                     <LN lnType="URPC74x_CTR-P" lnClass="TCTR" prefix="I01A" inst="1">
                         <DOI name="AmpSv">
                             <SDI name="sVC">
@@ -31,9 +33,20 @@
                                     <Val>3000</Val>
                                 </DAI>
                             </SDI>
-                            <SDI name="SubBeh">
+                            <SDI name="subBeh">
                                 <DAI name="stVal">
                                     <Val>on</Val>
+                                </DAI>
+                            </SDI>
+                        </DOI>
+                        <DOI name="ARtg">
+                            <SDI name="setMag">
+                                <DAI name="i">
+                                    <Val sGroup="1">1</Val>
+                                    <Val sGroup="2">2</Val>
+                                    <Val sGroup="3">3</Val>
+                                    <Val sGroup="4">4</Val>
+                                    <Val sGroup="5">5</Val>
                                 </DAI>
                             </SDI>
                         </DOI>
@@ -69,7 +82,7 @@
                                     <Val>3000</Val>
                                 </DAI>
                             </SDI>
-                            <SDI name="SubBeh">
+                            <SDI name="subBeh">
                                 <DAI name="stVal">
                                     <Val>on</Val>
                                 </DAI>
@@ -104,7 +117,7 @@
                                     <Val>3000</Val>
                                 </DAI>
                             </SDI>
-                            <SDI name="SubBeh">
+                            <SDI name="subBeh">
                                 <DAI name="stVal">
                                     <Val>on</Val>
                                 </DAI>
@@ -136,7 +149,7 @@
             <DA name="instMag" fc="MX" bType="Struct" valKind="Spec" type="URPC74x_AnalogueValue"/>
             <DA name="q" fc="MX" bType="Quality" valKind="Spec"/>
             <DA name="sVC" fc="CF" bType="Struct" type="URPC74x_AmpScaledValueCfg"/>
-            <SDO name="SubBeh" type="Beh$oscd$_c6ed035c8137b35a"/>
+            <SDO name="subBeh" type="Beh$oscd$_c6ed035c8137b35a"/>
         </DOType>
         <DOType id="URPC74x_ARtg" cdc="ASG">
             <DA name="setMag" fc="SE" bType="Struct" type="AnalogueValueCtl"/>

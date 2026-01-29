@@ -146,60 +146,60 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
       return;
     }
 
-    this.daiValueDialog.show({
-      title: `Create DAI "${targetDai.getAttribute('name') ?? ''}"`,
-      bType,
-      enumValues: bType === 'Enum' ? this.getEnumValues() : [],
-      values: this.instanceElement
-        ? getInstanceValues(this.instanceElement, multipleSettings)
-        : [],
-      templateValue,
-      multipleSettings,
-      onConfirm: values => {
-        if (insertElement) {
-          Array.from(targetDai!.querySelectorAll('Val')).forEach(val =>
-            val.remove(),
-          );
-          if (multipleSettings) {
-            values.forEach((value, index) => {
-              targetDai!.append(this.buildValElement(value, index + 1));
-            });
-          } else {
-            targetDai!.append(this.buildValElement(values[0] ?? ''));
-          }
-
-          this.dispatchEvent(
-            newEditEventV2({
-              parent: parentElement,
-              node: insertElement,
-              reference: null,
-            }),
-          );
-          return;
+    this.daiValueDialog.dialogTitle = `Create DAI "${targetDai.getAttribute('name') ?? ''}"`;
+    this.daiValueDialog.bType = bType;
+    this.daiValueDialog.enumValues =
+      bType === 'Enum' ? this.getEnumValues() : [];
+    this.daiValueDialog.values = this.instanceElement
+      ? getInstanceValues(this.instanceElement, multipleSettings)
+      : [];
+    this.daiValueDialog.templateValue = templateValue ?? null;
+    this.daiValueDialog.multipleSettings = multipleSettings;
+    this.daiValueDialog.onConfirm = values => {
+      if (insertElement) {
+        Array.from(targetDai!.querySelectorAll('Val')).forEach(val =>
+          val.remove(),
+        );
+        if (multipleSettings) {
+          values.forEach((value, index) => {
+            targetDai!.append(this.buildValElement(value, index + 1));
+          });
+        } else {
+          targetDai!.append(this.buildValElement(values[0] ?? ''));
         }
 
-        const edits = [
-          ...Array.from(targetDai!.querySelectorAll('Val')).map(val => ({
-            node: val,
-          })),
-          ...(multipleSettings
-            ? values.map((value, index) => ({
-                parent: targetDai!,
-                node: this.buildValElement(value, index + 1),
-                reference: null,
-              }))
-            : [
-                {
-                  parent: targetDai!,
-                  node: this.buildValElement(values[0] ?? ''),
-                  reference: null,
-                },
-              ]),
-        ];
+        this.dispatchEvent(
+          newEditEventV2({
+            parent: parentElement,
+            node: insertElement,
+            reference: null,
+          }),
+        );
+        return;
+      }
 
-        this.dispatchEvent(newEditEventV2(edits));
-      },
-    });
+      const edits = [
+        ...Array.from(targetDai!.querySelectorAll('Val')).map(val => ({
+          node: val,
+        })),
+        ...(multipleSettings
+          ? values.map((value, index) => ({
+              parent: targetDai!,
+              node: this.buildValElement(value, index + 1),
+              reference: null,
+            }))
+          : [
+              {
+                parent: targetDai!,
+                node: this.buildValElement(values[0] ?? ''),
+                reference: null,
+              },
+            ]),
+      ];
+
+      this.dispatchEvent(newEditEventV2(edits));
+    };
+    this.daiValueDialog.show();
   }
 
   private openEditWizard(_val: Element): void {
@@ -216,38 +216,41 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
       .querySelector('Val')
       ?.textContent?.trim();
 
-    this.daiValueDialog.show({
-      title: `Edit DAI "${this.instanceElement.getAttribute('name') ?? ''}"`,
-      bType,
-      enumValues: bType === 'Enum' ? this.getEnumValues() : [],
-      values: getInstanceValues(this.instanceElement, multipleSettings),
-      templateValue,
+    this.daiValueDialog.dialogTitle = `Edit DAI "${this.instanceElement.getAttribute('name') ?? ''}"`;
+    this.daiValueDialog.bType = bType;
+    this.daiValueDialog.enumValues =
+      bType === 'Enum' ? this.getEnumValues() : [];
+    this.daiValueDialog.values = getInstanceValues(
+      this.instanceElement,
       multipleSettings,
-      onConfirm: values => {
-        const edits = [
-          ...Array.from(this.instanceElement!.querySelectorAll('Val')).map(
-            existingVal => ({
-              node: existingVal,
-            }),
-          ),
-          ...(multipleSettings
-            ? values.map((value, index) => ({
+    );
+    this.daiValueDialog.templateValue = templateValue ?? null;
+    this.daiValueDialog.multipleSettings = multipleSettings;
+    this.daiValueDialog.onConfirm = values => {
+      const edits = [
+        ...Array.from(this.instanceElement!.querySelectorAll('Val')).map(
+          existingVal => ({
+            node: existingVal,
+          }),
+        ),
+        ...(multipleSettings
+          ? values.map((value, index) => ({
+              parent: this.instanceElement!,
+              node: this.buildValElement(value, index + 1),
+              reference: null,
+            }))
+          : [
+              {
                 parent: this.instanceElement!,
-                node: this.buildValElement(value, index + 1),
+                node: this.buildValElement(values[0] ?? ''),
                 reference: null,
-              }))
-            : [
-                {
-                  parent: this.instanceElement!,
-                  node: this.buildValElement(values[0] ?? ''),
-                  reference: null,
-                },
-              ]),
-        ];
+              },
+            ]),
+      ];
 
-        this.dispatchEvent(newEditEventV2(edits));
-      },
-    });
+      this.dispatchEvent(newEditEventV2(edits));
+    };
+    this.daiValueDialog.show();
   }
 
   private openInfoDialog(): void {
@@ -319,9 +322,10 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
     }
 
     const fc = daElement.getAttribute('fc') ?? '';
-    const settingControl = this.element
-      .closest('IED')
-      ?.querySelector('SettingControl');
+    const iedElement =
+      this.ancestors.find(element => element.tagName === 'IED') ??
+      this.element.closest('IED');
+    const settingControl = iedElement?.querySelector('SettingControl');
     const numOfSGs = settingControl?.getAttribute('numOfSGs') ?? '';
     const count = parseInt(numOfSGs);
 

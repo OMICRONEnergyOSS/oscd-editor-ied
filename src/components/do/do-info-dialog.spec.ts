@@ -1,16 +1,20 @@
-import { expect } from '@open-wc/testing';
+import { expect, fixture, html } from '@open-wc/testing';
 import { Nsdoc } from '../../foundation/nsdoc.js';
 import { MISSING_VALUE } from '../../foundation.js';
 import { buildDoInfoGroups } from './do-info-dialog.js';
 import { parseDoc, testDocs } from '../../test-utils/test-files.js';
 import { getFirstAndAssertBySelector } from '../../test-utils/queries.js';
 import { getAncestors } from '../../test-utils/test-harness.js';
+import { DoInfoDialog } from './do-info-dialog.js';
+import { OscdFilledTextField } from '@omicronenergy/oscd-ui/textfield/OscdFilledTextField.js';
 
 const nsdocStub: Nsdoc = {
   getDataDescription: (element: Element) => ({
     label: `${element.tagName}-label`,
   }),
 };
+
+customElements.define('do-info-dialog', DoInfoDialog);
 
 describe('do-info-dialog', () => {
   it('builds detailed groups for DO info', () => {
@@ -73,5 +77,54 @@ describe('do-info-dialog', () => {
       'Data object common data class',
     ]);
     expect(groups[1][0].value).to.equal(MISSING_VALUE);
+  });
+
+  it('renders dialog fields for template and instance data', async () => {
+    const doc = parseDoc(testDocs.withIED_instanciated);
+
+    const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+    const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
+    const ancestors = getAncestors(doc, [
+      'IED',
+      'AccessPoint',
+      'LDevice',
+      'LN0',
+    ]);
+
+    const dialog = await fixture<DoInfoDialog>(html`
+      <do-info-dialog
+        .ancestors=${ancestors}
+        .nsdoc=${nsdocStub}
+        .templateElement=${doElement}
+        .instanceElement=${doiElement}
+      ></do-info-dialog>
+    `);
+
+    await dialog.updateComplete;
+
+    dialog.show();
+    await dialog.updateComplete;
+
+    const infoDialog = dialog.shadowRoot?.querySelector('info-dialog');
+    expect(infoDialog).to.exist;
+
+    const fields =
+      infoDialog?.shadowRoot?.querySelectorAll('oscd-filled-text-field') ?? [];
+    const fieldValues = Array.from(fields).map(field =>
+      (field as OscdFilledTextField).value?.toString(),
+    );
+
+    expect(fieldValues).to.deep.equal([
+      'DO-label',
+      'Beh',
+      'Behavior',
+      'ENS',
+      'L',
+      'LN0-label',
+      '',
+      'LD1',
+      'AP1',
+      'IED1',
+    ]);
   });
 });
