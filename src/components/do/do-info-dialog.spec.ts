@@ -20,13 +20,19 @@ describe('do-info-dialog', () => {
   it('builds detailed groups for DO info', () => {
     const doc = parseDoc(testDocs.withIED_instanciated);
 
-    const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
-    const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
+    const doElement = getFirstAndAssertBySelector(
+      doc,
+      'LNodeType[id="TCTR_Test"] > DO[name="ARtg"]',
+    );
+    const doiElement = getFirstAndAssertBySelector(
+      doc,
+      'LN[lnClass="TCTR"][inst="1"] > DOI[name="ARtg"]',
+    );
     const ancestors = getAncestors(doc, [
       'IED',
       'AccessPoint',
       'LDevice',
-      'LN0',
+      'LN',
     ]);
 
     const groups = buildDoInfoGroups({
@@ -46,23 +52,23 @@ describe('do-info-dialog', () => {
       'Data object common data class',
     ]);
     expect(groups[0][0].value).to.equal('DO-label');
-    expect(groups[0][1].value).to.equal('Beh');
-    expect(groups[0][2].value).to.equal('Behavior');
-    expect(groups[0][3].value).to.equal('ENS');
-    expect(groups[1][1].value).to.equal('LN0-label');
+    expect(groups[0][1].value).to.equal('ARtg');
+    expect(groups[0][2].value).to.equal(MISSING_VALUE);
+    expect(groups[0][3].value).to.equal('ASG');
+    expect(groups[1][1].value).to.equal('LN-label');
   });
 
   it('omits detailed-only fields when detailed is false', () => {
     const doc = parseDoc(testDocs.withIED_instanciated);
-    const ln0 = getFirstAndAssertBySelector(doc, 'LN0');
-    ln0.removeAttribute('prefix');
-
-    const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+    const doElement = getFirstAndAssertBySelector(
+      doc,
+      'LNodeType[id="TCTR_Test"] > DO[name="ARtg"]',
+    );
     const ancestors = getAncestors(doc, [
       'IED',
       'AccessPoint',
       'LDevice',
-      'LN0',
+      'LN',
     ]);
 
     const groups = buildDoInfoGroups({
@@ -82,13 +88,19 @@ describe('do-info-dialog', () => {
   it('renders dialog fields for template and instance data', async () => {
     const doc = parseDoc(testDocs.withIED_instanciated);
 
-    const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
-    const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
+    const doElement = getFirstAndAssertBySelector(
+      doc,
+      'LNodeType[id="TCTR_Test"] > DO[name="ARtg"]',
+    );
+    const doiElement = getFirstAndAssertBySelector(
+      doc,
+      'LN[lnClass="TCTR"][inst="1"] > DOI[name="ARtg"]',
+    );
     const ancestors = getAncestors(doc, [
       'IED',
       'AccessPoint',
       'LDevice',
-      'LN0',
+      'LN',
     ]);
 
     const dialog = await fixture<DoInfoDialog>(html`
@@ -116,12 +128,12 @@ describe('do-info-dialog', () => {
 
     expect(fieldValues).to.deep.equal([
       'DO-label',
-      'Beh',
-      'Behavior',
-      'ENS',
-      'L',
-      'LN0-label',
-      '',
+      'ARtg',
+      MISSING_VALUE,
+      'ASG',
+      MISSING_VALUE,
+      'LN-label',
+      '1',
       'LD1',
       'AP1',
       'IED1',

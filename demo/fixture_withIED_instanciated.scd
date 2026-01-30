@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<SCL xmlns="http://www.iec.ch/61850/2003/SCL" version="2007" revision="B">
+<SCL xmlns="http://www.iec.ch/61850/2003/SCL" version="2007" revision="B" release="5">
     <Header id="development sample"/>
     <Substation name="S1">
         <VoltageLevel name="V1" >
@@ -12,32 +12,80 @@
             <Server>
                 <Authentication/>
                 <LDevice inst="LD1">
-                    <LN0 lnClass="LLN0" inst="" lnType="PlaceholderLLN0" prefix="L">
+                    <LN0 lnClass="LLN0" inst="" lnType="LLN0_Test">
                         <SettingControl numOfSGs="2"/>
                     </LN0>
+                    <LN lnClass="TCTR" inst="1" lnType="TCTR_Test">
+                        <DOI name="ARtg">
+                            <DAI name="setVal">
+                                <Val sGroup="1">10</Val>
+                                <Val sGroup="2">12</Val>
+                            </DAI>
+                            <DAI name="setMag">
+                                <Val sGroup="1">100</Val>
+                                <Val sGroup="2">120</Val>
+                            </DAI>
+                        </DOI>
+                    </LN>
+                </LDevice>
+                <LDevice inst="LD2">
+                    <LN0 lnClass="LLN0" inst="" lnType="LLN0_Test"/>
+                    <LN lnClass="TCTR" inst="2" lnType="TCTR_Test"/>
                 </LDevice>
             </Server>
         </AccessPoint>
     </IED>
     <DataTypeTemplates>
-        <LNodeType lnClass="LLN0" id="PlaceholderLLN0">
-            <DO name="Beh" desc="DoDesc" type="Beh_Test"/>
+        <LNodeType lnClass="LLN0" id="LLN0_Test">
+            <DO name="Beh" type="Beh_Test"/>
+        </LNodeType>
+        <LNodeType lnClass="TCTR" id="TCTR_Test">
+            <DO name="Beh" type="Beh_Test"/>
+            <DO name="HzRtg" type="HzRtg_Test"/>
+            <DO name="ARtg" type="ARtg_Test"/>
         </LNodeType>
         <DOType cdc="ENS" id="Beh_Test">
-            <DA name="stVal" fc="ST" dchg="true" dupd="true" bType="Enum" type="stVal$oscd$_48ba16345b8e7f5b"/>
-            <DA name="stValSG" fc="SG" bType="Enum" type="stVal$oscd$_48ba16345b8e7f5b"/>
+            <DA name="stVal" fc="ST" dchg="true" dupd="true" bType="Enum" type="stVal_enums"/>
             <DA name="q" fc="ST" qchg="true" bType="Quality"/>
             <DA name="t" fc="ST" bType="Timestamp"/>
-            <SDO name="Sub1" type="SubType"/>
-            <DA name="Sub2" bType="Struct" type="SubDaType"/>
         </DOType>
-        <DOType id="SubType" cdc="ENS">
-            <DA name="subDa" fc="ST" bType="Enum"/>
+        <DOType cdc="ASG" id="ARtg_Test">
+            <DA name="setVal" fc="SG" bType="INT32"/>
+            <DA name="setMag" fc="SE" bType="INT32"/>
         </DOType>
-        <DAType id="SubDaType">
-            <BDA name="subBda" bType="Enum" type="stVal$oscd$_48ba16345b8e7f5b"/>
+        <DOType cdc="ASG" id="HzRtg_Test">
+            <DA name="setMag" fc="SE" bType="Struct" type="AnalogueValueCtl"/>
+            <DA name="units" fc="CF" bType="Struct" type="Unit"/>
+            <DA name="sVC" fc="CF" bType="Struct" type="ScaledValueConfig"/>
+            <DA name="minVal" fc="CF" bType="Struct" type="AnalogueValue"/>
+            <DA name="maxVal" fc="CF" bType="Struct" type="AnalogueValue"/>
+            <DA name="stepSize" fc="CF" bType="Struct" type="AnalogueValue"/>
+        </DOType>
+        <DAType id="AnalogueValueCtl">
+            <BDA name="i" bType="INT32"/>
         </DAType>
-        <EnumType id="stVal$oscd$_48ba16345b8e7f5b">
+        <DAType id="AnalogueValue">
+            <BDA name="i" bType="INT32"/>
+        </DAType>
+        <DAType id="ScaledValueConfig">
+            <BDA name="scaleFactor" bType="FLOAT32" valKind="RO">
+                <Val>0.001</Val>
+            </BDA>
+            <BDA name="offset" bType="FLOAT32" valKind="RO">
+                <Val>0.0</Val>
+            </BDA>
+        </DAType>
+        <DAType id="Unit">
+            <BDA name="SIUnit" bType="Enum" type="SIUnitKind"/>
+            <BDA name="multiplier" bType="Enum" type="MultiplierKind"/>
+        </DAType>
+        <EnumType id="SIUnitKind">
+            <EnumVal ord="1">Hz</EnumVal>
+        </EnumType>
+        <EnumType id="MultiplierKind">
+            <EnumVal ord="0">none</EnumVal>
+        </EnumType>
+        <EnumType id="stVal_enums">
             <EnumVal ord="1">on</EnumVal>
             <EnumVal ord="2">blocked</EnumVal>
             <EnumVal ord="3">test</EnumVal>

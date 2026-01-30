@@ -1,73 +1,22 @@
 import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
 import { LitElement, TemplateResult, html, css, nothing } from 'lit';
-import { property, query, state } from 'lit/decorators.js';
+import { property, query } from 'lit/decorators.js';
 import { msg } from '@lit/localize';
 
 import { OscdDialog } from '@omicronenergy/oscd-ui/dialog/OscdDialog.js';
 import { OscdOutlinedButton } from '@omicronenergy/oscd-ui/button/OscdOutlinedButton.js';
 import { OscdFilledButton } from '@omicronenergy/oscd-ui/button/OscdFilledButton.js';
 import { OscdFilledTextField } from '@omicronenergy/oscd-ui/textfield/OscdFilledTextField.js';
-import { OscdFilledSelect } from '@omicronenergy/oscd-ui/select/OscdFilledSelect.js';
-import { OscdSelectOption } from '@omicronenergy/oscd-ui/select/OscdSelectOption.js';
-
-const stringTypeLengths: Record<string, number> = {
-  VisString32: 32,
-  VisString64: 64,
-  VisString65: 65,
-  VisString129: 129,
-  VisString255: 255,
-  ObjRef: 129,
-  Currency: 3,
-  Octet64: 128,
-  Octet6: 12,
-  Octet16: 32,
-  Unicode255: 255,
-};
-
-const integerTypes = new Set([
-  'INT8',
-  'INT16',
-  'INT24',
-  'INT32',
-  'INT64',
-  'INT128',
-  'INT8U',
-  'INT16U',
-  'INT24U',
-  'INT32U',
-]);
-
-const floatTypes = new Set(['FLOAT32', 'FLOAT64']);
-
-function getDateValue(value: string): string | null {
-  const parts = value.split('T');
-  const dateValue = parts[0];
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
-    return null;
-  }
-  if (dateValue === '0000-00-00') {
-    return null;
-  }
-  return dateValue;
-}
-
-function getTimeValue(value: string): string | null {
-  const parts = value.split('T');
-  if (parts.length !== 2) {
-    return null;
-  }
-  let timeValue = parts[1];
-  if (timeValue.length > 8) {
-    timeValue = timeValue.substring(0, 8);
-  }
-  if (!/^\d{2}:\d{2}:\d{2}$/.test(timeValue)) {
-    return null;
-  }
-  if (timeValue === '00:00:00') {
-    return null;
-  }
-  return timeValue;
-}
+import {
+  determineUninitializedStructure,
+  initializeElements,
+} from '../../foundation/dai.js';
+import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
+import { DaiValueField, DaiValueFieldChange } from './dai-value-field.js';
+import {
+  DaiTimestampField,
+  DaiTimestampFieldChange,
+} from './dai-timestamp-field.js';
 
 export class DaiValueDialog extends ScopedElementsMixin(LitElement) {
   static scopedElements = {
@@ -75,148 +24,328 @@ export class DaiValueDialog extends ScopedElementsMixin(LitElement) {
     'oscd-outlined-button': OscdOutlinedButton,
     'oscd-filled-button': OscdFilledButton,
     'oscd-filled-text-field': OscdFilledTextField,
-    'oscd-filled-select': OscdFilledSelect,
-    'oscd-select-option': OscdSelectOption,
+    'dai-value-field': DaiValueField,
+    'dai-timestamp-field': DaiTimestampField,
   };
 
-  @property({ type: String }) dialogTitle = '';
-  @property({ type: String }) bType = '';
-  @property({ type: Array }) enumValues: string[] = [];
-  @property({ type: Array }) values: string[] = [];
-  @property({ type: String }) templateValue: string | null = null;
-  @property({ type: Number }) multipleSettings: number | null = null;
-  // eslint-disable-next-line class-methods-use-this
   @property({ attribute: false })
-  onConfirm: (values: string[]) => void = () => undefined;
+  templateElement!: Element;
 
-  @state() private formValues: string[] = [];
-  @state() private dateValues: string[] = [];
-  @state() private timeValues: string[] = [];
+  @property({ attribute: false })
+  instanceElement: Element | null = null;
 
-  @query('oscd-dialog') private dialog!: OscdDialog;
+  @property({ attribute: false })
+  ancestors: Element[] = [];
+
+  @query('oscd-dialog')
+  private dialog!: OscdDialog;
+
+  private dialogTitle = '';
+
+  private bType = '';
+
+  private enumValues: string[] = [];
+
+  private templateValue: string | null = null;
+
+  private multipleSettings: number | null = null;
+
+  private targetDai: Element | null = null;
+
+  private insertElement: Element | null = null;
+
+  private lnElement: Element | null = null;
+
+  private editedValues = new Map<number, string>();
 
   public show(): void {
-    this.formValues = [...this.values];
-    this.dateValues = this.values.map(value => getDateValue(value) ?? '');
-    this.timeValues = this.values.map(value => getTimeValue(value) ?? '');
+    const bType = this.templateElement?.getAttribute('bType') ?? '';
+    if (!bType) {
+      return;
+    }
+
+    this.editedValues.clear();
+    this.bType = bType;
+    this.enumValues = bType === 'Enum' ? this.getEnumValues() : [];
+    this.multipleSettings = this.getMultipleSettingGroupCount();
+    this.templateValue =
+      this.templateElement?.querySelector('Val')?.textContent?.trim() ?? null;
+
+    if (this.instanceElement) {
+      this.targetDai = this.instanceElement;
+      this.insertElement = null;
+      this.lnElement = null;
+      const hasInstanceValues = !!this.instanceElement?.querySelector('Val');
+      this.dialogTitle = `${hasInstanceValues ? 'Edit' : 'Create'} DAI "${this.instanceElement.getAttribute('name') ?? ''}"`;
+    } else {
+      const lnElement =
+        this.ancestors.find(element =>
+          ['LN0', 'LN'].includes(element.tagName),
+        ) ?? null;
+      if (!lnElement) {
+        return;
+      }
+
+      const templateStructure = this.getTemplateStructure();
+      const [_, uninitializedTemplateStructure] =
+        determineUninitializedStructure(lnElement, templateStructure);
+      const insertElement = initializeElements(uninitializedTemplateStructure);
+      const targetDai =
+        insertElement.tagName === 'DAI'
+          ? insertElement
+          : insertElement.querySelector('DAI');
+      if (!targetDai) {
+        return;
+      }
+
+      this.lnElement = lnElement;
+      this.insertElement = insertElement;
+      this.targetDai = targetDai;
+      this.dialogTitle = `Create DAI "${targetDai.getAttribute('name') ?? ''}"`;
+    }
+
+    this.requestUpdate();
     this.dialog.show();
   }
 
   private close(): void {
     this.dialog.close();
-    this.formValues = [];
-    this.dateValues = [];
-    this.timeValues = [];
+    this.dialogTitle = '';
+    this.bType = '';
+    this.enumValues = [];
+    this.templateValue = null;
+    this.multipleSettings = null;
+    this.targetDai = null;
+    this.insertElement = null;
+    this.lnElement = null;
+    this.editedValues.clear();
+    this.requestUpdate();
   }
 
   private confirm(): void {
-    const values =
-      this.bType === 'Timestamp'
-        ? this.dateValues.map((date, index) => {
-            const time = this.timeValues[index] || '00:00:00';
-            const normalizedDate = date || '0000-00-00';
-            return `${normalizedDate}T${time}.000`;
-          })
-        : this.formValues.map(value => value ?? '');
-    this.onConfirm(values);
+    if (!this.targetDai) {
+      return;
+    }
+
+    if (this.insertElement && this.lnElement) {
+      const values = this.getResolvedValues();
+      Array.from(this.targetDai.querySelectorAll('Val')).forEach(val =>
+        val.remove(),
+      );
+      if (this.multipleSettings) {
+        values.forEach((value, index) => {
+          this.targetDai!.append(this.buildValElement(value, index + 1));
+        });
+      } else {
+        this.targetDai.append(this.buildValElement(values[0] ?? ''));
+      }
+
+      this.dispatchEvent(
+        newEditEventV2({
+          parent: this.lnElement,
+          node: this.insertElement,
+          reference: null,
+        }),
+      );
+      this.close();
+      return;
+    }
+
+    const values = this.getResolvedValues();
+    const edits = [
+      ...Array.from(this.targetDai.querySelectorAll('Val')).map(
+        existingVal => ({
+          node: existingVal,
+        }),
+      ),
+      ...(this.multipleSettings
+        ? values.map((value, index) => ({
+            parent: this.targetDai!,
+            node: this.buildValElement(value, index + 1),
+            reference: null,
+          }))
+        : [
+            {
+              parent: this.targetDai!,
+              node: this.buildValElement(values[0] ?? ''),
+              reference: null,
+            },
+          ]),
+    ];
+
+    this.dispatchEvent(newEditEventV2(edits));
     this.close();
   }
 
-  private setValue(index: number, value: string): void {
-    const updated = [...this.formValues];
-    updated[index] = value;
-    this.formValues = updated;
+  private getTemplateStructure(): Element[] {
+    const doElement = this.ancestors.find(element => element.tagName === 'DO');
+    if (!doElement) {
+      return [this.templateElement];
+    }
+
+    const dataStructure = this.ancestors.slice(
+      this.ancestors.indexOf(doElement),
+    );
+    dataStructure.push(this.templateElement);
+    return dataStructure;
   }
 
-  private setDateValue(index: number, value: string): void {
-    const updated = [...this.dateValues];
-    updated[index] = value;
-    this.dateValues = updated;
+  private getMultipleSettingGroupCount(): number | null {
+    let daElement = this.templateElement;
+    if (this.templateElement.tagName === 'BDA') {
+      const daTypeId = this.templateElement.parentElement?.getAttribute('id');
+      const root = this.templateElement.getRootNode() as Document | Element;
+      const referencedDa = root.querySelector(
+        `DOType > DA[type="${daTypeId}"]`,
+      );
+      if (referencedDa) {
+        daElement = referencedDa;
+      }
+    }
+
+    const fc = daElement.getAttribute('fc') ?? '';
+    const iedElement = this.ancestors.find(
+      element => element.tagName === 'IED',
+    );
+    const settingControl = iedElement?.querySelector('SettingControl');
+    const numOfSGs = settingControl?.getAttribute('numOfSGs') ?? '';
+    const count = parseInt(numOfSGs);
+
+    if (
+      (fc === 'SG' || fc === 'SE') &&
+      numOfSGs !== '' &&
+      !Number.isNaN(count)
+    ) {
+      return count;
+    }
+
+    return null;
   }
 
-  private setTimeValue(index: number, value: string): void {
-    const updated = [...this.timeValues];
-    updated[index] = value;
-    this.timeValues = updated;
+  private getEnumValues(): string[] {
+    const enumTypeId = this.templateElement.getAttribute('type');
+    if (!enumTypeId) {
+      return [];
+    }
+
+    return Array.from(
+      this.templateElement.ownerDocument.querySelectorAll(
+        `EnumType[id="${enumTypeId}"] > EnumVal`,
+      ),
+    )
+      .filter(enumVal => enumVal.textContent && enumVal.textContent !== '')
+      .sort(
+        (left, right) =>
+          parseInt(left.getAttribute('ord') ?? '0') -
+          parseInt(right.getAttribute('ord') ?? '0'),
+      )
+      .map(enumVal => enumVal.textContent ?? '');
+  }
+
+  private buildValElement(value: string, sGroup?: number): Element {
+    const val = this.templateElement.ownerDocument.createElementNS(
+      'http://www.iec.ch/61850/2003/SCL',
+      'Val',
+    );
+    val.textContent = value ?? '';
+    if (sGroup) {
+      val.setAttribute('sGroup', `${sGroup}`);
+    }
+    return val;
+  }
+
+  private handleValueChange(event: CustomEvent<DaiValueFieldChange>): void {
+    const sGroup = event.detail.sGroup ?? null;
+    const index = sGroup ? sGroup - 1 : 0;
+    this.editedValues.set(index, event.detail.value ?? '');
+  }
+
+  private handleTimestampChange(
+    event: CustomEvent<DaiTimestampFieldChange>,
+  ): void {
+    const sGroup = event.detail.sGroup ?? null;
+    const index = sGroup ? sGroup - 1 : 0;
+    this.editedValues.set(index, event.detail.value ?? '');
+  }
+
+  private getInstanceValue(index: number): string | null {
+    if (!this.instanceElement) {
+      return null;
+    }
+
+    const values = Array.from(this.instanceElement.querySelectorAll('Val'));
+    if (!values.length) {
+      return null;
+    }
+
+    if (this.multipleSettings) {
+      const sGroup = `${index + 1}`;
+      const match = values.find(val => val.getAttribute('sGroup') === sGroup);
+      if (match) {
+        return match.textContent?.trim() ?? '';
+      }
+    }
+
+    const fallback = values[index] ?? values[0];
+    return fallback?.textContent?.trim() ?? '';
+  }
+
+  private getCurrentValue(index: number): string {
+    if (this.editedValues.has(index)) {
+      return this.editedValues.get(index) ?? '';
+    }
+
+    const instanceValue = this.getInstanceValue(index);
+    if (instanceValue !== null) {
+      return instanceValue;
+    }
+
+    return this.templateValue ?? '';
+  }
+
+  private getResolvedValues(): string[] {
+    const count = this.multipleSettings ?? 1;
+    return Array.from({ length: count }, (_, index) =>
+      this.getCurrentValue(index),
+    );
   }
 
   private renderValueField(index: number): TemplateResult {
     const { bType, enumValues } = this;
     const label = this.multipleSettings
-      ? `Val for sGroup ${index + 1}`
+      ? msg(`Val for sGroup ${index + 1}`)
       : msg('Val');
-
-    if (bType === 'BOOLEAN') {
-      return html`
-        <oscd-filled-select
-          label=${label}
-          .value=${this.formValues[index] ?? ''}
-          @change=${(e: Event) =>
-            this.setValue(index, (e.target as HTMLSelectElement).value)}
-        >
-          <oscd-select-option value="true">true</oscd-select-option>
-          <oscd-select-option value="false">false</oscd-select-option>
-        </oscd-filled-select>
-      `;
-    }
-
-    if (bType === 'Enum') {
-      return html`
-        <oscd-filled-select
-          label=${label}
-          .value=${this.formValues[index] ?? ''}
-          @change=${(e: Event) =>
-            this.setValue(index, (e.target as HTMLSelectElement).value)}
-        >
-          ${enumValues.map(
-            enumValue =>
-              html`<oscd-select-option value=${enumValue}
-                >${enumValue}</oscd-select-option
-              >`,
-          )}
-        </oscd-filled-select>
-      `;
-    }
+    const value = this.getCurrentValue(index);
+    const sGroup = this.multipleSettings ? index + 1 : null;
 
     if (bType === 'Timestamp') {
+      const labelDate = this.multipleSettings
+        ? msg(`Val (Date) for sGroup ${index + 1}`)
+        : msg('Val (Date)');
+      const labelTime = this.multipleSettings
+        ? msg(`Val (Time) for sGroup ${index + 1}`)
+        : msg('Val (Time)');
+
       return html`
-        <oscd-filled-text-field
-          label=${this.multipleSettings
-            ? `Val (Date) for sGroup ${index + 1}`
-            : msg('Val (Date)')}
-          type="date"
-          .value=${this.dateValues[index] ?? ''}
-          @input=${(e: Event) =>
-            this.setDateValue(index, (e.target as HTMLInputElement).value)}
-        ></oscd-filled-text-field>
-        <oscd-filled-text-field
-          label=${this.multipleSettings
-            ? `Val (Time) for sGroup ${index + 1}`
-            : msg('Val (Time)')}
-          type="time"
-          step="1"
-          .value=${this.timeValues[index] ?? ''}
-          @input=${(e: Event) =>
-            this.setTimeValue(index, (e.target as HTMLInputElement).value)}
-        ></oscd-filled-text-field>
+        <dai-timestamp-field
+          .value=${value}
+          .labelDate=${labelDate}
+          .labelTime=${labelTime}
+          .sGroup=${sGroup}
+          @change=${this.handleTimestampChange}
+        ></dai-timestamp-field>
       `;
     }
 
-    const isNumeric = integerTypes.has(bType) || floatTypes.has(bType);
-    const maxLength = stringTypeLengths[bType];
-    const type = isNumeric ? 'number' : 'text';
-    const step = floatTypes.has(bType) ? '0.1' : '1';
-
     return html`
-      <oscd-filled-text-field
-        label=${label}
-        type=${type}
-        step=${isNumeric ? step : nothing}
-        .value=${this.formValues[index] ?? ''}
-        maxlength=${maxLength ?? nothing}
-        @input=${(e: Event) =>
-          this.setValue(index, (e.target as HTMLInputElement).value)}
-      ></oscd-filled-text-field>
+      <dai-value-field
+        .bType=${bType}
+        .value=${value}
+        .label=${label}
+        .enumValues=${enumValues}
+        .sGroup=${sGroup}
+        @change=${this.handleValueChange}
+      ></dai-value-field>
     `;
   }
 

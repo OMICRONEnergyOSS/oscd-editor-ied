@@ -18,16 +18,19 @@ describe('da-info-dialog', () => {
 
     const daElement = getFirstAndAssertBySelector(
       doc,
-      'DOType > DA[name="stVal"]',
+      'DOType[id="ARtg_Test"] > DA[name="setVal"]',
     );
-    const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+    const doElement = getFirstAndAssertBySelector(
+      doc,
+      'LNodeType[id="TCTR_Test"] > DO[name="ARtg"]',
+    );
     const daiElement = getFirstAndAssertBySelector(
       doc,
-      'LN0 > DOI > DAI[name="stVal"]',
+      'LN[lnClass="TCTR"][inst="1"] > DOI[name="ARtg"] > DAI[name="setVal"]',
     );
 
     const ancestors = [
-      ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN0']),
+      ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN']),
       doElement,
     ];
 
@@ -48,15 +51,15 @@ describe('da-info-dialog', () => {
       'Data attribute value',
     ]);
     expect(groups[0][0].value).to.equal('DA-label');
-    expect(groups[0][1].value).to.equal('stVal');
-    expect(groups[0][2].value).to.equal('ValueDesc');
-    expect(groups[0][3].value).to.equal('ST');
-    expect(groups[0][4].value).to.equal('Enum');
-    expect(groups[0][5].value).to.equal('on');
-    expect(groups[1][0].value).to.equal('Beh');
-    expect(groups[1][1].value).to.equal('ENS');
-    expect(groups[2][0].value).to.equal('L');
-    expect(groups[2][2].value).to.equal('');
+    expect(groups[0][1].value).to.equal('setVal');
+    expect(groups[0][2].value).to.equal(MISSING_VALUE);
+    expect(groups[0][3].value).to.equal('SG');
+    expect(groups[0][4].value).to.equal('INT32');
+    expect(groups[0][5].value).to.equal('10, 12');
+    expect(groups[1][0].value).to.equal('ARtg');
+    expect(groups[1][1].value).to.equal('ASG');
+    expect(groups[2][0].value).to.equal(MISSING_VALUE);
+    expect(groups[2][2].value).to.equal('1');
   });
 
   it('uses missing value placeholders when no instance values exist', () => {
@@ -64,11 +67,14 @@ describe('da-info-dialog', () => {
 
     const daElement = getFirstAndAssertBySelector(
       doc,
-      'DOType > DA[name="stVal"]',
+      'DOType[id="ARtg_Test"] > DA[name="setVal"]',
     );
-    const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+    const doElement = getFirstAndAssertBySelector(
+      doc,
+      'LNodeType[id="TCTR_Test"] > DO[name="ARtg"]',
+    );
     const ancestors = [
-      ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN0']),
+      ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN']),
       doElement,
     ];
 

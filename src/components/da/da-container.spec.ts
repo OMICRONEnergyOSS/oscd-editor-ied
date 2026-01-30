@@ -16,6 +16,32 @@ const nsdocStub: Nsdoc = {
 
 describe('da-container', () => {
   describe('visual', () => {
+    let doc: XMLDocument;
+    let daElement: Element;
+    let doElement: Element;
+    let daiElement: Element;
+    let ancestors: Element[];
+
+    beforeEach(() => {
+      doc = parseDoc(testDocs.withIED_instanciated);
+      daElement = getFirstAndAssertBySelector(
+        doc,
+        'DOType[id="ARtg_Test"] > DA[name="setVal"]',
+      );
+      doElement = getFirstAndAssertBySelector(
+        doc,
+        'LNodeType[id="TCTR_Test"] > DO[name="ARtg"]',
+      );
+      daiElement = getFirstAndAssertBySelector(
+        doc,
+        'LN[lnClass="TCTR"][inst="1"] > DOI[name="ARtg"] > DAI[name="setVal"]',
+      );
+      ancestors = [
+        ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN']),
+        doElement,
+      ];
+    });
+
     it('sets dialog props when DA has no instance element', async () => {
       const doc = parseDoc(testDocs.withIED);
 
@@ -52,23 +78,6 @@ describe('da-container', () => {
     });
 
     it('sets dialog props when DA has an instance element', async () => {
-      const doc = parseDoc(testDocs.withIED_instanciated);
-
-      const daElement = getFirstAndAssertBySelector(
-        doc,
-        'DOType > DA[name="stVal"]',
-      );
-      const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
-      const daiElement = getFirstAndAssertBySelector(
-        doc,
-        'LN0 > DOI > DAI[name="stVal"]',
-      );
-
-      const ancestors = [
-        ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN0']),
-        doElement,
-      ];
-
       const container = await fixture<DAContainer>(html`
         <da-container
           .doc=${doc}
@@ -91,17 +100,6 @@ describe('da-container', () => {
     });
 
     it('renders a create button for non-struct DA without instance values', async () => {
-      const doc = parseDoc(testDocs.withIED_instanciated);
-      const daElement = getFirstAndAssertBySelector(
-        doc,
-        'DOType > DA[name="stVal"]',
-      );
-      const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
-      const ancestors = [
-        ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN0']),
-        doElement,
-      ];
-
       const container = await fixture<DAContainer>(html`
         <da-container
           .doc=${doc}
@@ -125,21 +123,6 @@ describe('da-container', () => {
     });
 
     it('renders an edit button when instance values exist', async () => {
-      const doc = parseDoc(testDocs.withIED_instanciated);
-      const daElement = getFirstAndAssertBySelector(
-        doc,
-        'DOType > DA[name="stVal"]',
-      );
-      const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
-      const daiElement = getFirstAndAssertBySelector(
-        doc,
-        'LN0 > DOI > DAI[name="stVal"]',
-      );
-      const ancestors = [
-        ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN0']),
-        doElement,
-      ];
-
       const container = await fixture<DAContainer>(html`
         <da-container
           .doc=${doc}
@@ -160,12 +143,14 @@ describe('da-container', () => {
     });
 
     it('disables create/edit controls for unsupported bType', async () => {
-      const doc = parseDoc(testDocs.withIED_instanciated);
       const daElement = getFirstAndAssertBySelector(
         doc,
-        'DOType > DA[name="q"]',
+        'DOType[id="Beh_Test"] > DA[name="q"]',
       );
-      const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+      const doElement = getFirstAndAssertBySelector(
+        doc,
+        'LNodeType[id="LLN0_Test"] > DO[name="Beh"]',
+      );
       const ancestors = [
         ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN0']),
         doElement,
@@ -194,7 +179,7 @@ describe('da-container', () => {
 
       const daiElement = getFirstAndAssertBySelector(
         doc,
-        'LN0 > DOI > DAI[name="stVal"]',
+        'LN[lnClass="TCTR"][inst="1"] > DOI[name="ARtg"] > DAI[name="setVal"]',
       );
       const editContainer = await fixture<DAContainer>(html`
         <da-container
@@ -219,14 +204,16 @@ describe('da-container', () => {
     });
 
     it('does not render BDA containers when collapsed', async () => {
-      const doc = parseDoc(testDocs.withIED_instanciated);
-      const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+      const doElement = getFirstAndAssertBySelector(
+        doc,
+        'LNodeType[id="TCTR_Test"] > DO[name="HzRtg"]',
+      );
       const structDa = getFirstAndAssertBySelector(
         doc,
-        'DOType[id="Beh_Test"] > DA[name="Sub2"]',
+        'DOType[id="HzRtg_Test"] > DA[name="setMag"]',
       );
       const ancestors = [
-        ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN0']),
+        ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN']),
         doElement,
       ];
 
@@ -250,20 +237,28 @@ describe('da-container', () => {
   });
 
   describe('header actions', () => {
-    it('opens the dialog on info button click', async () => {
-      const doc = parseDoc(testDocs.withIED_instanciated);
+    let doc: XMLDocument;
+    let daElement: Element;
+    let doElement: Element;
+    let ancestors: Element[];
 
-      const daElement = getFirstAndAssertBySelector(
+    beforeEach(() => {
+      doc = parseDoc(testDocs.withIED_instanciated);
+      daElement = getFirstAndAssertBySelector(
         doc,
-        'DOType > DA[name="stVal"]',
+        'DOType[id="ARtg_Test"] > DA[name="setVal"]',
       );
-      const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
-
-      const ancestors = [
-        ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN0']),
+      doElement = getFirstAndAssertBySelector(
+        doc,
+        'LNodeType[id="TCTR_Test"] > DO[name="ARtg"]',
+      );
+      ancestors = [
+        ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN']),
         doElement,
       ];
+    });
 
+    it('opens the dialog on info button click', async () => {
       const container = await fixture<DAContainer>(html`
         <da-container
           .doc=${doc}
@@ -303,17 +298,24 @@ describe('da-container', () => {
   });
 
   describe('content interactions', () => {
+    let doc: XMLDocument;
+    let ancestors: Element[];
+
+    beforeEach(() => {
+      doc = parseDoc(testDocs.withIED_instanciated);
+      ancestors = getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN']);
+    });
+
     it('renders BDA containers when expanded for Struct DA', async () => {
-      const doc = parseDoc(testDocs.withIED_instanciated);
-      const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+      const doElement = getFirstAndAssertBySelector(
+        doc,
+        'LNodeType[id="TCTR_Test"] > DO[name="HzRtg"]',
+      );
       const structDa = getFirstAndAssertBySelector(
         doc,
-        'DOType[id="Beh_Test"] > DA[name="Sub2"]',
+        'DOType[id="HzRtg_Test"] > DA[name="setMag"]',
       );
-      const ancestors = [
-        ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN0']),
-        doElement,
-      ];
+      ancestors = [...ancestors, doElement];
 
       const container = await fixture<DAContainer>(html`
         <da-container
@@ -385,20 +387,19 @@ describe('da-container', () => {
     });
 
     it('opens the edit dialog when clicking the edit button', async () => {
-      const doc = parseDoc(testDocs.withIED_instanciated);
       const daElement = getFirstAndAssertBySelector(
         doc,
-        'DOType > DA[name="stVal"]',
+        'DOType[id="ARtg_Test"] > DA[name="setVal"]',
       );
-      const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+      const doElement = getFirstAndAssertBySelector(
+        doc,
+        'LNodeType[id="TCTR_Test"] > DO[name="ARtg"]',
+      );
       const daiElement = getFirstAndAssertBySelector(
         doc,
-        'LN0 > DOI > DAI[name="stVal"]',
+        'LN[lnClass="TCTR"][inst="1"] > DOI[name="ARtg"] > DAI[name="setVal"]',
       );
-      const ancestors = [
-        ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN0']),
-        doElement,
-      ];
+      ancestors = [...ancestors, doElement];
 
       const container = await fixture<DAContainer>(html`
         <da-container

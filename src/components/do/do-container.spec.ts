@@ -19,13 +19,19 @@ describe('do-container', () => {
     it('renders the header label and info icon', async () => {
       const doc = parseDoc(testDocs.withIED_instanciated);
 
-      const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
-      const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
+      const doElement = getFirstAndAssertBySelector(
+        doc,
+        'LNodeType[id="TCTR_Test"] > DO[name="ARtg"]',
+      );
+      const doiElement = getFirstAndAssertBySelector(
+        doc,
+        'LN[lnClass="TCTR"][inst="1"] > DOI[name="ARtg"]',
+      );
       const ancestors = getAncestors(doc, [
         'IED',
         'AccessPoint',
         'LDevice',
-        'LN0',
+        'LN',
       ]);
 
       const container = await fixture<DOContainer>(html`
@@ -58,14 +64,20 @@ describe('do-container', () => {
 
     it('hides the toggle button when no child elements exist', async () => {
       const doc = parseDoc(testDocs.withIED_instanciated);
-      const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+      const doElement = getFirstAndAssertBySelector(
+        doc,
+        'LNodeType[id="TCTR_Test"] > DO[name="ARtg"]',
+      );
       doElement.setAttribute('type', 'MissingType');
-      const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
+      const doiElement = getFirstAndAssertBySelector(
+        doc,
+        'LN[lnClass="TCTR"][inst="1"] > DOI[name="ARtg"]',
+      );
       const ancestors = getAncestors(doc, [
         'IED',
         'AccessPoint',
         'LDevice',
-        'LN0',
+        'LN',
       ]);
 
       const container = await fixture<DOContainer>(html`
@@ -90,13 +102,19 @@ describe('do-container', () => {
     it('opens the info dialog when clicking the info icon', async () => {
       const doc = parseDoc(testDocs.withIED_instanciated);
 
-      const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
-      const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
+      const doElement = getFirstAndAssertBySelector(
+        doc,
+        'LNodeType[id="TCTR_Test"] > DO[name="ARtg"]',
+      );
+      const doiElement = getFirstAndAssertBySelector(
+        doc,
+        'LN[lnClass="TCTR"][inst="1"] > DOI[name="ARtg"]',
+      );
       const ancestors = getAncestors(doc, [
         'IED',
         'AccessPoint',
         'LDevice',
-        'LN0',
+        'LN',
       ]);
 
       const container = await fixture<DOContainer>(html`
@@ -141,14 +159,19 @@ describe('do-container', () => {
     it('renders DA and DO containers after expanding the action pane', async () => {
       const doc = parseDoc(testDocs.withIED_instanciated);
 
-      const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
-      const doiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI');
-      const sdiElement = getFirstAndAssertBySelector(doc, 'LN0 > DOI > SDI');
+      const doElement = getFirstAndAssertBySelector(
+        doc,
+        'LNodeType[id="TCTR_Test"] > DO[name="ARtg"]',
+      );
+      const doiElement = getFirstAndAssertBySelector(
+        doc,
+        'LN[lnClass="TCTR"][inst="1"] > DOI[name="ARtg"]',
+      );
       const ancestors = getAncestors(doc, [
         'IED',
         'AccessPoint',
         'LDevice',
-        'LN0',
+        'LN',
       ]);
 
       const container = await fixture<DOContainer>(html`
@@ -175,13 +198,11 @@ describe('do-container', () => {
 
       const daContainers =
         container.shadowRoot?.querySelectorAll('da-container') ?? [];
-      expect(daContainers.length).to.equal(5);
+      expect(daContainers.length).to.equal(2);
 
       const doContainers =
         container.shadowRoot?.querySelectorAll('do-container') ?? [];
-      expect(doContainers.length).to.equal(1);
-      const nestedDoContainer = doContainers[0] as DOContainer;
-      expect(nestedDoContainer.instanceElement).to.equal(sdiElement);
+      expect(doContainers.length).to.equal(0);
     });
   });
 });
