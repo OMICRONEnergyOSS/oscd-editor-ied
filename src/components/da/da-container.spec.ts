@@ -368,7 +368,7 @@ describe('da-container', () => {
       `);
       await container.updateComplete;
 
-      const daiDialog = container.daiValueDialog as HTMLElement;
+      const daiDialog = container.daiValueCreateDialog as HTMLElement;
       expect(daiDialog).to.exist;
       const oscdDialog = (daiDialog as any)?.shadowRoot?.querySelector(
         'oscd-dialog',
@@ -413,7 +413,7 @@ describe('da-container', () => {
       `);
       await container.updateComplete;
 
-      const daiDialog = container.daiValueDialog as HTMLElement;
+      const daiDialog = container.daiValueEditDialog as HTMLElement;
       expect(daiDialog).to.exist;
       const oscdDialog = (daiDialog as any)?.shadowRoot?.querySelector(
         'oscd-dialog',
@@ -429,6 +429,152 @@ describe('da-container', () => {
       expect(editButton).to.exist;
       editButton!.click();
       await waitUntil(() => oscdDialog?.open === true);
+    });
+
+    it('renders add icons for missing sGroups and opens edit dialog for them', async () => {
+      const doc = parseDoc(testDocs.withIED_instanciated);
+      const settingControl = getFirstAndAssertBySelector(
+        doc,
+        'IED[name="IED1"] SettingControl',
+      );
+      settingControl.setAttribute('numOfSGs', '5');
+      const daiElement = getFirstAndAssertBySelector(
+        doc,
+        'LN[lnClass="TCTR"][inst="1"] > DOI[name="ARtg"] > DAI[name="setVal"]',
+      );
+      const namespace =
+        doc.documentElement.namespaceURI ?? 'http://www.iec.ch/61850/2003/SCL';
+      Array.from(daiElement.querySelectorAll('Val'))
+        .filter(val => val.getAttribute('sGroup') === '2')
+        .forEach(val => val.remove());
+      const val3 = doc.createElementNS(namespace, 'Val');
+      val3.setAttribute('sGroup', '3');
+      val3.textContent = '30';
+      const val5 = doc.createElementNS(namespace, 'Val');
+      val5.setAttribute('sGroup', '5');
+      val5.textContent = '50';
+      daiElement.append(val3, val5);
+      const daElement = getFirstAndAssertBySelector(
+        doc,
+        'DOType[id="ARtg_Test"] > DA[name="setVal"]',
+      );
+      const doElement = getFirstAndAssertBySelector(
+        doc,
+        'LNodeType[id="TCTR_Test"] > DO[name="ARtg"]',
+      );
+      const ancestors = [
+        ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN']),
+        doElement,
+      ];
+
+      const container = await fixture<DAContainer>(html`
+        <da-container
+          .doc=${doc}
+          .docVersion=${0}
+          .element=${daElement}
+          .instanceElement=${daiElement}
+          .nsdoc=${nsdocStub}
+          .ancestors=${ancestors}
+        ></da-container>
+      `);
+      await container.updateComplete;
+
+      const addButtons = Array.from(
+        container.shadowRoot?.querySelectorAll('oscd-icon-button') ?? [],
+      ).filter(
+        button =>
+          button.querySelector('oscd-icon')?.textContent?.trim() === 'add',
+      );
+      expect(addButtons.length).to.equal(2);
+
+      const daiDialog = container.daiValueEditDialog as HTMLElement;
+      expect(daiDialog).to.exist;
+      const oscdDialog = (daiDialog as any)?.shadowRoot?.querySelector(
+        'oscd-dialog',
+      ) as { open?: boolean } | null;
+      expect(oscdDialog).to.exist;
+
+      addButtons[0].click();
+      await waitUntil(() => oscdDialog?.open === true);
+    });
+    it('opens the create dialog when instance element has no Val', async () => {
+      const doc = parseDoc(testDocs.withIED);
+      const daElement = getFirstAndAssertBySelector(
+        doc,
+        'DOType > DA[name="stVal"]',
+      );
+      const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+      const ancestors = [
+        ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN0']),
+        doElement,
+      ];
+      const namespace =
+        doc.documentElement.namespaceURI ?? 'http://www.iec.ch/61850/2003/SCL';
+      const daiElement = doc.createElementNS(namespace, 'DAI');
+      daiElement.setAttribute('name', 'stVal');
+
+      const container = await fixture<DAContainer>(html`
+        <da-container
+          .doc=${doc}
+          .docVersion=${0}
+          .element=${daElement}
+          .instanceElement=${daiElement}
+          .nsdoc=${nsdocStub}
+          .ancestors=${ancestors}
+        ></da-container>
+      `);
+      await container.updateComplete;
+
+      const daiDialog = container.daiValueCreateDialog as HTMLElement;
+      expect(daiDialog).to.exist;
+      const oscdDialog = (daiDialog as any)?.shadowRoot?.querySelector(
+        'oscd-dialog',
+      ) as { open?: boolean } | null;
+      expect(oscdDialog).to.exist;
+
+      const addButton = Array.from(
+        container.shadowRoot?.querySelectorAll('oscd-icon-button') ?? [],
+      ).find(
+        button =>
+          button.querySelector('oscd-icon')?.textContent?.trim() === 'add',
+      ) as HTMLElement | undefined;
+      expect(addButton).to.exist;
+      addButton!.click();
+      await waitUntil(() => oscdDialog?.open === true);
+    });
+
+    it('renders a create button when instance element has no Val', async () => {
+      const doc = parseDoc(testDocs.withIED);
+      const daElement = getFirstAndAssertBySelector(
+        doc,
+        'DOType > DA[name="stVal"]',
+      );
+      const doElement = getFirstAndAssertBySelector(doc, 'LNodeType > DO');
+      const ancestors = [
+        ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN0']),
+        doElement,
+      ];
+      const namespace =
+        doc.documentElement.namespaceURI ?? 'http://www.iec.ch/61850/2003/SCL';
+      const daiElement = doc.createElementNS(namespace, 'DAI');
+      daiElement.setAttribute('name', 'stVal');
+
+      const container = await fixture<DAContainer>(html`
+        <da-container
+          .doc=${doc}
+          .docVersion=${0}
+          .element=${daElement}
+          .instanceElement=${daiElement}
+          .nsdoc=${nsdocStub}
+          .ancestors=${ancestors}
+        ></da-container>
+      `);
+      await container.updateComplete;
+
+      const addIcon = Array.from(
+        container.shadowRoot?.querySelectorAll('oscd-icon') ?? [],
+      ).find(icon => icon.textContent?.trim() === 'add');
+      expect(addIcon).to.exist;
     });
   });
 });

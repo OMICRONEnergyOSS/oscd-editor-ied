@@ -12,13 +12,16 @@ import {
   initializeElements,
 } from '../../foundation/dai.js';
 import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
-import { DaiValueField, DaiValueFieldChange } from './dai-value-field.js';
+import {
+  DaiValueField,
+  DaiValueFieldChange,
+} from './fields/dai-value-field.js';
 import {
   DaiTimestampField,
   DaiTimestampFieldChange,
-} from './dai-timestamp-field.js';
+} from './fields/dai-timestamp-field.js';
 
-export class DaiValueDialog extends ScopedElementsMixin(LitElement) {
+export class DaiValueCreateDialog extends ScopedElementsMixin(LitElement) {
   static scopedElements = {
     'oscd-dialog': OscdDialog,
     'oscd-outlined-button': OscdOutlinedButton,
@@ -37,14 +40,15 @@ export class DaiValueDialog extends ScopedElementsMixin(LitElement) {
   @property({ attribute: false })
   ancestors: Element[] = [];
 
+  @property({ type: Array })
+  enumValues: string[] = [];
+
   @query('oscd-dialog')
   private dialog!: OscdDialog;
 
   private dialogTitle = '';
 
   private bType = '';
-
-  private enumValues: string[] = [];
 
   private templateValue: string | null = null;
 
@@ -66,7 +70,9 @@ export class DaiValueDialog extends ScopedElementsMixin(LitElement) {
 
     this.editedValues.clear();
     this.bType = bType;
-    this.enumValues = bType === 'Enum' ? this.getEnumValues() : [];
+    if (bType !== 'Enum') {
+      this.enumValues = [];
+    }
     this.multipleSettings = this.getMultipleSettingGroupCount();
     this.templateValue =
       this.templateElement?.querySelector('Val')?.textContent?.trim() ?? null;
@@ -75,8 +81,7 @@ export class DaiValueDialog extends ScopedElementsMixin(LitElement) {
       this.targetDai = this.instanceElement;
       this.insertElement = null;
       this.lnElement = null;
-      const hasInstanceValues = !!this.instanceElement?.querySelector('Val');
-      this.dialogTitle = `${hasInstanceValues ? 'Edit' : 'Create'} DAI "${this.instanceElement.getAttribute('name') ?? ''}"`;
+      this.dialogTitle = `Create DAI "${this.instanceElement.getAttribute('name') ?? ''}"`;
     } else {
       const lnElement =
         this.ancestors.find(element =>
@@ -110,14 +115,14 @@ export class DaiValueDialog extends ScopedElementsMixin(LitElement) {
 
   private close(): void {
     this.dialog.close();
-    this.dialogTitle = '';
-    this.bType = '';
-    this.enumValues = [];
-    this.templateValue = null;
-    this.multipleSettings = null;
     this.targetDai = null;
     this.insertElement = null;
     this.lnElement = null;
+    this.dialogTitle = '';
+    this.bType = '';
+    this.templateValue = null;
+    this.multipleSettings = null;
+    this.enumValues = [];
     this.editedValues.clear();
     this.requestUpdate();
   }
@@ -127,19 +132,19 @@ export class DaiValueDialog extends ScopedElementsMixin(LitElement) {
       return;
     }
 
-    if (this.insertElement && this.lnElement) {
-      const values = this.getResolvedValues();
-      Array.from(this.targetDai.querySelectorAll('Val')).forEach(val =>
-        val.remove(),
-      );
-      if (this.multipleSettings) {
-        values.forEach((value, index) => {
-          this.targetDai!.append(this.buildValElement(value, index + 1));
-        });
-      } else {
-        this.targetDai.append(this.buildValElement(values[0] ?? ''));
-      }
+    const values = this.getResolvedValues();
+    Array.from(this.targetDai.querySelectorAll('Val')).forEach(val =>
+      val.remove(),
+    );
+    if (this.multipleSettings) {
+      values.forEach((value, index) => {
+        this.targetDai!.append(this.buildValElement(value, index + 1));
+      });
+    } else {
+      this.targetDai.append(this.buildValElement(values[0] ?? ''));
+    }
 
+    if (this.insertElement && this.lnElement) {
       this.dispatchEvent(
         newEditEventV2({
           parent: this.lnElement,
@@ -151,7 +156,6 @@ export class DaiValueDialog extends ScopedElementsMixin(LitElement) {
       return;
     }
 
-    const values = this.getResolvedValues();
     const edits = [
       ...Array.from(this.targetDai.querySelectorAll('Val')).map(
         existingVal => ({
@@ -220,26 +224,6 @@ export class DaiValueDialog extends ScopedElementsMixin(LitElement) {
     }
 
     return null;
-  }
-
-  private getEnumValues(): string[] {
-    const enumTypeId = this.templateElement.getAttribute('type');
-    if (!enumTypeId) {
-      return [];
-    }
-
-    return Array.from(
-      this.templateElement.ownerDocument.querySelectorAll(
-        `EnumType[id="${enumTypeId}"] > EnumVal`,
-      ),
-    )
-      .filter(enumVal => enumVal.textContent && enumVal.textContent !== '')
-      .sort(
-        (left, right) =>
-          parseInt(left.getAttribute('ord') ?? '0') -
-          parseInt(right.getAttribute('ord') ?? '0'),
-      )
-      .map(enumVal => enumVal.textContent ?? '');
   }
 
   private buildValElement(value: string, sGroup?: number): Element {

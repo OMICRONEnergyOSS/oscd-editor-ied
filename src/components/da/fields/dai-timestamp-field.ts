@@ -80,7 +80,7 @@ export class DaiTimestampField extends ScopedElementsMixin(LitElement) {
     }
   }
 
-  private emitChange(): void {
+  private handleChange(): void {
     const value = buildTimestamp(this.dateValue, this.timeValue);
     this.dispatchEvent(
       new CustomEvent<DaiTimestampFieldChange>('change', {
@@ -98,12 +98,12 @@ export class DaiTimestampField extends ScopedElementsMixin(LitElement) {
 
   private onDateInput(event: Event): void {
     this.dateValue = (event.target as HTMLInputElement).value;
-    this.emitChange();
+    this.handleChange();
   }
 
   private onTimeInput(event: Event): void {
     this.timeValue = (event.target as HTMLInputElement).value;
-    this.emitChange();
+    this.handleChange();
   }
 
   render(): TemplateResult {
@@ -128,7 +128,9 @@ export class DaiTimestampField extends ScopedElementsMixin(LitElement) {
 
   static styles = css`
     :host {
-      display: block;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
   `;
 }
