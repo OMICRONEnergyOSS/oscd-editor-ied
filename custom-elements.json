@@ -875,423 +875,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/foundation/dai.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "determineUninitializedStructure",
-          "return": {
-            "type": {
-              "text": ""
-            }
-          },
-          "parameters": [
-            {
-              "name": "parentElement",
-              "type": {
-                "text": "Element"
-              },
-              "description": "The element to search from for DOI/SDI"
-            },
-            {
-              "name": "templateStructure",
-              "type": {
-                "text": "Element[]"
-              },
-              "description": "The templates structure with DO/DA/BDA Elements."
-            }
-          ],
-          "description": "Determine which part of the template structure still needs to be initialized."
-        },
-        {
-          "kind": "function",
-          "name": "initializeElements",
-          "return": {
-            "type": {
-              "text": ""
-            }
-          },
-          "parameters": [
-            {
-              "name": "uninitializedTemplateStructure",
-              "type": {
-                "text": "Element[]"
-              },
-              "description": "Template elements to initialize."
-            }
-          ],
-          "description": "Create a new instance structure defined by the array of template elements passed."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "determineUninitializedStructure",
-          "declaration": {
-            "name": "determineUninitializedStructure",
-            "module": "src/foundation/dai.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "initializeElements",
-          "declaration": {
-            "name": "initializeElements",
-            "module": "src/foundation/dai.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/foundation/events.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "newFullElementPathEvent",
-          "return": {
-            "type": {
-              "text": "FullElementPathEvent"
-            }
-          },
-          "parameters": [
-            {
-              "name": "elementNames",
-              "type": {
-                "text": "string[]"
-              }
-            },
-            {
-              "name": "eventInitDict",
-              "optional": true,
-              "type": {
-                "text": "CustomEventInit<FullElementPathDetail>"
-              }
-            }
-          ]
-        },
-        {
-          "kind": "function",
-          "name": "newAddElementEvent",
-          "return": {
-            "type": {
-              "text": "CreateElementEvent"
-            }
-          },
-          "parameters": [
-            {
-              "name": "detail",
-              "type": {
-                "text": "CreateWizard"
-              }
-            },
-            {
-              "name": "eventInitDict",
-              "optional": true,
-              "type": {
-                "text": "CustomEventInit<CreateWizard>"
-              }
-            }
-          ]
-        },
-        {
-          "kind": "function",
-          "name": "newEditElementEvent",
-          "return": {
-            "type": {
-              "text": "EditElementEvent"
-            }
-          },
-          "parameters": [
-            {
-              "name": "detail",
-              "type": {
-                "text": "EditWizard"
-              }
-            },
-            {
-              "name": "eventInitDict",
-              "optional": true,
-              "type": {
-                "text": "CustomEventInit<EditWizard>"
-              }
-            }
-          ]
-        },
-        {
-          "kind": "function",
-          "name": "newIedCreatedEvent",
-          "return": {
-            "type": {
-              "text": "IedCreatedEvent"
-            }
-          },
-          "parameters": [
-            {
-              "name": "detail",
-              "type": {
-                "text": "IedCreatedDetail"
-              }
-            }
-          ]
-        },
-        {
-          "kind": "function",
-          "name": "newConfirmDeleteEvent",
-          "return": {
-            "type": {
-              "text": "ConfirmDeleteEvent"
-            }
-          },
-          "parameters": [
-            {
-              "name": "detail",
-              "type": {
-                "text": "ConfirmDeleteDetail"
-              }
-            }
-          ]
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "newFullElementPathEvent",
-          "declaration": {
-            "name": "newFullElementPathEvent",
-            "module": "src/foundation/events.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "newAddElementEvent",
-          "declaration": {
-            "name": "newAddElementEvent",
-            "module": "src/foundation/events.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "newEditElementEvent",
-          "declaration": {
-            "name": "newEditElementEvent",
-            "module": "src/foundation/events.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "newIedCreatedEvent",
-          "declaration": {
-            "name": "newIedCreatedEvent",
-            "module": "src/foundation/events.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "newConfirmDeleteEvent",
-          "declaration": {
-            "name": "newConfirmDeleteEvent",
-            "module": "src/foundation/events.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/foundation/nsd.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "nsd72",
-          "declaration": {
-            "name": "nsd72",
-            "module": "src/foundation/nsd.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "nsd73",
-          "declaration": {
-            "name": "nsd73",
-            "module": "src/foundation/nsd.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "nsd74",
-          "declaration": {
-            "name": "nsd74",
-            "module": "src/foundation/nsd.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "nsd7420",
-          "declaration": {
-            "name": "nsd7420",
-            "module": "src/foundation/nsd.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "nsd81",
-          "declaration": {
-            "name": "nsd81",
-            "module": "src/foundation/nsd.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/foundation/nsdoc.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "initializeNsdoc",
-          "return": {
-            "type": {
-              "text": ""
-            }
-          },
-          "description": "Initialize the full Nsdoc object."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "initializeNsdoc",
-          "declaration": {
-            "name": "initializeNsdoc",
-            "module": "src/foundation/nsdoc.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/foundation/types.ts",
-      "declarations": [],
-      "exports": []
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/foundation/virtual-ied.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "findLogicalNodeElement",
-          "return": {
-            "type": {
-              "text": ""
-            }
-          },
-          "parameters": [
-            {
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              },
-              "description": "The list of elements to search in for an LN or LN0 element."
-            }
-          ],
-          "description": "Search for the LN0 or LN element in the list of ancestors passed."
-        },
-        {
-          "kind": "function",
-          "name": "createIEDStructure",
-          "return": {
-            "type": {
-              "text": ""
-            }
-          },
-          "parameters": [
-            {
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "description": "The XML document to create the IED in."
-            },
-            {
-              "name": "iedName",
-              "type": {
-                "text": "string"
-              },
-              "description": "The name for the new IED."
-            },
-            {
-              "name": "lnTypeId",
-              "type": {
-                "text": "string"
-              },
-              "description": "The LNodeType ID to use for the LN0."
-            },
-            {
-              "name": "manufacturer",
-              "default": "'OpenSCD'",
-              "type": {
-                "text": "string"
-              },
-              "description": "Optional manufacturer name, defaults to 'OpenSCD'."
-            }
-          ],
-          "description": "Create a basic IED structure with the specified name."
-        },
-        {
-          "kind": "function",
-          "name": "createVirtualIED",
-          "return": {
-            "type": {
-              "text": "Insert[]"
-            }
-          },
-          "parameters": [
-            {
-              "name": "iedName",
-              "type": {
-                "text": "string"
-              }
-            },
-            {
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              }
-            }
-          ]
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "findLogicalNodeElement",
-          "declaration": {
-            "name": "findLogicalNodeElement",
-            "module": "src/foundation/virtual-ied.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "createIEDStructure",
-          "declaration": {
-            "name": "createIEDStructure",
-            "module": "src/foundation/virtual-ied.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "createVirtualIED",
-          "declaration": {
-            "name": "createVirtualIED",
-            "module": "src/foundation/virtual-ied.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/components/base-container.ts",
       "declarations": [
         {
@@ -1823,6 +1406,423 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/foundation/dai.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "determineUninitializedStructure",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "parentElement",
+              "type": {
+                "text": "Element"
+              },
+              "description": "The element to search from for DOI/SDI"
+            },
+            {
+              "name": "templateStructure",
+              "type": {
+                "text": "Element[]"
+              },
+              "description": "The templates structure with DO/DA/BDA Elements."
+            }
+          ],
+          "description": "Determine which part of the template structure still needs to be initialized."
+        },
+        {
+          "kind": "function",
+          "name": "initializeElements",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "uninitializedTemplateStructure",
+              "type": {
+                "text": "Element[]"
+              },
+              "description": "Template elements to initialize."
+            }
+          ],
+          "description": "Create a new instance structure defined by the array of template elements passed."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "determineUninitializedStructure",
+          "declaration": {
+            "name": "determineUninitializedStructure",
+            "module": "src/foundation/dai.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "initializeElements",
+          "declaration": {
+            "name": "initializeElements",
+            "module": "src/foundation/dai.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/foundation/events.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "newFullElementPathEvent",
+          "return": {
+            "type": {
+              "text": "FullElementPathEvent"
+            }
+          },
+          "parameters": [
+            {
+              "name": "elementNames",
+              "type": {
+                "text": "string[]"
+              }
+            },
+            {
+              "name": "eventInitDict",
+              "optional": true,
+              "type": {
+                "text": "CustomEventInit<FullElementPathDetail>"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "newAddElementEvent",
+          "return": {
+            "type": {
+              "text": "CreateElementEvent"
+            }
+          },
+          "parameters": [
+            {
+              "name": "detail",
+              "type": {
+                "text": "CreateWizard"
+              }
+            },
+            {
+              "name": "eventInitDict",
+              "optional": true,
+              "type": {
+                "text": "CustomEventInit<CreateWizard>"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "newEditElementEvent",
+          "return": {
+            "type": {
+              "text": "EditElementEvent"
+            }
+          },
+          "parameters": [
+            {
+              "name": "detail",
+              "type": {
+                "text": "EditWizard"
+              }
+            },
+            {
+              "name": "eventInitDict",
+              "optional": true,
+              "type": {
+                "text": "CustomEventInit<EditWizard>"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "newIedCreatedEvent",
+          "return": {
+            "type": {
+              "text": "IedCreatedEvent"
+            }
+          },
+          "parameters": [
+            {
+              "name": "detail",
+              "type": {
+                "text": "IedCreatedDetail"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "newConfirmDeleteEvent",
+          "return": {
+            "type": {
+              "text": "ConfirmDeleteEvent"
+            }
+          },
+          "parameters": [
+            {
+              "name": "detail",
+              "type": {
+                "text": "ConfirmDeleteDetail"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "newFullElementPathEvent",
+          "declaration": {
+            "name": "newFullElementPathEvent",
+            "module": "src/foundation/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "newAddElementEvent",
+          "declaration": {
+            "name": "newAddElementEvent",
+            "module": "src/foundation/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "newEditElementEvent",
+          "declaration": {
+            "name": "newEditElementEvent",
+            "module": "src/foundation/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "newIedCreatedEvent",
+          "declaration": {
+            "name": "newIedCreatedEvent",
+            "module": "src/foundation/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "newConfirmDeleteEvent",
+          "declaration": {
+            "name": "newConfirmDeleteEvent",
+            "module": "src/foundation/events.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/foundation/nsd.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "nsd72",
+          "declaration": {
+            "name": "nsd72",
+            "module": "src/foundation/nsd.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "nsd73",
+          "declaration": {
+            "name": "nsd73",
+            "module": "src/foundation/nsd.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "nsd74",
+          "declaration": {
+            "name": "nsd74",
+            "module": "src/foundation/nsd.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "nsd7420",
+          "declaration": {
+            "name": "nsd7420",
+            "module": "src/foundation/nsd.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "nsd81",
+          "declaration": {
+            "name": "nsd81",
+            "module": "src/foundation/nsd.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/foundation/nsdoc.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "initializeNsdoc",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "description": "Initialize the full Nsdoc object."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "initializeNsdoc",
+          "declaration": {
+            "name": "initializeNsdoc",
+            "module": "src/foundation/nsdoc.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/foundation/types.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/foundation/virtual-ied.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "findLogicalNodeElement",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "description": "The list of elements to search in for an LN or LN0 element."
+            }
+          ],
+          "description": "Search for the LN0 or LN element in the list of ancestors passed."
+        },
+        {
+          "kind": "function",
+          "name": "createIEDStructure",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "description": "The XML document to create the IED in."
+            },
+            {
+              "name": "iedName",
+              "type": {
+                "text": "string"
+              },
+              "description": "The name for the new IED."
+            },
+            {
+              "name": "lnTypeId",
+              "type": {
+                "text": "string"
+              },
+              "description": "The LNodeType ID to use for the LN0."
+            },
+            {
+              "name": "manufacturer",
+              "default": "'OpenSCD'",
+              "type": {
+                "text": "string"
+              },
+              "description": "Optional manufacturer name, defaults to 'OpenSCD'."
+            }
+          ],
+          "description": "Create a basic IED structure with the specified name."
+        },
+        {
+          "kind": "function",
+          "name": "createVirtualIED",
+          "return": {
+            "type": {
+              "text": "Insert[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "iedName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "findLogicalNodeElement",
+          "declaration": {
+            "name": "findLogicalNodeElement",
+            "module": "src/foundation/virtual-ied.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "createIEDStructure",
+          "declaration": {
+            "name": "createIEDStructure",
+            "module": "src/foundation/virtual-ied.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "createVirtualIED",
+          "declaration": {
+            "name": "createVirtualIED",
+            "module": "src/foundation/virtual-ied.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/test-utils/actions.ts",
       "declarations": [
         {
@@ -2064,7 +2064,7 @@
           "type": {
             "text": "object"
           },
-          "default": "{ empty: `<?xml version=\"1.0\" encoding=\"UTF-8\"?><SCL xmlns=\"http://www.iec.ch/61850/2003/SCL\" version=\"2007\" revision=\"B\"> <Header id=\"development sample\"/> <Substation name=\"S1\"> <VoltageLevel name=\"V1\" > <Bay name=\"B2\" /> <Bay name=\"B1\" /> </VoltageLevel> </Substation> </SCL>`, withIED: `<?xml version=\"1.0\" encoding=\"UTF-8\"?><SCL xmlns=\"http://www.iec.ch/61850/2003/SCL\" version=\"2007\" revision=\"B\"> <Header id=\"development sample\"/> <Substation name=\"S1\"> <VoltageLevel name=\"V1\" > <Bay name=\"B2\" /> <Bay name=\"B1\" /> </VoltageLevel> </Substation> <IED name=\"IED1\" manufacturer=\"OpenSCD\"> <AccessPoint name=\"AP1\"> <Server> <Authentication/> <LDevice inst=\"LD1\"> <LN0 lnClass=\"LLN0\" inst=\"\" lnType=\"PlaceholderLLN0\"> <SettingControl numOfSGs=\"2\"/> </LN0> </LDevice> </Server> </AccessPoint> </IED> <IED name=\"IED2\" manufacturer=\"OpenSCD\"> <AccessPoint name=\"AP2\"> <Server> <Authentication/> <LDevice inst=\"LD2\"> <LN0 lnClass=\"LLN0\" inst=\"\" lnType=\"PlaceholderLLN0\"/> </LDevice> </Server> </AccessPoint> </IED> <DataTypeTemplates> <LNodeType lnClass=\"LLN0\" id=\"PlaceholderLLN0\"> <DO name=\"Beh\" type=\"Beh_Test\"/> </LNodeType> <DOType cdc=\"ENS\" id=\"Beh_Test\"> <DA name=\"stVal\" fc=\"ST\" dchg=\"true\" dupd=\"true\" bType=\"Enum\" type=\"stVal$oscd$_48ba16345b8e7f5b\"/> <DA name=\"q\" fc=\"ST\" qchg=\"true\" bType=\"Quality\"/> <DA name=\"t\" fc=\"ST\" bType=\"Timestamp\"/> </DOType> <EnumType id=\"stVal$oscd$_48ba16345b8e7f5b\"> <EnumVal ord=\"1\">on</EnumVal> <EnumVal ord=\"2\">blocked</EnumVal> <EnumVal ord=\"3\">test</EnumVal> <EnumVal ord=\"4\">test/blocked</EnumVal> <EnumVal ord=\"5\">off</EnumVal> </EnumType> </DataTypeTemplates> </SCL>`, withIED_instanciated: `<?xml version=\"1.0\" encoding=\"UTF-8\"?><SCL xmlns=\"http://www.iec.ch/61850/2003/SCL\" version=\"2007\" revision=\"B\"> <Header id=\"development sample\"/> <Substation name=\"S1\"> <VoltageLevel name=\"V1\" > <Bay name=\"B2\" /> <Bay name=\"B1\" /> </VoltageLevel> </Substation> <IED name=\"IED1\" manufacturer=\"OpenSCD\"> <AccessPoint name=\"AP1\"> <Server> <Authentication/> <LDevice inst=\"LD1\"> <LN0 lnClass=\"LLN0\" inst=\"\" lnType=\"PlaceholderLLN0\" prefix=\"L\"> <SettingControl numOfSGs=\"2\"/> <DOI name=\"Beh\" desc=\"Behavior\"> <SDI name=\"Sub1\" desc=\"SubDesc\"/> <DAI name=\"stVal\" desc=\"ValueDesc\"> <Val>on</Val> </DAI> <DAI name=\"stValSG\"> <Val sGroup=\"1\">v1</Val> <Val sGroup=\"2\">v2</Val> </DAI> </DOI> </LN0> </LDevice> </Server> </AccessPoint> </IED> <DataTypeTemplates> <LNodeType lnClass=\"LLN0\" id=\"PlaceholderLLN0\"> <DO name=\"Beh\" desc=\"DoDesc\" type=\"Beh_Test\"/> </LNodeType> <DOType cdc=\"ENS\" id=\"Beh_Test\"> <DA name=\"stVal\" fc=\"ST\" dchg=\"true\" dupd=\"true\" bType=\"Enum\" type=\"stVal$oscd$_48ba16345b8e7f5b\"/> <DA name=\"stValSG\" fc=\"SG\" bType=\"Enum\" type=\"stVal$oscd$_48ba16345b8e7f5b\"/> <DA name=\"q\" fc=\"ST\" qchg=\"true\" bType=\"Quality\"/> <DA name=\"t\" fc=\"ST\" bType=\"Timestamp\"/> <SDO name=\"Sub1\" type=\"SubType\"/> <DA name=\"Sub2\" bType=\"Struct\" type=\"SubDaType\"/> </DOType> <DOType id=\"SubType\" cdc=\"ENS\"> <DA name=\"subDa\" fc=\"ST\" bType=\"Enum\"/> </DOType> <DAType id=\"SubDaType\"> <BDA name=\"subBda\" bType=\"Enum\" type=\"stVal$oscd$_48ba16345b8e7f5b\"/> </DAType> <EnumType id=\"stVal$oscd$_48ba16345b8e7f5b\"> <EnumVal ord=\"1\">on</EnumVal> <EnumVal ord=\"2\">blocked</EnumVal> <EnumVal ord=\"3\">test</EnumVal> <EnumVal ord=\"4\">test/blocked</EnumVal> <EnumVal ord=\"5\">off</EnumVal> </EnumType> </DataTypeTemplates> </SCL>`, }"
+          "default": "{ empty: `<?xml version=\"1.0\" encoding=\"UTF-8\"?><SCL xmlns=\"http://www.iec.ch/61850/2003/SCL\" version=\"2007\" revision=\"B\"> <Header id=\"development sample\"/> <Substation name=\"S1\"> <VoltageLevel name=\"V1\" > <Bay name=\"B2\" /> <Bay name=\"B1\" /> </VoltageLevel> </Substation> </SCL>`, withIED: `<?xml version=\"1.0\" encoding=\"UTF-8\"?><SCL xmlns=\"http://www.iec.ch/61850/2003/SCL\" version=\"2007\" revision=\"B\"> <Header id=\"development sample\"/> <Substation name=\"S1\"> <VoltageLevel name=\"V1\" > <Bay name=\"B2\" /> <Bay name=\"B1\" /> </VoltageLevel> </Substation> <IED name=\"IED1\" manufacturer=\"OpenSCD\"> <AccessPoint name=\"AP1\"> <Server> <Authentication/> <LDevice inst=\"LD1\"> <LN0 lnClass=\"LLN0\" inst=\"\" lnType=\"PlaceholderLLN0\"> <SettingControl numOfSGs=\"2\"/> </LN0> </LDevice> </Server> </AccessPoint> </IED> <IED name=\"IED2\" manufacturer=\"OpenSCD\"> <AccessPoint name=\"AP2\"> <Server> <Authentication/> <LDevice inst=\"LD2\"> <LN0 lnClass=\"LLN0\" inst=\"\" lnType=\"PlaceholderLLN0\"/> </LDevice> </Server> </AccessPoint> </IED> <DataTypeTemplates> <LNodeType lnClass=\"LLN0\" id=\"PlaceholderLLN0\"> <DO name=\"Beh\" type=\"Beh_Test\"/> </LNodeType> <DOType cdc=\"ENS\" id=\"Beh_Test\"> <DA name=\"stVal\" fc=\"ST\" dchg=\"true\" dupd=\"true\" bType=\"Enum\" type=\"stVal$oscd$_48ba16345b8e7f5b\"/> <DA name=\"q\" fc=\"ST\" qchg=\"true\" bType=\"Quality\"/> <DA name=\"t\" fc=\"ST\" bType=\"Timestamp\"/> </DOType> <EnumType id=\"stVal$oscd$_48ba16345b8e7f5b\"> <EnumVal ord=\"1\">on</EnumVal> <EnumVal ord=\"2\">blocked</EnumVal> <EnumVal ord=\"3\">test</EnumVal> <EnumVal ord=\"4\">test/blocked</EnumVal> <EnumVal ord=\"5\">off</EnumVal> </EnumType> </DataTypeTemplates> </SCL>`, withIED_instanciated: `<?xml version=\"1.0\" encoding=\"UTF-8\"?> <SCL xmlns=\"http://www.iec.ch/61850/2003/SCL\" version=\"2007\" revision=\"B\" release=\"5\"> <Header id=\"development sample\"/> <Substation name=\"S1\"> <VoltageLevel name=\"V1\" > <Bay name=\"B2\" /> <Bay name=\"B1\" /> </VoltageLevel> </Substation> <IED name=\"IED1\" manufacturer=\"OpenSCD\"> <AccessPoint name=\"AP1\"> <Server> <Authentication/> <LDevice inst=\"LD1\"> <LN0 lnClass=\"LLN0\" inst=\"\" lnType=\"LLN0_Test\"> <SettingControl numOfSGs=\"2\"/> </LN0> <LN lnClass=\"TCTR\" inst=\"1\" lnType=\"TCTR_Test\"> <DOI name=\"ARtg\"> <DAI name=\"setVal\"> <Val sGroup=\"1\">10</Val> <Val sGroup=\"2\">12</Val> </DAI> <DAI name=\"setMag\"> <Val sGroup=\"1\">100</Val> <Val sGroup=\"2\">120</Val> </DAI> </DOI> </LN> </LDevice> <LDevice inst=\"LD2\"> <LN0 lnClass=\"LLN0\" inst=\"\" lnType=\"LLN0_Test\"/> <LN lnClass=\"TCTR\" inst=\"2\" lnType=\"TCTR_Test\"/> </LDevice> </Server> </AccessPoint> </IED> <DataTypeTemplates> <LNodeType lnClass=\"LLN0\" id=\"LLN0_Test\"> <DO name=\"Beh\" type=\"Beh_Test\"/> </LNodeType> <LNodeType lnClass=\"TCTR\" id=\"TCTR_Test\"> <DO name=\"Beh\" type=\"Beh_Test\"/> <DO name=\"HzRtg\" type=\"HzRtg_Test\"/> <DO name=\"ARtg\" type=\"ARtg_Test\"/> </LNodeType> <DOType cdc=\"ENS\" id=\"Beh_Test\"> <DA name=\"stVal\" fc=\"ST\" dchg=\"true\" dupd=\"true\" bType=\"Enum\" type=\"stVal_enums\"/> <DA name=\"q\" fc=\"ST\" qchg=\"true\" bType=\"Quality\"/> <DA name=\"t\" fc=\"ST\" bType=\"Timestamp\"/> </DOType> <DOType cdc=\"ASG\" id=\"ARtg_Test\"> <DA name=\"setVal\" fc=\"SG\" bType=\"INT32\"/> <DA name=\"setMag\" fc=\"SE\" bType=\"INT32\"/> </DOType> <DOType cdc=\"ASG\" id=\"HzRtg_Test\"> <DA name=\"setMag\" fc=\"SE\" bType=\"Struct\" type=\"AnalogueValueCtl\"/> <DA name=\"units\" fc=\"CF\" bType=\"Struct\" type=\"Unit\"/> <DA name=\"sVC\" fc=\"CF\" bType=\"Struct\" type=\"ScaledValueConfig\"/> <DA name=\"minVal\" fc=\"CF\" bType=\"Struct\" type=\"AnalogueValue\"/> <DA name=\"maxVal\" fc=\"CF\" bType=\"Struct\" type=\"AnalogueValue\"/> <DA name=\"stepSize\" fc=\"CF\" bType=\"Struct\" type=\"AnalogueValue\"/> </DOType> <DAType id=\"AnalogueValueCtl\"> <BDA name=\"i\" bType=\"INT32\"/> </DAType> <DAType id=\"AnalogueValue\"> <BDA name=\"i\" bType=\"INT32\"/> </DAType> <DAType id=\"ScaledValueConfig\"> <BDA name=\"scaleFactor\" bType=\"FLOAT32\" valKind=\"RO\"> <Val>0.001</Val> </BDA> <BDA name=\"offset\" bType=\"FLOAT32\" valKind=\"RO\"> <Val>0.0</Val> </BDA> </DAType> <DAType id=\"Unit\"> <BDA name=\"SIUnit\" bType=\"Enum\" type=\"SIUnitKind\"/> <BDA name=\"multiplier\" bType=\"Enum\" type=\"MultiplierKind\"/> </DAType> <EnumType id=\"SIUnitKind\"> <EnumVal ord=\"1\">Hz</EnumVal> </EnumType> <EnumType id=\"MultiplierKind\"> <EnumVal ord=\"0\">none</EnumVal> </EnumType> <EnumType id=\"stVal_enums\"> <EnumVal ord=\"1\">on</EnumVal> <EnumVal ord=\"2\">blocked</EnumVal> <EnumVal ord=\"3\">test</EnumVal> <EnumVal ord=\"4\">test/blocked</EnumVal> <EnumVal ord=\"5\">off</EnumVal> </EnumType> </DataTypeTemplates> </SCL> `, }"
         },
         {
           "kind": "function",
@@ -2910,7 +2910,7 @@
                 "text": "object"
               },
               "static": true,
-              "default": "{ 'oscd-action-pane': OscdActionPane, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'da-container': DAContainer, 'dai-value-dialog': DaiValueDialog, 'da-info-dialog': DaInfoDialog, }"
+              "default": "{ 'oscd-action-pane': OscdActionPane, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'da-container': DAContainer, 'dai-value-create-dialog': DaiValueCreateDialog, 'dai-value-edit-dialog': DaiValueEditDialog, 'da-info-dialog': DaInfoDialog, }"
             },
             {
               "kind": "field",
@@ -2932,9 +2932,16 @@
             },
             {
               "kind": "field",
-              "name": "daiValueDialog",
+              "name": "daiValueCreateDialog",
               "type": {
-                "text": "DaiValueDialog"
+                "text": "DaiValueCreateDialog"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "daiValueEditDialog",
+              "type": {
+                "text": "DaiValueEditDialog"
               }
             },
             {
@@ -2946,7 +2953,7 @@
             },
             {
               "kind": "method",
-              "name": "openCreateWizard",
+              "name": "openCreateDialog",
               "privacy": "private",
               "return": {
                 "type": {
@@ -2956,21 +2963,13 @@
             },
             {
               "kind": "method",
-              "name": "openEditWizard",
+              "name": "openEditDialog",
               "privacy": "private",
               "return": {
                 "type": {
                   "text": "void"
                 }
-              },
-              "parameters": [
-                {
-                  "name": "_val",
-                  "type": {
-                    "text": "Element"
-                  }
-                }
-              ]
+              }
             },
             {
               "kind": "method",
@@ -3012,62 +3011,6 @@
                 }
               },
               "description": "Get the nested (B)DA element(s) if available."
-            },
-            {
-              "kind": "method",
-              "name": "getTemplateStructure",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": ""
-                }
-              },
-              "description": "Use the list of ancestor to retrieve the list from DO to the current (B)DA Element.\nThis structure is used to create the initialized structure from (DOI/SDI/DAI)."
-            },
-            {
-              "kind": "method",
-              "name": "getMultipleSettingGroupCount",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "number | null"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "getEnumValues",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "string[]"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "buildValElement",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "Element"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "value",
-                  "type": {
-                    "text": "string"
-                  }
-                },
-                {
-                  "name": "sGroup",
-                  "optional": true,
-                  "type": {
-                    "text": "number"
-                  }
-                }
-              ]
             },
             {
               "kind": "method",
@@ -3353,15 +3296,811 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/da/dai-value-dialog.spec.ts",
+      "path": "src/components/da/dai-value-create-dialog.spec.ts",
       "declarations": [],
       "exports": [
         {
           "kind": "custom-element-definition",
-          "name": "dai-value-dialog",
+          "name": "dai-value-create-dialog",
           "declaration": {
-            "name": "DaiValueDialog",
-            "module": "/src/components/da/dai-value-dialog.js"
+            "name": "DaiValueCreateDialog",
+            "module": "/src/components/da/dai-value-create-dialog.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/da/dai-value-create-dialog.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "DaiValueCreateDialog",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ ...DaiValueDialogBase.scopedElements, }",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "targetDai",
+              "type": {
+                "text": "Element | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "insertElement",
+              "type": {
+                "text": "Element | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "lnElement",
+              "type": {
+                "text": "Element | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "confirm",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "templateElement",
+              "type": {
+                "text": "Element"
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "instanceElement",
+              "type": {
+                "text": "Element | null"
+              },
+              "default": "null",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "dialog",
+              "type": {
+                "text": "OscdDialog"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "dialogTitle",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "protected",
+              "default": "''",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "bType",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "protected",
+              "default": "''",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "enumValues",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "protected",
+              "default": "[]",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "templateValue",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "protected",
+              "default": "null",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "multipleSettings",
+              "type": {
+                "text": "number | null"
+              },
+              "privacy": "protected",
+              "default": "null",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "editedValues",
+              "privacy": "protected",
+              "default": "new Map<number, string>()",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "initializeBaseState",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resetBaseState",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getTemplateStructure",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "Element[]"
+                }
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getMultipleSettingGroupCount",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "number | null"
+                }
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getEnumValues",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "string[]"
+                }
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "buildValElement",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "Element"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "sGroup",
+                  "optional": true,
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "handleValueChange",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "CustomEvent<DaiValueFieldChange>"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "handleTimestampChange",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "CustomEvent<DaiTimestampFieldChange>"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getInstanceValue",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "string | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getCurrentValue",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getResolvedValues",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "string[]"
+                }
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderValueField",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderFields",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult[]"
+                }
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "DaiValueDialogBase",
+            "module": "/src/components/da/dai-value-dialog-base.js"
+          },
+          "tagName": "dai-value-create-dialog",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DaiValueCreateDialog",
+          "declaration": {
+            "name": "DaiValueCreateDialog",
+            "module": "src/components/da/dai-value-create-dialog.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/da/dai-value-dialog-base.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "DaiValueDialogBase",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-dialog': OscdDialog, 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filled-button': OscdFilledButton, 'oscd-filled-text-field': OscdFilledTextField, 'dai-value-field': DaiValueField, 'dai-timestamp-field': DaiTimestampField, }"
+            },
+            {
+              "kind": "field",
+              "name": "templateElement",
+              "type": {
+                "text": "Element"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "instanceElement",
+              "type": {
+                "text": "Element | null"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "dialog",
+              "type": {
+                "text": "OscdDialog"
+              },
+              "privacy": "protected"
+            },
+            {
+              "kind": "field",
+              "name": "dialogTitle",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "protected",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "bType",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "protected",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "enumValues",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "protected",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "templateValue",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "protected",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "multipleSettings",
+              "type": {
+                "text": "number | null"
+              },
+              "privacy": "protected",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "editedValues",
+              "privacy": "protected",
+              "default": "new Map<number, string>()"
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "confirm",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "initializeBaseState",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resetBaseState",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getTemplateStructure",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "Element[]"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getMultipleSettingGroupCount",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "number | null"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getEnumValues",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "string[]"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "buildValElement",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "Element"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "sGroup",
+                  "optional": true,
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "handleValueChange",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "CustomEvent<DaiValueFieldChange>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "handleTimestampChange",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "CustomEvent<DaiTimestampFieldChange>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "getInstanceValue",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "string | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "getCurrentValue",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "getResolvedValues",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "string[]"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderValueField",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderFields",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult[]"
+                }
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DaiValueDialogBase",
+          "declaration": {
+            "name": "DaiValueDialogBase",
+            "module": "src/components/da/dai-value-dialog-base.ts"
           }
         }
       ]
@@ -3382,94 +4121,29 @@
                 "text": "object"
               },
               "static": true,
-              "default": "{ 'oscd-dialog': OscdDialog, 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filled-button': OscdFilledButton, 'oscd-filled-text-field': OscdFilledTextField, 'oscd-filled-select': OscdFilledSelect, 'oscd-select-option': OscdSelectOption, }"
+              "default": "{ 'oscd-dialog': OscdDialog, 'oscd-outlined-button': OscdOutlinedButton, 'oscd-filled-button': OscdFilledButton, 'oscd-filled-text-field': OscdFilledTextField, 'dai-value-field': DaiValueField, 'dai-timestamp-field': DaiTimestampField, }"
             },
             {
               "kind": "field",
-              "name": "dialogTitle",
+              "name": "templateElement",
               "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "dialogTitle"
-            },
-            {
-              "kind": "field",
-              "name": "bType",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "bType"
-            },
-            {
-              "kind": "field",
-              "name": "enumValues",
-              "type": {
-                "text": "string[]"
-              },
-              "default": "[]",
-              "attribute": "enumValues"
-            },
-            {
-              "kind": "field",
-              "name": "values",
-              "type": {
-                "text": "string[]"
-              },
-              "default": "[]",
-              "attribute": "values"
-            },
-            {
-              "kind": "field",
-              "name": "templateValue",
-              "type": {
-                "text": "string | null"
-              },
-              "default": "null",
-              "attribute": "templateValue"
-            },
-            {
-              "kind": "field",
-              "name": "multipleSettings",
-              "type": {
-                "text": "number | null"
-              },
-              "default": "null",
-              "attribute": "multipleSettings"
-            },
-            {
-              "kind": "field",
-              "name": "onConfirm",
-              "type": {
-                "text": "(values: string[]) => void"
+                "text": "Element"
               }
             },
             {
               "kind": "field",
-              "name": "formValues",
+              "name": "instanceElement",
               "type": {
-                "text": "string[]"
+                "text": "Element | null"
               },
-              "privacy": "private",
-              "default": "[]"
+              "default": "null"
             },
             {
               "kind": "field",
-              "name": "dateValues",
+              "name": "ancestors",
               "type": {
-                "text": "string[]"
+                "text": "Element[]"
               },
-              "privacy": "private",
-              "default": "[]"
-            },
-            {
-              "kind": "field",
-              "name": "timeValues",
-              "type": {
-                "text": "string[]"
-              },
-              "privacy": "private",
               "default": "[]"
             },
             {
@@ -3479,6 +4153,84 @@
                 "text": "OscdDialog"
               },
               "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "dialogTitle",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "bType",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "enumValues",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "templateValue",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "multipleSettings",
+              "type": {
+                "text": "number | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "targetDai",
+              "type": {
+                "text": "Element | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "insertElement",
+              "type": {
+                "text": "Element | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "lnElement",
+              "type": {
+                "text": "Element | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "editedValues",
+              "privacy": "private",
+              "default": "new Map<number, string>()"
             },
             {
               "kind": "method",
@@ -3512,31 +4264,62 @@
             },
             {
               "kind": "method",
-              "name": "setValue",
+              "name": "getTemplateStructure",
               "privacy": "private",
               "return": {
                 "type": {
-                  "text": "void"
+                  "text": "Element[]"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getMultipleSettingGroupCount",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number | null"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getEnumValues",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string[]"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "buildValElement",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Element"
                 }
               },
               "parameters": [
                 {
-                  "name": "index",
-                  "type": {
-                    "text": "number"
-                  }
-                },
-                {
                   "name": "value",
                   "type": {
                     "text": "string"
+                  }
+                },
+                {
+                  "name": "sGroup",
+                  "optional": true,
+                  "type": {
+                    "text": "number"
                   }
                 }
               ]
             },
             {
               "kind": "method",
-              "name": "setDateValue",
+              "name": "handleValueChange",
               "privacy": "private",
               "return": {
                 "type": {
@@ -3545,22 +4328,16 @@
               },
               "parameters": [
                 {
-                  "name": "index",
+                  "name": "event",
                   "type": {
-                    "text": "number"
-                  }
-                },
-                {
-                  "name": "value",
-                  "type": {
-                    "text": "string"
+                    "text": "CustomEvent<DaiValueFieldChange>"
                   }
                 }
               ]
             },
             {
               "kind": "method",
-              "name": "setTimeValue",
+              "name": "handleTimestampChange",
               "privacy": "private",
               "return": {
                 "type": {
@@ -3569,18 +4346,58 @@
               },
               "parameters": [
                 {
+                  "name": "event",
+                  "type": {
+                    "text": "CustomEvent<DaiTimestampFieldChange>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "getInstanceValue",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string | null"
+                }
+              },
+              "parameters": [
+                {
                   "name": "index",
                   "type": {
                     "text": "number"
                   }
-                },
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "getCurrentValue",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
                 {
-                  "name": "value",
+                  "name": "index",
                   "type": {
-                    "text": "string"
+                    "text": "number"
                   }
                 }
               ]
+            },
+            {
+              "kind": "method",
+              "name": "getResolvedValues",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string[]"
+                }
+              }
             },
             {
               "kind": "method",
@@ -3611,56 +4428,6 @@
               }
             }
           ],
-          "attributes": [
-            {
-              "name": "dialogTitle",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "fieldName": "dialogTitle"
-            },
-            {
-              "name": "bType",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "fieldName": "bType"
-            },
-            {
-              "name": "enumValues",
-              "type": {
-                "text": "string[]"
-              },
-              "default": "[]",
-              "fieldName": "enumValues"
-            },
-            {
-              "name": "values",
-              "type": {
-                "text": "string[]"
-              },
-              "default": "[]",
-              "fieldName": "values"
-            },
-            {
-              "name": "templateValue",
-              "type": {
-                "text": "string | null"
-              },
-              "default": "null",
-              "fieldName": "templateValue"
-            },
-            {
-              "name": "multipleSettings",
-              "type": {
-                "text": "number | null"
-              },
-              "default": "null",
-              "fieldName": "multipleSettings"
-            }
-          ],
           "mixins": [
             {
               "name": "ScopedElementsMixin",
@@ -3671,7 +4438,6 @@
             "name": "LitElement",
             "package": "lit"
           },
-          "tagName": "dai-value-dialog",
           "customElement": true
         }
       ],
@@ -3682,6 +4448,469 @@
           "declaration": {
             "name": "DaiValueDialog",
             "module": "src/components/da/dai-value-dialog.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/da/dai-value-edit-dialog.spec.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "dai-value-edit-dialog",
+          "declaration": {
+            "name": "DaiValueEditDialog",
+            "module": "/src/components/da/dai-value-edit-dialog.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/da/dai-value-edit-dialog.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "DaiValueEditDialog",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ ...DaiValueDialogBase.scopedElements, }",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "targetDai",
+              "type": {
+                "text": "Element | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "confirm",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderFields",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult[]"
+                }
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "templateElement",
+              "type": {
+                "text": "Element"
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "instanceElement",
+              "type": {
+                "text": "Element | null"
+              },
+              "default": "null",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "dialog",
+              "type": {
+                "text": "OscdDialog"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "dialogTitle",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "protected",
+              "default": "''",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "bType",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "protected",
+              "default": "''",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "enumValues",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "protected",
+              "default": "[]",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "templateValue",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "protected",
+              "default": "null",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "multipleSettings",
+              "type": {
+                "text": "number | null"
+              },
+              "privacy": "protected",
+              "default": "null",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "editedValues",
+              "privacy": "protected",
+              "default": "new Map<number, string>()",
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "initializeBaseState",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resetBaseState",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getTemplateStructure",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "Element[]"
+                }
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getMultipleSettingGroupCount",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "number | null"
+                }
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getEnumValues",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "string[]"
+                }
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "buildValElement",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "Element"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "sGroup",
+                  "optional": true,
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "handleValueChange",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "CustomEvent<DaiValueFieldChange>"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "handleTimestampChange",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "CustomEvent<DaiTimestampFieldChange>"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getInstanceValue",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "string | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getCurrentValue",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getResolvedValues",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "string[]"
+                }
+              },
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderValueField",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "DaiValueDialogBase",
+                "module": "src/components/da/dai-value-dialog-base.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "DaiValueDialogBase",
+            "module": "/src/components/da/dai-value-dialog-base.js"
+          },
+          "tagName": "dai-value-edit-dialog",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DaiValueEditDialog",
+          "declaration": {
+            "name": "DaiValueEditDialog",
+            "module": "src/components/da/dai-value-edit-dialog.ts"
           }
         }
       ]
@@ -5254,6 +6483,443 @@
           "declaration": {
             "name": "ServerContainer",
             "module": "src/components/server/server-container.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/da/fields/dai-timestamp-field.spec.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "dai-timestamp-field",
+          "declaration": {
+            "name": "DaiTimestampField",
+            "module": "/src/components/da/fields/dai-timestamp-field.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/da/fields/dai-timestamp-field.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "DaiTimestampField",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-filled-text-field': OscdFilledTextField, }"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "labelDate",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "labelDate"
+            },
+            {
+              "kind": "field",
+              "name": "labelTime",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "labelTime"
+            },
+            {
+              "kind": "field",
+              "name": "sGroup",
+              "type": {
+                "text": "number | null"
+              },
+              "default": "null",
+              "attribute": "sGroup"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "disabled"
+            },
+            {
+              "kind": "field",
+              "name": "dateValue",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "timeValue",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "method",
+              "name": "handleChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "onDateInput",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onTimeInput",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "change",
+              "type": {
+                "text": "CustomEvent"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "fieldName": "value"
+            },
+            {
+              "name": "labelDate",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "fieldName": "labelDate"
+            },
+            {
+              "name": "labelTime",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "fieldName": "labelTime"
+            },
+            {
+              "name": "sGroup",
+              "type": {
+                "text": "number | null"
+              },
+              "default": "null",
+              "fieldName": "sGroup"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "disabled"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "dai-timestamp-field",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DaiTimestampField",
+          "declaration": {
+            "name": "DaiTimestampField",
+            "module": "src/components/da/fields/dai-timestamp-field.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/da/fields/dai-value-field.spec.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "dai-value-field",
+          "declaration": {
+            "name": "DaiValueField",
+            "module": "/src/components/da/fields/dai-value-field.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/da/fields/dai-value-field.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "DaiValueField",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-filled-text-field': OscdFilledTextField, 'oscd-filled-select': OscdFilledSelect, 'oscd-select-option': OscdSelectOption, }"
+            },
+            {
+              "kind": "field",
+              "name": "bType",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "bType"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "enumValues",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "attribute": "enumValues"
+            },
+            {
+              "kind": "field",
+              "name": "sGroup",
+              "type": {
+                "text": "number | null"
+              },
+              "default": "null",
+              "attribute": "sGroup"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "disabled"
+            },
+            {
+              "kind": "method",
+              "name": "emitChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderBoolean",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderEnum",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderText",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "change",
+              "type": {
+                "text": "CustomEvent"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "bType",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "fieldName": "bType"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "fieldName": "value"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "fieldName": "label"
+            },
+            {
+              "name": "enumValues",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "fieldName": "enumValues"
+            },
+            {
+              "name": "sGroup",
+              "type": {
+                "text": "number | null"
+              },
+              "default": "null",
+              "fieldName": "sGroup"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "disabled"
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "dai-value-field",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DaiValueField",
+          "declaration": {
+            "name": "DaiValueField",
+            "module": "src/components/da/fields/dai-value-field.ts"
           }
         }
       ]

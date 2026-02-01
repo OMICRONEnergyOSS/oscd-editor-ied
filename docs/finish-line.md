@@ -47,6 +47,13 @@ Status note: oscd-scl-dialogs `createLNWizard` covers selection, prefix, amount,
 Verify supported types vs legacy and align.
 Status: Open
 Legacy uses `getCustomField()` for DAI edit support; current uses a hard-coded `supportedDaiTypes` set. Verify whether any editable types regressed.
+DA/DAI parity tasks:
+- E8.1 Confirm `supportedDaiTypes` stays in sync with legacy `getCustomField()` (add a test or checklist).
+- E8.2 Add tests for edit dialog targeting a specific `Val` when multiple sGroups exist (edit only the clicked `Val`).
+- E8.3 Add tests for missing sGroup values: add icon opens edit dialog, confirm inserts new `Val` with correct `sGroup`.
+- E8.4 Add test for insertion order when adding a missing sGroup (e.g., insert sGroup 2 between 1 and 3).
+- E8.5 Add tests for sparse sGroups in create flow (numOfSGs > existing Val count) to verify prefill and save behavior.
+- E8.6 Decide whether to keep or remove legacy `dai-value-dialog` (now unused) and document the decision.
 
 ### E9. Coverage ≥ 90%
 Add tests and maintain IEC 61850 correctness in edits.
