@@ -1,18 +1,11 @@
 import { expect, fixture, html, waitUntil } from '@open-wc/testing';
 import { DOContainer } from './do-container.js';
-import { Nsdoc } from '../../foundation/nsdoc.js';
 import { parseDoc, testDocs } from '../../test-utils/test-files.js';
 import { getFirstAndAssertBySelector } from '../../test-utils/queries.js';
-import { getAncestors } from '../../test-utils/test-harness.js';
+import { getAncestors, nsdocStub } from '../../test-utils/test-harness.js';
 import { InfoDialog } from '../info-dialog.js';
 
 customElements.define('do-container', DOContainer);
-
-const nsdocStub: Nsdoc = {
-  getDataDescription: (element: Element) => ({
-    label: `${element.tagName}-label`,
-  }),
-};
 
 describe('do-container', () => {
   describe('visual', () => {

@@ -1,18 +1,11 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { Nsdoc } from '../../foundation/nsdoc.js';
 import { MISSING_VALUE } from '../../foundation.js';
 import { buildDoInfoGroups } from './do-info-dialog.js';
 import { parseDoc, testDocs } from '../../test-utils/test-files.js';
 import { getFirstAndAssertBySelector } from '../../test-utils/queries.js';
-import { getAncestors } from '../../test-utils/test-harness.js';
+import { getAncestors, nsdocStub } from '../../test-utils/test-harness.js';
 import { DoInfoDialog } from './do-info-dialog.js';
 import { OscdFilledTextField } from '@omicronenergy/oscd-ui/textfield/OscdFilledTextField.js';
-
-const nsdocStub: Nsdoc = {
-  getDataDescription: (element: Element) => ({
-    label: `${element.tagName}-label`,
-  }),
-};
 
 customElements.define('do-info-dialog', DoInfoDialog);
 
