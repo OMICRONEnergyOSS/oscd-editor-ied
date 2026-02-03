@@ -1,16 +1,9 @@
 import { expect } from '@open-wc/testing';
-import { Nsdoc } from '../../foundation/nsdoc.js';
 import { MISSING_VALUE } from '../../foundation.js';
 import { buildDaInfoGroups } from './da-info-dialog.js';
 import { parseDoc, testDocs } from '../../test-utils/test-files.js';
 import { getFirstAndAssertBySelector } from '../../test-utils/queries.js';
-import { getAncestors } from '../../test-utils/test-harness.js';
-
-const nsdocStub: Nsdoc = {
-  getDataDescription: (element: Element) => ({
-    label: `${element.tagName}-label`,
-  }),
-};
+import { getAncestors, nsdocStub } from '../../test-utils/test-harness.js';
 
 describe('da-info-dialog', () => {
   it('builds groups for DA info with instance values', () => {
@@ -55,7 +48,7 @@ describe('da-info-dialog', () => {
     expect(groups[0][2].value).to.equal(MISSING_VALUE);
     expect(groups[0][3].value).to.equal('SG');
     expect(groups[0][4].value).to.equal('INT32');
-    expect(groups[0][5].value).to.equal('10, 12');
+    expect(groups[0][5].value).to.equal('10, 12, 13, 14, 15');
     expect(groups[1][0].value).to.equal('ARtg');
     expect(groups[1][1].value).to.equal('ASG');
     expect(groups[2][0].value).to.equal(MISSING_VALUE);

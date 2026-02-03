@@ -26,7 +26,7 @@
 
   const filename = 'fixture_withIED_instanciated.scd'; //'sample2.scd';
   // const filename = 'XAT_Subsystem_Testing_old_coords_removed.scd';
-  const sample = await fetch(filename).then(r => r.text());
+  // const sample = await fetch(filename).then(r => r.text());
   editor.docs = {
     [filename]: parseDoc(testDocs.withIED_instanciated), //parseDoc(sample),
   };

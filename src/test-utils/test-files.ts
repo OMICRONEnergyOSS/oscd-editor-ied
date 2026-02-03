@@ -96,9 +96,9 @@ export const testDocs = {
                             <DAI name="setVal">
                                 <Val sGroup="1">10</Val>
                                 <Val sGroup="2">12</Val>
-                                <Val sGroup="3">12</Val>
-                                <Val sGroup="4">12</Val>
-                                <Val sGroup="5">12</Val>
+                                <Val sGroup="3">13</Val>
+                                <Val sGroup="4">14</Val>
+                                <Val sGroup="5">15</Val>
                             </DAI>
                             <DAI name="setMag">
                                 <Val sGroup="1">100</Val>

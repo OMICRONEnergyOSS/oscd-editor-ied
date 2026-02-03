@@ -1,21 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { expect, fixture, html, waitUntil } from '@open-wc/testing';
 import { DAContainer } from './da-container.js';
-import { Nsdoc } from '../../foundation/nsdoc.js';
 import { parseDoc, testDocs } from '../../test-utils/test-files.js';
 import { getFirstAndAssertBySelector } from '../../test-utils/queries.js';
-import { getAncestors } from '../../test-utils/test-harness.js';
+import { getAncestors, nsdocStub } from '../../test-utils/test-harness.js';
 import { OscdIconButton } from '@omicronenergy/oscd-ui/iconbutton/OscdIconButton.js';
 import { OscdDialog } from '@omicronenergy/oscd-ui/dialog/OscdDialog.js';
 import { DaiValueEditDialog } from './dai-value-edit-dialog.js';
 
 customElements.define('da-container', DAContainer);
-
-const nsdocStub: Nsdoc = {
-  getDataDescription: (element: Element) => ({
-    label: `${element.tagName}-label`,
-  }),
-};
 
 const testSetup = async ({
   docContents,

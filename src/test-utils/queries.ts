@@ -40,3 +40,14 @@ export function getFirstAndAssertBySelector(
   }
   return element;
 }
+
+export const findIconButtonByIconName = (
+  container: Element,
+  iconName: string,
+) =>
+  Array.from(
+    container.shadowRoot?.querySelectorAll('oscd-icon-button') ?? [],
+  ).find(
+    button =>
+      button.querySelector('oscd-icon')?.textContent?.trim() === iconName,
+  );

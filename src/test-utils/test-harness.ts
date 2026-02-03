@@ -7,6 +7,13 @@ import { LitElement } from 'lit';
 import sinon from 'sinon';
 import { ConfirmDeleteEvent, EVENTS } from '../foundation/events.js';
 import { expect } from '@open-wc/testing';
+import { Nsdoc } from '../foundation/nsdoc.js';
+
+export const nsdocStub: Nsdoc = {
+  getDataDescription: (element: Element) => ({
+    label: `${element.tagName}-label`,
+  }),
+};
 
 function getElement(
   baseElement: Element | XMLDocument,
