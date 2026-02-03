@@ -10,20 +10,20 @@ import { expect } from '@open-wc/testing';
 
 function getElement(
   baseElement: Element | XMLDocument,
-  tagName: string,
+  selector: string,
 ): Element {
-  const element = baseElement.querySelector(tagName);
-  expect(element, `Missing element for ${tagName}`).to.exist;
+  const element = baseElement.querySelector(selector);
+  expect(element, `Missing element for ${selector}`).to.exist;
   return element!;
 }
 
-export function getAncestors(doc: XMLDocument, tags: string[]): Element[] {
+export function getAncestors(doc: XMLDocument, selectors: string[]): Element[] {
   const ancestors: Element[] = [];
-  tags.forEach(tag => {
+  selectors.forEach(selector => {
     const baseElement = ancestors.length
       ? ancestors[ancestors.length - 1]
       : doc;
-    ancestors.push(getElement(baseElement, tag));
+    ancestors.push(getElement(baseElement, selector));
   });
   return ancestors;
 }

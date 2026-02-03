@@ -23,7 +23,18 @@ export const testDocs = {
 				<LDevice inst="LD1">
 					<LN0 lnClass="LLN0" inst="" lnType="PlaceholderLLN0">
 						<SettingControl numOfSGs="2"/>
+                        <DOI name="Beh">
+							<DAI name="stVal">
+								<Val>on</Val>
+							</DAI>
+                            <DAI name="t">
+							    <Val>2026-12-24T12:14:16.000</Val>
+						    </DAI>
+						</DOI>
 					</LN0>
+				</LDevice>
+                <LDevice inst="LD2">
+					<LN0 lnClass="LLN0" lnType="PlaceholderLLN0" />
 				</LDevice>
 			</Server>
 		</AccessPoint>
@@ -43,7 +54,9 @@ export const testDocs = {
 			<DO name="Beh" type="Beh_Test"/>
 		</LNodeType>
 		<DOType cdc="ENS" id="Beh_Test">
-			<DA name="stVal" fc="ST" dchg="true" dupd="true" bType="Enum" type="stVal$oscd$_48ba16345b8e7f5b"/>
+			<DA name="stVal" fc="ST" dchg="true" dupd="true" bType="Enum" type="stVal$oscd$_48ba16345b8e7f5b">
+                <Val>blocked</Val>
+            </DA>
 			<DA name="q" fc="ST" qchg="true" bType="Quality"/>
 			<DA name="t" fc="ST" bType="Timestamp"/>
 		</DOType>
@@ -71,17 +84,25 @@ export const testDocs = {
                 <Authentication/>
                 <LDevice inst="LD1">
                     <LN0 lnClass="LLN0" inst="" lnType="LLN0_Test">
-                        <SettingControl numOfSGs="2"/>
+                        <SettingControl numOfSGs="5"/>
                     </LN0>
                     <LN lnClass="TCTR" inst="1" lnType="TCTR_Test">
+                    	<DOI name="Beh">
+							<DAI name="stVal">
+								<Val>blocked</Val>
+							</DAI>
+						</DOI>
                         <DOI name="ARtg">
                             <DAI name="setVal">
                                 <Val sGroup="1">10</Val>
                                 <Val sGroup="2">12</Val>
+                                <Val sGroup="3">12</Val>
+                                <Val sGroup="4">12</Val>
+                                <Val sGroup="5">12</Val>
                             </DAI>
                             <DAI name="setMag">
                                 <Val sGroup="1">100</Val>
-                                <Val sGroup="2">120</Val>
+                                <Val sGroup="5">120</Val>
                             </DAI>
                         </DOI>
                     </LN>
@@ -108,8 +129,10 @@ export const testDocs = {
             <DA name="t" fc="ST" bType="Timestamp"/>
         </DOType>
         <DOType cdc="ASG" id="ARtg_Test">
-            <DA name="setVal" fc="SG" bType="INT32"/>
-            <DA name="setMag" fc="SE" bType="INT32"/>
+            <DA name="setVal" desc="fc=SG" fc="SG" bType="INT32"/>
+            <DA name="setMag" desc="fc=SE" fc="SE" bType="INT32">
+                <Val>555</Val>
+            </DA>
         </DOType>
         <DOType cdc="ASG" id="HzRtg_Test">
             <DA name="setMag" fc="SE" bType="Struct" type="AnalogueValueCtl"/>
