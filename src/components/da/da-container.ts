@@ -45,6 +45,27 @@ function getEnumValues(element: Element): string[] {
     .map(enumVal => enumVal.textContent ?? '');
 }
 
+function renderValueRow(
+  displayString: string,
+  bType: string | null,
+  icon: string,
+  onClick: () => void,
+): TemplateResult {
+  return html`<div class="da-value-row">
+    <div class="da-value-row-label">
+      <h4>${displayString}</h4>
+    </div>
+    <div class="da-value-row-action">
+      <oscd-icon-button
+        ?disabled=${!bType || !supportedDaiTypes.has(bType)}
+        @click=${onClick}
+      >
+        <oscd-icon>${icon}</oscd-icon>
+      </oscd-icon-button>
+    </div>
+  </div>`;
+}
+
 const supportedDaiTypes = new Set([
   'BOOLEAN',
   'Enum',
@@ -191,13 +212,17 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
   /* Review-me:
    */
   // Response: SG/SE is a separate UI mode (row per sGroup). For non‑SG we keep the simple instantiated/not‑instantiated flow.
-  private renderVal(): TemplateResult[] {
+  private renderValueSection(): TemplateResult[] {
     const bType = this.element!.getAttribute('bType');
     const element = this.instanceElement ?? this.element;
     const hasInstantiatedVal = !!this.instanceElement?.querySelector('Val');
 
     const settingGroupCount = this.getMultipleSettingGroupCount();
-    if (settingGroupCount) {
+    if (
+      settingGroupCount !== null &&
+      settingGroupCount > 1 &&
+      hasInstantiatedVal
+    ) {
       const values = getValueElements(element);
       return Array.from({ length: settingGroupCount }, (_, index) => {
         const sGroup = index + 1;
@@ -206,67 +231,26 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
           null;
         const icon = val ? 'edit' : 'add';
 
-        // Review-me: Why is this block repeated two more times below? Should this be extracted to a function or a template or component?
-        // Response: yes, a small helper (e.g. renderValRow) would reduce duplication; we can do that once behavior settles.
-
-        return html`<div style="display: flex; flex-direction: row;">
-          <div style="display: flex; align-items: center; flex: auto;">
-            <h4>${val ? getValueDisplayString(val) : `SG${sGroup}: `}</h4>
-          </div>
-          <div style="display: flex; align-items: center;">
-            <oscd-icon-button
-              ?disabled=${!bType || !supportedDaiTypes.has(bType)}
-              @click=${() => this.openEditDialog(val, sGroup)}
-            >
-              <oscd-icon>${icon}</oscd-icon>
-            </oscd-icon-button>
-          </div>
-        </div>`;
+        return renderValueRow(
+          val ? getValueDisplayString(val) : `SG${sGroup}: `,
+          bType,
+          icon,
+          () => this.openEditDialog(val, sGroup),
+        );
       });
     }
 
-    /* Review-me: Here we handle two cases - instanciated, or not. But in the above block handle things differently. Is this correct? Whether its a single value or multiple SGs,
-     * is it not true that the "instanciated/not instanciated" logic should be the same?
-     */
-    // Response: SG/SE always renders all sGroup rows and uses add/edit per row; non‑SG uses single add vs edit based on Val existence.
     return hasInstantiatedVal
-      ? getValueElements(element).map(
-          val =>
-            html`<div style="display: flex; flex-direction: row;">
-              <div style="display: flex; align-items: center; flex: auto;">
-                <h4>${getValueDisplayString(val)}</h4>
-              </div>
-              <div style="display: flex; align-items: center;">
-                <oscd-icon-button
-                  ?disabled=${!bType || !supportedDaiTypes.has(bType)}
-                  @click=${() => this.openEditDialog(val, 1)}
-                >
-                  <oscd-icon>edit</oscd-icon>
-                </oscd-icon-button>
-              </div>
-            </div>`,
+      ? getValueElements(element).map(val =>
+          renderValueRow(getValueDisplayString(val), bType, 'edit', () =>
+            this.openEditDialog(val, 1),
+          ),
         )
-      : [
-          html`<div style="display: flex; flex-direction: row;">
-            <div style="display: flex; align-items: center; flex: auto;">
-              <h4>&nbsp;</h4>
-            </div>
-            <div style="display: flex; align-items: center;">
-              <oscd-icon-button
-                ?disabled=${!bType || !supportedDaiTypes.has(bType)}
-                @click=${this.openCreateDialog}
-              >
-                <oscd-icon>add</oscd-icon>
-              </oscd-icon-button>
-            </div>
-          </div>`,
-        ];
+      : [renderValueRow('\u00A0', bType, 'add', this.openCreateDialog)];
   }
 
   private getMultipleSettingGroupCount(): number | null {
-    // Review-me: does this read a little funny? what about setting daElement to this.element in the else block so we never set daElement to first potentially bein a DAI and then fix that inside the if block.
-    // Response: we can keep as‑is; starting with template element and remapping BDA→DA is the intent. Happy to refactor for clarity.
-    let daElement = this.element;
+    let daElement;
     if (this.element.tagName === 'BDA') {
       const daTypeId = this.element.parentElement?.getAttribute('id');
       const root = this.element.getRootNode() as Document | Element;
@@ -276,9 +260,11 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
       if (referencedDa) {
         daElement = referencedDa;
       }
+    } else {
+      daElement = this.element;
     }
 
-    const fc = daElement.getAttribute('fc') ?? '';
+    const fc = daElement?.getAttribute('fc') ?? '';
     const iedElement = this.ancestors.find(
       element => element.tagName === 'IED',
     );
@@ -302,6 +288,15 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
     // Response: computing per render keeps it correct if element changes; caching adds complexity without clear benefit.
     const bType = this.element!.getAttribute('bType');
 
+    const nsDocDescription = this.nsdoc.getDataDescription(
+      this.element,
+      this.ancestors,
+    ).label;
+    const infoButtonTooltip =
+      nsDocDescription !== this.element.getAttribute('name')
+        ? nsDocDescription
+        : msg('Show more information');
+
     return html`
       <oscd-action-pane
         .label="${this.header()}"
@@ -309,16 +304,18 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
       >
         <abbr slot="action">
           <oscd-icon-button
-            title=${this.nsdoc.getDataDescription(this.element, this.ancestors)
-              .label}
+            aria-label="${infoButtonTooltip}"
+            title=${infoButtonTooltip}
             @click=${() => this.openInfoDialog()}
           >
             <oscd-icon>info</oscd-icon>
           </oscd-icon-button>
         </abbr>
         ${bType === 'Struct'
-          ? html` <abbr slot="action" title="${msg('Toggle child elements')}">
+          ? html` <abbr slot="action">
               <oscd-icon-button
+                aria-label="${msg('Toggle child elements')}"
+                title="${msg('Toggle child elements')}"
                 id="toggleButton"
                 toggle
                 .selected=${this.expanded}
@@ -328,7 +325,7 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
                 <oscd-icon slot="selected">keyboard_arrow_up</oscd-icon>
               </oscd-icon-button>
             </abbr>`
-          : html`${this.renderVal()}`}
+          : html`${this.renderValueSection()}`}
         ${this.expanded && bType === 'Struct'
           ? this.getBDAElements().map(
               bdaElement =>
@@ -367,6 +364,22 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
       padding-left: 0.3em;
       word-break: break-word;
       white-space: pre-wrap;
+    }
+
+    .da-value-row {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .da-value-row-label {
+      display: flex;
+      align-items: center;
+      flex: auto;
+    }
+
+    .da-value-row-action {
+      display: flex;
+      align-items: center;
     }
 
     oscd-icon-button {

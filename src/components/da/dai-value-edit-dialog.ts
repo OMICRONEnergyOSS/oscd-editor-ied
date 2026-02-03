@@ -17,6 +17,7 @@ import {
   DaiTimestampFieldChange,
 } from './fields/dai-timestamp-field.js';
 import { EditV2 } from '@openscd/oscd-api';
+import { createElement } from '@openscd/scl-lib/dist/foundation/utils.js';
 
 export class DaiValueEditDialog extends ScopedElementsMixin(LitElement) {
   static scopedElements = {
@@ -52,36 +53,23 @@ export class DaiValueEditDialog extends ScopedElementsMixin(LitElement) {
 
   private templateValue: string | null = null;
 
-  private targetDai: Element | null = null;
-
   public show(): void {
-    if (!this.instanceElement) {
+    this.bType = this.templateElement?.getAttribute('bType') ?? '';
+    if (!this.instanceElement || !this.bType) {
       return;
     }
 
-    const bType = this.templateElement?.getAttribute('bType') ?? '';
-    if (!bType) {
-      return;
-    }
-
-    this.bType = bType;
-    if (bType !== 'Enum') {
-      this.enumValues = [];
-    }
     this.templateValue =
       this.templateElement?.querySelector('Val')?.textContent?.trim() ?? null;
-    this.editedValue = null;
+    this.editedValue = this.getInstanceValue() ?? '';
 
-    this.targetDai = this.instanceElement;
     this.dialogTitle = `Edit DAI "${this.instanceElement.getAttribute('name') ?? ''}"`;
 
     this.requestUpdate();
     this.dialog.show();
   }
 
-  private close(): void {
-    this.dialog.close();
-    this.targetDai = null;
+  private reset() {
     this.dialogTitle = '';
     this.bType = '';
     this.templateValue = null;
@@ -92,21 +80,30 @@ export class DaiValueEditDialog extends ScopedElementsMixin(LitElement) {
     this.requestUpdate();
   }
 
+  private close(): void {
+    this.dialog.close();
+    this.reset();
+  }
+
   private confirm(): void {
-    if (!this.targetDai) {
+    if (!this.instanceElement) {
       return;
     }
 
-    const value = this.editedValue ?? this.getInstanceValue() ?? '';
     const edits: EditV2 = [];
-    const newVal = this.buildValElement(value, this.sGroup ?? undefined);
 
-    if (this.valElement) {
-      edits.push({ node: this.valElement });
-      edits.push({ parent: this.targetDai, node: newVal, reference: null });
-    } else {
+    if (!this.valElement) {
       const reference = this.findInsertReference();
-      edits.push({ parent: this.targetDai, node: newVal, reference });
+      const newVal = this.buildValElement(
+        this.editedValue ?? '',
+        this.sGroup ?? undefined,
+      );
+      edits.push({ parent: this.instanceElement, node: newVal, reference });
+    } else {
+      edits.push({
+        element: this.valElement,
+        textContent: this.editedValue ?? '',
+      });
     }
 
     this.dispatchEvent(newEditEventV2(edits));
@@ -116,48 +113,39 @@ export class DaiValueEditDialog extends ScopedElementsMixin(LitElement) {
   private editedValue: string | null = null;
 
   private buildValElement(value: string, sGroup?: number): Element {
-    // Review-me: wouldn't the createElement of scl-lib be the right thing to be using everywhere? Where else are we "rolling our own"? Scan code base and add a "review-me comment" there too.
-    // Response: we could use @openscd/scl-lib createElement for consistency, but we still need to set sGroup/text. If we standardize,
-    // a small helper in src/foundation could wrap createElement + text + optional sGroup. Create dialog has a similar builder.
-    const val = this.templateElement.ownerDocument.createElementNS(
-      'http://www.iec.ch/61850/2003/SCL',
-      'Val',
-    );
+    const val = createElement(this.templateElement.ownerDocument, 'Val', {
+      ...(sGroup ? { sGroup: `${sGroup}` } : {}),
+    });
     val.textContent = value ?? '';
-    if (sGroup) {
-      val.setAttribute('sGroup', `${sGroup}`);
-    }
     return val;
   }
 
-  private getInstanceValue(): string | null {
+  private getInstanceValue(): string | undefined {
     if (this.valElement) {
-      return this.valElement.textContent?.trim() ?? '';
+      return this.valElement.textContent?.trim();
     }
 
     if (!this.instanceElement) {
-      return null;
+      return undefined;
     }
 
-    if (this.sGroup) {
+    if (this.sGroup !== null && this.sGroup > 1) {
       const match = this.instanceElement.querySelector(
         `Val[sGroup="${this.sGroup}"]`,
       );
-      if (match) {
-        return match.textContent?.trim() ?? '';
-      }
+      return match?.textContent?.trim();
     }
 
     const val = this.instanceElement.querySelector('Val');
-    return val?.textContent?.trim() ?? '';
+    return val?.textContent?.trim();
   }
 
   private findInsertReference(): Element | null {
-    if (!this.sGroup || !this.targetDai) {
+    if (!this.sGroup || !this.instanceElement) {
       return null;
     }
 
-    const vals = Array.from(this.targetDai.querySelectorAll('Val'));
+    const vals = Array.from(this.instanceElement.querySelectorAll('Val'));
     return (
       vals.find(val => {
         const current = parseInt(val.getAttribute('sGroup') ?? '0');
@@ -177,7 +165,7 @@ export class DaiValueEditDialog extends ScopedElementsMixin(LitElement) {
   }
 
   private renderValueField(): TemplateResult {
-    const value = this.editedValue ?? this.getInstanceValue() ?? '';
+    const value = this.editedValue ?? '';
 
     if (this.bType === 'Timestamp') {
       return html`
