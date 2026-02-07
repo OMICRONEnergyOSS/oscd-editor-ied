@@ -24,17 +24,17 @@ export function getFirstChildElement(
 }
 
 export function getFirstBySelector(
-  doc: XMLDocument,
+  doc: XMLDocument | Element,
   selector: string,
 ): Element | null {
   return doc.querySelector(selector);
 }
 
 export function getFirstAndAssertBySelector(
-  doc: XMLDocument,
+  doc: XMLDocument | Element,
   selector: string,
 ): Element {
-  const element = doc.querySelector(selector);
+  const element = getFirstBySelector(doc, selector);
   if (!element) {
     throw new Error(`Expected element for selector: ${selector}`);
   }

@@ -15,8 +15,9 @@ export default /** @type {import('@web/dev-server').DevServerConfig} */ ({
     hmr &&
       //Details & options: https://open-wc.org/docs/development/hot-module-replacement/
       hmrPlugin({
-        exclude: ['**/*/node_modules/**/*'],
-        presets: [presets.lit],
+        include: ['src/**/*'],
+        exclude: ['dist/**/*', '**/*/node_modules/**/*'],
+        presets: [presets.lit, presets.litElement],
       }),
   ],
 });
