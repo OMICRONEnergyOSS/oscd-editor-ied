@@ -875,423 +875,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/foundation/dai.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "determineUninitializedStructure",
-          "return": {
-            "type": {
-              "text": ""
-            }
-          },
-          "parameters": [
-            {
-              "name": "parentElement",
-              "type": {
-                "text": "Element"
-              },
-              "description": "The element to search from for DOI/SDI"
-            },
-            {
-              "name": "templateStructure",
-              "type": {
-                "text": "Element[]"
-              },
-              "description": "The templates structure with DO/DA/BDA Elements."
-            }
-          ],
-          "description": "Determine which part of the template structure still needs to be initialized."
-        },
-        {
-          "kind": "function",
-          "name": "initializeElements",
-          "return": {
-            "type": {
-              "text": ""
-            }
-          },
-          "parameters": [
-            {
-              "name": "uninitializedTemplateStructure",
-              "type": {
-                "text": "Element[]"
-              },
-              "description": "Template elements to initialize."
-            }
-          ],
-          "description": "Create a new instance structure defined by the array of template elements passed."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "determineUninitializedStructure",
-          "declaration": {
-            "name": "determineUninitializedStructure",
-            "module": "src/foundation/dai.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "initializeElements",
-          "declaration": {
-            "name": "initializeElements",
-            "module": "src/foundation/dai.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/foundation/events.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "newFullElementPathEvent",
-          "return": {
-            "type": {
-              "text": "FullElementPathEvent"
-            }
-          },
-          "parameters": [
-            {
-              "name": "elementNames",
-              "type": {
-                "text": "string[]"
-              }
-            },
-            {
-              "name": "eventInitDict",
-              "optional": true,
-              "type": {
-                "text": "CustomEventInit<FullElementPathDetail>"
-              }
-            }
-          ]
-        },
-        {
-          "kind": "function",
-          "name": "newAddElementEvent",
-          "return": {
-            "type": {
-              "text": "CreateElementEvent"
-            }
-          },
-          "parameters": [
-            {
-              "name": "detail",
-              "type": {
-                "text": "CreateWizard"
-              }
-            },
-            {
-              "name": "eventInitDict",
-              "optional": true,
-              "type": {
-                "text": "CustomEventInit<CreateWizard>"
-              }
-            }
-          ]
-        },
-        {
-          "kind": "function",
-          "name": "newEditElementEvent",
-          "return": {
-            "type": {
-              "text": "EditElementEvent"
-            }
-          },
-          "parameters": [
-            {
-              "name": "detail",
-              "type": {
-                "text": "EditWizard"
-              }
-            },
-            {
-              "name": "eventInitDict",
-              "optional": true,
-              "type": {
-                "text": "CustomEventInit<EditWizard>"
-              }
-            }
-          ]
-        },
-        {
-          "kind": "function",
-          "name": "newIedCreatedEvent",
-          "return": {
-            "type": {
-              "text": "IedCreatedEvent"
-            }
-          },
-          "parameters": [
-            {
-              "name": "detail",
-              "type": {
-                "text": "IedCreatedDetail"
-              }
-            }
-          ]
-        },
-        {
-          "kind": "function",
-          "name": "newConfirmDeleteEvent",
-          "return": {
-            "type": {
-              "text": "ConfirmDeleteEvent"
-            }
-          },
-          "parameters": [
-            {
-              "name": "detail",
-              "type": {
-                "text": "ConfirmDeleteDetail"
-              }
-            }
-          ]
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "newFullElementPathEvent",
-          "declaration": {
-            "name": "newFullElementPathEvent",
-            "module": "src/foundation/events.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "newAddElementEvent",
-          "declaration": {
-            "name": "newAddElementEvent",
-            "module": "src/foundation/events.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "newEditElementEvent",
-          "declaration": {
-            "name": "newEditElementEvent",
-            "module": "src/foundation/events.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "newIedCreatedEvent",
-          "declaration": {
-            "name": "newIedCreatedEvent",
-            "module": "src/foundation/events.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "newConfirmDeleteEvent",
-          "declaration": {
-            "name": "newConfirmDeleteEvent",
-            "module": "src/foundation/events.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/foundation/nsd.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "nsd72",
-          "declaration": {
-            "name": "nsd72",
-            "module": "src/foundation/nsd.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "nsd73",
-          "declaration": {
-            "name": "nsd73",
-            "module": "src/foundation/nsd.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "nsd74",
-          "declaration": {
-            "name": "nsd74",
-            "module": "src/foundation/nsd.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "nsd7420",
-          "declaration": {
-            "name": "nsd7420",
-            "module": "src/foundation/nsd.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "nsd81",
-          "declaration": {
-            "name": "nsd81",
-            "module": "src/foundation/nsd.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/foundation/nsdoc.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "initializeNsdoc",
-          "return": {
-            "type": {
-              "text": ""
-            }
-          },
-          "description": "Initialize the full Nsdoc object."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "initializeNsdoc",
-          "declaration": {
-            "name": "initializeNsdoc",
-            "module": "src/foundation/nsdoc.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/foundation/types.ts",
-      "declarations": [],
-      "exports": []
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/foundation/virtual-ied.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "findLogicalNodeElement",
-          "return": {
-            "type": {
-              "text": ""
-            }
-          },
-          "parameters": [
-            {
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              },
-              "description": "The list of elements to search in for an LN or LN0 element."
-            }
-          ],
-          "description": "Search for the LN0 or LN element in the list of ancestors passed."
-        },
-        {
-          "kind": "function",
-          "name": "createIEDStructure",
-          "return": {
-            "type": {
-              "text": ""
-            }
-          },
-          "parameters": [
-            {
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "description": "The XML document to create the IED in."
-            },
-            {
-              "name": "iedName",
-              "type": {
-                "text": "string"
-              },
-              "description": "The name for the new IED."
-            },
-            {
-              "name": "lnTypeId",
-              "type": {
-                "text": "string"
-              },
-              "description": "The LNodeType ID to use for the LN0."
-            },
-            {
-              "name": "manufacturer",
-              "default": "'OpenSCD'",
-              "type": {
-                "text": "string"
-              },
-              "description": "Optional manufacturer name, defaults to 'OpenSCD'."
-            }
-          ],
-          "description": "Create a basic IED structure with the specified name."
-        },
-        {
-          "kind": "function",
-          "name": "createVirtualIED",
-          "return": {
-            "type": {
-              "text": "Insert[]"
-            }
-          },
-          "parameters": [
-            {
-              "name": "iedName",
-              "type": {
-                "text": "string"
-              }
-            },
-            {
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              }
-            }
-          ]
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "findLogicalNodeElement",
-          "declaration": {
-            "name": "findLogicalNodeElement",
-            "module": "src/foundation/virtual-ied.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "createIEDStructure",
-          "declaration": {
-            "name": "createIEDStructure",
-            "module": "src/foundation/virtual-ied.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "createVirtualIED",
-          "declaration": {
-            "name": "createVirtualIED",
-            "module": "src/foundation/virtual-ied.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/components/base-container.ts",
       "declarations": [
         {
@@ -1823,6 +1406,491 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/foundation/dai.spec.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/foundation/dai.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "getTemplatePath",
+          "return": {
+            "type": {
+              "text": "Element[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "templateElement",
+              "type": {
+                "text": "Element"
+              }
+            },
+            {
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "determineUninitializedStructure",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "parentElement",
+              "type": {
+                "text": "Element"
+              },
+              "description": "The instance element to search from for DOI/SDI"
+            },
+            {
+              "name": "templateStructure",
+              "type": {
+                "text": "Element[]"
+              },
+              "description": "The templates structure with DO/DA/BDA Elements."
+            }
+          ],
+          "description": "Determine which part of the template structure still needs to be initialized."
+        },
+        {
+          "kind": "function",
+          "name": "initializeElements",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "uninitializedTemplateStructure",
+              "type": {
+                "text": "Element[]"
+              },
+              "description": "Template elements to initialize."
+            }
+          ],
+          "description": "Create a new instance structure defined by the array of template elements passed."
+        },
+        {
+          "kind": "function",
+          "name": "planDaiCreation",
+          "return": {
+            "type": {
+              "text": "DaiCreationPlan"
+            }
+          },
+          "parameters": [
+            {
+              "name": "lnElement",
+              "type": {
+                "text": "Element"
+              }
+            },
+            {
+              "name": "templatePath",
+              "type": {
+                "text": "Element[]"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "getTemplatePath",
+          "declaration": {
+            "name": "getTemplatePath",
+            "module": "src/foundation/dai.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "determineUninitializedStructure",
+          "declaration": {
+            "name": "determineUninitializedStructure",
+            "module": "src/foundation/dai.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "initializeElements",
+          "declaration": {
+            "name": "initializeElements",
+            "module": "src/foundation/dai.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "planDaiCreation",
+          "declaration": {
+            "name": "planDaiCreation",
+            "module": "src/foundation/dai.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/foundation/events.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "newFullElementPathEvent",
+          "return": {
+            "type": {
+              "text": "FullElementPathEvent"
+            }
+          },
+          "parameters": [
+            {
+              "name": "elementNames",
+              "type": {
+                "text": "string[]"
+              }
+            },
+            {
+              "name": "eventInitDict",
+              "optional": true,
+              "type": {
+                "text": "CustomEventInit<FullElementPathDetail>"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "newAddElementEvent",
+          "return": {
+            "type": {
+              "text": "CreateElementEvent"
+            }
+          },
+          "parameters": [
+            {
+              "name": "detail",
+              "type": {
+                "text": "CreateWizard"
+              }
+            },
+            {
+              "name": "eventInitDict",
+              "optional": true,
+              "type": {
+                "text": "CustomEventInit<CreateWizard>"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "newEditElementEvent",
+          "return": {
+            "type": {
+              "text": "EditElementEvent"
+            }
+          },
+          "parameters": [
+            {
+              "name": "detail",
+              "type": {
+                "text": "EditWizard"
+              }
+            },
+            {
+              "name": "eventInitDict",
+              "optional": true,
+              "type": {
+                "text": "CustomEventInit<EditWizard>"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "newIedCreatedEvent",
+          "return": {
+            "type": {
+              "text": "IedCreatedEvent"
+            }
+          },
+          "parameters": [
+            {
+              "name": "detail",
+              "type": {
+                "text": "IedCreatedDetail"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "newConfirmDeleteEvent",
+          "return": {
+            "type": {
+              "text": "ConfirmDeleteEvent"
+            }
+          },
+          "parameters": [
+            {
+              "name": "detail",
+              "type": {
+                "text": "ConfirmDeleteDetail"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "newFullElementPathEvent",
+          "declaration": {
+            "name": "newFullElementPathEvent",
+            "module": "src/foundation/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "newAddElementEvent",
+          "declaration": {
+            "name": "newAddElementEvent",
+            "module": "src/foundation/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "newEditElementEvent",
+          "declaration": {
+            "name": "newEditElementEvent",
+            "module": "src/foundation/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "newIedCreatedEvent",
+          "declaration": {
+            "name": "newIedCreatedEvent",
+            "module": "src/foundation/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "newConfirmDeleteEvent",
+          "declaration": {
+            "name": "newConfirmDeleteEvent",
+            "module": "src/foundation/events.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/foundation/nsd.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "nsd72",
+          "declaration": {
+            "name": "nsd72",
+            "module": "src/foundation/nsd.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "nsd73",
+          "declaration": {
+            "name": "nsd73",
+            "module": "src/foundation/nsd.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "nsd74",
+          "declaration": {
+            "name": "nsd74",
+            "module": "src/foundation/nsd.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "nsd7420",
+          "declaration": {
+            "name": "nsd7420",
+            "module": "src/foundation/nsd.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "nsd81",
+          "declaration": {
+            "name": "nsd81",
+            "module": "src/foundation/nsd.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/foundation/nsdoc.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "initializeNsdoc",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "description": "Initialize the full Nsdoc object."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "initializeNsdoc",
+          "declaration": {
+            "name": "initializeNsdoc",
+            "module": "src/foundation/nsdoc.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/foundation/types.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/foundation/virtual-ied.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "findLogicalNodeElement",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "description": "The list of elements to search in for an LN or LN0 element."
+            }
+          ],
+          "description": "Search for the LN0 or LN element in the list of ancestors passed."
+        },
+        {
+          "kind": "function",
+          "name": "createIEDStructure",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "description": "The XML document to create the IED in."
+            },
+            {
+              "name": "iedName",
+              "type": {
+                "text": "string"
+              },
+              "description": "The name for the new IED."
+            },
+            {
+              "name": "lnTypeId",
+              "type": {
+                "text": "string"
+              },
+              "description": "The LNodeType ID to use for the LN0."
+            },
+            {
+              "name": "manufacturer",
+              "default": "'OpenSCD'",
+              "type": {
+                "text": "string"
+              },
+              "description": "Optional manufacturer name, defaults to 'OpenSCD'."
+            }
+          ],
+          "description": "Create a basic IED structure with the specified name."
+        },
+        {
+          "kind": "function",
+          "name": "createVirtualIED",
+          "return": {
+            "type": {
+              "text": "Insert[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "iedName",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "findLogicalNodeElement",
+          "declaration": {
+            "name": "findLogicalNodeElement",
+            "module": "src/foundation/virtual-ied.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "createIEDStructure",
+          "declaration": {
+            "name": "createIEDStructure",
+            "module": "src/foundation/virtual-ied.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "createVirtualIED",
+          "declaration": {
+            "name": "createVirtualIED",
+            "module": "src/foundation/virtual-ied.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/test-utils/actions.ts",
       "declarations": [
         {
@@ -2017,7 +2085,7 @@
             {
               "name": "doc",
               "type": {
-                "text": "XMLDocument"
+                "text": "XMLDocument | Element"
               }
             },
             {
@@ -2040,11 +2108,29 @@
             {
               "name": "doc",
               "type": {
-                "text": "XMLDocument"
+                "text": "XMLDocument | Element"
               }
             },
             {
               "name": "selector",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "findIconButtonByIconName",
+          "parameters": [
+            {
+              "name": "container",
+              "type": {
+                "text": "Element"
+              }
+            },
+            {
+              "name": "iconName",
               "type": {
                 "text": "string"
               }
@@ -2084,6 +2170,14 @@
             "name": "getFirstAndAssertBySelector",
             "module": "src/test-utils/queries.ts"
           }
+        },
+        {
+          "kind": "js",
+          "name": "findIconButtonByIconName",
+          "declaration": {
+            "name": "findIconButtonByIconName",
+            "module": "src/test-utils/queries.ts"
+          }
         }
       ]
     },
@@ -2097,7 +2191,7 @@
           "type": {
             "text": "object"
           },
-          "default": "{ empty: `<?xml version=\"1.0\" encoding=\"UTF-8\"?><SCL xmlns=\"http://www.iec.ch/61850/2003/SCL\" version=\"2007\" revision=\"B\"> <Header id=\"development sample\"/> <Substation name=\"S1\"> <VoltageLevel name=\"V1\" > <Bay name=\"B2\" /> <Bay name=\"B1\" /> </VoltageLevel> </Substation> </SCL>`, withIED: `<?xml version=\"1.0\" encoding=\"UTF-8\"?><SCL xmlns=\"http://www.iec.ch/61850/2003/SCL\" version=\"2007\" revision=\"B\"> <Header id=\"development sample\"/> <Substation name=\"S1\"> <VoltageLevel name=\"V1\" > <Bay name=\"B2\" /> <Bay name=\"B1\" /> </VoltageLevel> </Substation> <IED name=\"IED1\" manufacturer=\"OpenSCD\"> <AccessPoint name=\"AP1\"> <Server> <Authentication/> <LDevice inst=\"LD1\"> <LN0 lnClass=\"LLN0\" inst=\"\" lnType=\"PlaceholderLLN0\"> <SettingControl numOfSGs=\"2\"/> <DOI name=\"Beh\"> <DAI name=\"stVal\"> <Val>on</Val> </DAI> <DAI name=\"t\"> <Val>2026-12-24T12:14:16.000</Val> </DAI> </DOI> </LN0> </LDevice> <LDevice inst=\"LD2\"> <LN0 lnClass=\"LLN0\" lnType=\"PlaceholderLLN0\" /> </LDevice> </Server> </AccessPoint> </IED> <IED name=\"IED2\" manufacturer=\"OpenSCD\"> <AccessPoint name=\"AP2\"> <Server> <Authentication/> <LDevice inst=\"LD2\"> <LN0 lnClass=\"LLN0\" inst=\"\" lnType=\"PlaceholderLLN0\"/> </LDevice> </Server> </AccessPoint> </IED> <DataTypeTemplates> <LNodeType lnClass=\"LLN0\" id=\"PlaceholderLLN0\"> <DO name=\"Beh\" type=\"Beh_Test\"/> </LNodeType> <DOType cdc=\"ENS\" id=\"Beh_Test\"> <DA name=\"stVal\" fc=\"ST\" dchg=\"true\" dupd=\"true\" bType=\"Enum\" type=\"stVal$oscd$_48ba16345b8e7f5b\"> <Val>blocked</Val> </DA> <DA name=\"q\" fc=\"ST\" qchg=\"true\" bType=\"Quality\"/> <DA name=\"t\" fc=\"ST\" bType=\"Timestamp\"/> </DOType> <EnumType id=\"stVal$oscd$_48ba16345b8e7f5b\"> <EnumVal ord=\"1\">on</EnumVal> <EnumVal ord=\"2\">blocked</EnumVal> <EnumVal ord=\"3\">test</EnumVal> <EnumVal ord=\"4\">test/blocked</EnumVal> <EnumVal ord=\"5\">off</EnumVal> </EnumType> </DataTypeTemplates> </SCL>`, withIED_instanciated: `<?xml version=\"1.0\" encoding=\"UTF-8\"?> <SCL xmlns=\"http://www.iec.ch/61850/2003/SCL\" version=\"2007\" revision=\"B\" release=\"5\"> <Header id=\"development sample\"/> <Substation name=\"S1\"> <VoltageLevel name=\"V1\" > <Bay name=\"B2\" /> <Bay name=\"B1\" /> </VoltageLevel> </Substation> <IED name=\"IED1\" manufacturer=\"OpenSCD\"> <AccessPoint name=\"AP1\"> <Server> <Authentication/> <LDevice inst=\"LD1\"> <LN0 lnClass=\"LLN0\" inst=\"\" lnType=\"LLN0_Test\"> <SettingControl numOfSGs=\"5\"/> </LN0> <LN lnClass=\"TCTR\" inst=\"1\" lnType=\"TCTR_Test\"> <DOI name=\"Beh\"> <DAI name=\"stVal\"> <Val>blocked</Val> </DAI> </DOI> <DOI name=\"ARtg\"> <DAI name=\"setVal\"> <Val sGroup=\"1\">10</Val> <Val sGroup=\"2\">12</Val> <Val sGroup=\"3\">12</Val> <Val sGroup=\"4\">12</Val> <Val sGroup=\"5\">12</Val> </DAI> <DAI name=\"setMag\"> <Val sGroup=\"1\">100</Val> <Val sGroup=\"5\">120</Val> </DAI> </DOI> </LN> </LDevice> <LDevice inst=\"LD2\"> <LN0 lnClass=\"LLN0\" inst=\"\" lnType=\"LLN0_Test\"/> <LN lnClass=\"TCTR\" inst=\"2\" lnType=\"TCTR_Test\"/> </LDevice> </Server> </AccessPoint> </IED> <DataTypeTemplates> <LNodeType lnClass=\"LLN0\" id=\"LLN0_Test\"> <DO name=\"Beh\" type=\"Beh_Test\"/> </LNodeType> <LNodeType lnClass=\"TCTR\" id=\"TCTR_Test\"> <DO name=\"Beh\" type=\"Beh_Test\"/> <DO name=\"HzRtg\" type=\"HzRtg_Test\"/> <DO name=\"ARtg\" type=\"ARtg_Test\"/> </LNodeType> <DOType cdc=\"ENS\" id=\"Beh_Test\"> <DA name=\"stVal\" fc=\"ST\" dchg=\"true\" dupd=\"true\" bType=\"Enum\" type=\"stVal_enums\"/> <DA name=\"q\" fc=\"ST\" qchg=\"true\" bType=\"Quality\"/> <DA name=\"t\" fc=\"ST\" bType=\"Timestamp\"/> </DOType> <DOType cdc=\"ASG\" id=\"ARtg_Test\"> <DA name=\"setVal\" desc=\"fc=SG\" fc=\"SG\" bType=\"INT32\"/> <DA name=\"setMag\" desc=\"fc=SE\" fc=\"SE\" bType=\"INT32\"> <Val>555</Val> </DA> </DOType> <DOType cdc=\"ASG\" id=\"HzRtg_Test\"> <DA name=\"setMag\" fc=\"SE\" bType=\"Struct\" type=\"AnalogueValueCtl\"/> <DA name=\"units\" fc=\"CF\" bType=\"Struct\" type=\"Unit\"/> <DA name=\"sVC\" fc=\"CF\" bType=\"Struct\" type=\"ScaledValueConfig\"/> <DA name=\"minVal\" fc=\"CF\" bType=\"Struct\" type=\"AnalogueValue\"/> <DA name=\"maxVal\" fc=\"CF\" bType=\"Struct\" type=\"AnalogueValue\"/> <DA name=\"stepSize\" fc=\"CF\" bType=\"Struct\" type=\"AnalogueValue\"/> </DOType> <DAType id=\"AnalogueValueCtl\"> <BDA name=\"i\" bType=\"INT32\"/> </DAType> <DAType id=\"AnalogueValue\"> <BDA name=\"i\" bType=\"INT32\"/> </DAType> <DAType id=\"ScaledValueConfig\"> <BDA name=\"scaleFactor\" bType=\"FLOAT32\" valKind=\"RO\"> <Val>0.001</Val> </BDA> <BDA name=\"offset\" bType=\"FLOAT32\" valKind=\"RO\"> <Val>0.0</Val> </BDA> </DAType> <DAType id=\"Unit\"> <BDA name=\"SIUnit\" bType=\"Enum\" type=\"SIUnitKind\"/> <BDA name=\"multiplier\" bType=\"Enum\" type=\"MultiplierKind\"/> </DAType> <EnumType id=\"SIUnitKind\"> <EnumVal ord=\"1\">Hz</EnumVal> </EnumType> <EnumType id=\"MultiplierKind\"> <EnumVal ord=\"0\">none</EnumVal> </EnumType> <EnumType id=\"stVal_enums\"> <EnumVal ord=\"1\">on</EnumVal> <EnumVal ord=\"2\">blocked</EnumVal> <EnumVal ord=\"3\">test</EnumVal> <EnumVal ord=\"4\">test/blocked</EnumVal> <EnumVal ord=\"5\">off</EnumVal> </EnumType> </DataTypeTemplates> </SCL> `, }"
+          "default": "{ empty: `<?xml version=\"1.0\" encoding=\"UTF-8\"?><SCL xmlns=\"http://www.iec.ch/61850/2003/SCL\" version=\"2007\" revision=\"B\"> <Header id=\"development sample\"/> <Substation name=\"S1\"> <VoltageLevel name=\"V1\" > <Bay name=\"B2\" /> <Bay name=\"B1\" /> </VoltageLevel> </Substation> </SCL>`, withIED: `<?xml version=\"1.0\" encoding=\"UTF-8\"?><SCL xmlns=\"http://www.iec.ch/61850/2003/SCL\" version=\"2007\" revision=\"B\"> <Header id=\"development sample\"/> <Substation name=\"S1\"> <VoltageLevel name=\"V1\" > <Bay name=\"B2\" /> <Bay name=\"B1\" /> </VoltageLevel> </Substation> <IED name=\"IED1\" manufacturer=\"OpenSCD\"> <AccessPoint name=\"AP1\"> <Server> <Authentication/> <LDevice inst=\"LD1\"> <LN0 lnClass=\"LLN0\" inst=\"\" lnType=\"PlaceholderLLN0\"> <SettingControl numOfSGs=\"2\"/> <DOI name=\"Beh\"> <DAI name=\"stVal\"> <Val>on</Val> </DAI> <DAI name=\"t\"> <Val>2026-12-24T12:14:16.000</Val> </DAI> </DOI> </LN0> </LDevice> <LDevice inst=\"LD2\"> <LN0 lnClass=\"LLN0\" lnType=\"PlaceholderLLN0\" /> </LDevice> </Server> </AccessPoint> </IED> <IED name=\"IED2\" manufacturer=\"OpenSCD\"> <AccessPoint name=\"AP2\"> <Server> <Authentication/> <LDevice inst=\"LD2\"> <LN0 lnClass=\"LLN0\" inst=\"\" lnType=\"PlaceholderLLN0\"/> </LDevice> </Server> </AccessPoint> </IED> <DataTypeTemplates> <LNodeType lnClass=\"LLN0\" id=\"PlaceholderLLN0\"> <DO name=\"Beh\" type=\"Beh_Test\"/> </LNodeType> <DOType cdc=\"ENS\" id=\"Beh_Test\"> <DA name=\"stVal\" fc=\"ST\" dchg=\"true\" dupd=\"true\" bType=\"Enum\" type=\"stVal$oscd$_48ba16345b8e7f5b\"> <Val>blocked</Val> </DA> <DA name=\"q\" fc=\"ST\" qchg=\"true\" bType=\"Quality\"/> <DA name=\"t\" fc=\"ST\" bType=\"Timestamp\"/> </DOType> <EnumType id=\"stVal$oscd$_48ba16345b8e7f5b\"> <EnumVal ord=\"1\">on</EnumVal> <EnumVal ord=\"2\">blocked</EnumVal> <EnumVal ord=\"3\">test</EnumVal> <EnumVal ord=\"4\">test/blocked</EnumVal> <EnumVal ord=\"5\">off</EnumVal> </EnumType> </DataTypeTemplates> </SCL>`, withIED_instanciated: `<?xml version=\"1.0\" encoding=\"UTF-8\"?> <SCL xmlns=\"http://www.iec.ch/61850/2003/SCL\" version=\"2007\" revision=\"B\" release=\"5\"> <Header id=\"development sample\"/> <Substation name=\"S1\"> <VoltageLevel name=\"V1\"> <Bay name=\"B2\"/> <Bay name=\"B1\"/> </VoltageLevel> </Substation> <IED name=\"IED1\" manufacturer=\"OpenSCD\"> <AccessPoint name=\"AP1\"> <Server> <Authentication/> <LDevice inst=\"LD1\"> <LN0 lnClass=\"LLN0\" inst=\"\" lnType=\"LLN0_Test\"> <SettingControl numOfSGs=\"5\"/> </LN0> <LN lnClass=\"TCTR\" inst=\"1\" lnType=\"TCTR_Test\"> <DOI name=\"Beh\"> <DAI name=\"stVal\"> <Val>blocked</Val> </DAI> </DOI> <DOI name=\"ARtg\"> <DAI name=\"setVal\"> <Val sGroup=\"1\">10</Val> <Val sGroup=\"2\">12</Val> <Val sGroup=\"3\">13</Val> <Val sGroup=\"4\">14</Val> <Val sGroup=\"5\">15</Val> </DAI> <DAI name=\"setMag\"> <Val sGroup=\"1\">100</Val> <Val sGroup=\"5\">120</Val> </DAI> </DOI> </LN> </LDevice> <LDevice inst=\"LD2\"> <LN0 lnClass=\"LLN0\" inst=\"\" lnType=\"LLN0_Test\"> <SettingControl numOfSGs=\"7\"/> </LN0> <LN lnClass=\"TCTR\" inst=\"2\" lnType=\"TCTR_Test\"/> </LDevice> <LDevice inst=\"LD3\"> <LN0 lnClass=\"LLN0\" inst=\"\" lnType=\"LLN0_Test\"/> <!-- Case 1: LN has nothing --> <LN lnClass=\"TCTR\" inst=\"1\" lnType=\"TCTR_Test\"/> <!-- Case 2: DOI exists, empty --> <LN lnClass=\"TCTR\" inst=\"2\" lnType=\"TCTR_Test\"> <DOI name=\"HzRtg\"/> </LN> <!-- Case 3: DOI exists, unrelated DAI --> <LN lnClass=\"TCTR\" inst=\"3\" lnType=\"TCTR_Test\"> <DOI name=\"HzRtg\"> <DAI name=\"units\"/> </DOI> </LN> <!-- Case 4: DOI exists, SDI exists, but missing target DAI --> <LN lnClass=\"TCTR\" inst=\"4\" lnType=\"TCTR_Test\"> <DOI name=\"HzRtg\"> <SDI name=\"setMag\"/> </DOI> </LN> <!-- Case 5: SDI exists, DAI exists, but no Val --> <LN lnClass=\"TCTR\" inst=\"5\" lnType=\"TCTR_Test\"> <DOI name=\"HzRtg\"> <SDI name=\"setMag\"> <DAI name=\"i\"/> </SDI> </DOI> </LN> <!-- Case 6: Everything exists, must not touch --> <LN lnClass=\"TCTR\" inst=\"6\" lnType=\"TCTR_Test\"> <DOI name=\"HzRtg\"> <SDI name=\"setMag\"> <DAI name=\"i\"> <Val>50</Val> </DAI> </SDI> </DOI> </LN> <!-- Case 7: Simple DA, DOI exists but wrong DAI --> <LN lnClass=\"TCTR\" inst=\"7\" lnType=\"TCTR_Test\"> <DOI name=\"ARtg\"> <DAI name=\"setVal\"/> </DOI> </LN> </LDevice> </Server> </AccessPoint> </IED> <DataTypeTemplates> <LNodeType lnClass=\"LLN0\" id=\"LLN0_Test\"> <DO name=\"Beh\" type=\"Beh_Test\"/> </LNodeType> <LNodeType lnClass=\"TCTR\" id=\"TCTR_Test\"> <DO name=\"Beh\" type=\"Beh_Test\"/> <DO name=\"HzRtg\" type=\"HzRtg_Test\"/> <DO name=\"ARtg\" type=\"ARtg_Test\"/> </LNodeType> <DOType cdc=\"ENS\" id=\"Beh_Test\"> <DA name=\"stVal\" fc=\"ST\" dchg=\"true\" dupd=\"true\" bType=\"Enum\" type=\"stVal_enums\"/> <DA name=\"q\" fc=\"ST\" qchg=\"true\" bType=\"Quality\"/> <DA name=\"t\" fc=\"ST\" bType=\"Timestamp\"/> </DOType> <DOType cdc=\"ASG\" id=\"ARtg_Test\"> <DA name=\"setVal\" desc=\"fc=SG\" fc=\"SG\" bType=\"INT32\"/> <DA name=\"setMag\" desc=\"fc=SE\" fc=\"SE\" bType=\"INT32\"> <Val>555</Val> </DA> </DOType> <DOType cdc=\"ASG\" id=\"HzRtg_Test\"> <DA name=\"setMag\" fc=\"SE\" bType=\"Struct\" type=\"AnalogueValueCtl\"/> <DA name=\"units\" fc=\"CF\" bType=\"Struct\" type=\"Unit\"/> <DA name=\"sVC\" fc=\"CF\" bType=\"Struct\" type=\"ScaledValueConfig\"/> <DA name=\"minVal\" fc=\"CF\" bType=\"Struct\" type=\"AnalogueValue\"/> <DA name=\"maxVal\" fc=\"CF\" bType=\"Struct\" type=\"AnalogueValue\"/> <DA name=\"stepSize\" fc=\"CF\" bType=\"Struct\" type=\"AnalogueValue\"/> </DOType> <DAType id=\"AnalogueValueCtl\"> <BDA name=\"i\" bType=\"INT32\"/> </DAType> <DAType id=\"AnalogueValue\"> <BDA name=\"i\" bType=\"INT32\"/> </DAType> <DAType id=\"ScaledValueConfig\"> <BDA name=\"scaleFactor\" bType=\"FLOAT32\" valKind=\"RO\"> <Val>0.001</Val> </BDA> <BDA name=\"offset\" bType=\"FLOAT32\" valKind=\"RO\"> <Val>0.0</Val> </BDA> </DAType> <DAType id=\"Unit\"> <BDA name=\"SIUnit\" bType=\"Enum\" type=\"SIUnitKind\"/> <BDA name=\"multiplier\" bType=\"Enum\" type=\"MultiplierKind\"/> </DAType> <EnumType id=\"SIUnitKind\"> <EnumVal ord=\"1\">Hz</EnumVal> </EnumType> <EnumType id=\"MultiplierKind\"> <EnumVal ord=\"0\">none</EnumVal> </EnumType> <EnumType id=\"stVal_enums\"> <EnumVal ord=\"1\">on</EnumVal> <EnumVal ord=\"2\">blocked</EnumVal> <EnumVal ord=\"3\">test</EnumVal> <EnumVal ord=\"4\">test/blocked</EnumVal> <EnumVal ord=\"5\">off</EnumVal> </EnumType> </DataTypeTemplates> </SCL> `, }"
         },
         {
           "kind": "function",
@@ -2140,6 +2234,22 @@
       "kind": "javascript-module",
       "path": "src/test-utils/test-harness.ts",
       "declarations": [
+        {
+          "kind": "variable",
+          "name": "nsdocStub",
+          "type": {
+            "text": "Nsdoc"
+          },
+          "default": "{ getDataDescription: (element: Element) => ({ label: `${element.tagName}-label`, }), }"
+        },
+        {
+          "kind": "variable",
+          "name": "enumValues",
+          "type": {
+            "text": "array"
+          },
+          "default": "['on', 'blocked', 'test', 'test/blocked', 'off']"
+        },
         {
           "kind": "function",
           "name": "getAncestors",
@@ -2374,6 +2484,22 @@
         }
       ],
       "exports": [
+        {
+          "kind": "js",
+          "name": "nsdocStub",
+          "declaration": {
+            "name": "nsdocStub",
+            "module": "src/test-utils/test-harness.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "enumValues",
+          "declaration": {
+            "name": "enumValues",
+            "module": "src/test-utils/test-harness.ts"
+          }
+        },
         {
           "kind": "js",
           "name": "getAncestors",
@@ -3388,6 +3514,13 @@
             },
             {
               "kind": "field",
+              "name": "_templateElement",
+              "type": {
+                "text": "Element"
+              }
+            },
+            {
+              "kind": "field",
               "name": "templateElement",
               "type": {
                 "text": "Element"
@@ -3428,6 +3561,14 @@
             },
             {
               "kind": "field",
+              "name": "valueFields",
+              "type": {
+                "text": "Array<DaiValueField | DaiTimestampField>"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
               "name": "dialogTitle",
               "type": {
                 "text": "string"
@@ -3439,10 +3580,10 @@
               "kind": "field",
               "name": "bType",
               "type": {
-                "text": "string"
+                "text": "string | null"
               },
               "privacy": "private",
-              "default": "''"
+              "default": "null"
             },
             {
               "kind": "field",
@@ -3458,33 +3599,6 @@
               "name": "multipleSettings",
               "type": {
                 "text": "number | null"
-              },
-              "privacy": "private",
-              "default": "null"
-            },
-            {
-              "kind": "field",
-              "name": "targetDai",
-              "type": {
-                "text": "Element | null"
-              },
-              "privacy": "private",
-              "default": "null"
-            },
-            {
-              "kind": "field",
-              "name": "insertElement",
-              "type": {
-                "text": "Element | null"
-              },
-              "privacy": "private",
-              "default": "null"
-            },
-            {
-              "kind": "field",
-              "name": "lnElement",
-              "type": {
-                "text": "Element | null"
               },
               "privacy": "private",
               "default": "null"
@@ -3507,16 +3621,6 @@
             },
             {
               "kind": "method",
-              "name": "close",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
               "name": "confirm",
               "privacy": "private",
               "return": {
@@ -3527,11 +3631,11 @@
             },
             {
               "kind": "method",
-              "name": "getTemplateStructure",
+              "name": "close",
               "privacy": "private",
               "return": {
                 "type": {
-                  "text": "Element[]"
+                  "text": "void"
                 }
               }
             },
@@ -3608,59 +3712,8 @@
             },
             {
               "kind": "method",
-              "name": "getInstanceValue",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "string | null"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "index",
-                  "type": {
-                    "text": "number"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "getCurrentValue",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "string"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "index",
-                  "type": {
-                    "text": "number"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "getResolvedValues",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "string[]"
-                }
-              }
-            },
-            {
-              "kind": "method",
               "name": "renderValueField",
               "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult"
-                }
-              },
               "parameters": [
                 {
                   "name": "index",
@@ -4874,262 +4927,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/ldevice/ldevice-container.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "[[`IED`]] plugin subeditor for editing `LDevice` element.",
-          "name": "LDeviceContainer",
-          "members": [
-            {
-              "kind": "field",
-              "name": "scopedElements",
-              "type": {
-                "text": "object"
-              },
-              "static": true,
-              "default": "{ 'oscd-action-pane': OscdActionPane, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'ln-container': LNContainer, 'oscd-scl-dialogs': OscdSclDialogs, }"
-            },
-            {
-              "kind": "field",
-              "name": "selectedLNClasses",
-              "type": {
-                "text": "string[]"
-              },
-              "default": "[]",
-              "attribute": "selectedLNClasses"
-            },
-            {
-              "kind": "field",
-              "name": "expanded",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "expanded"
-            },
-            {
-              "kind": "field",
-              "name": "oscdSclDialogs",
-              "type": {
-                "text": "OscdSclDialogs"
-              },
-              "privacy": "private"
-            },
-            {
-              "kind": "method",
-              "name": "handleAddLN",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "Promise<void>"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "handleEditLDevice",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "removeLDevice",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "toggleExpanded",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "header",
-              "privacy": "private"
-            },
-            {
-              "kind": "method",
-              "name": "getLnElements",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "Element[]"
-                }
-              }
-            },
-            {
-              "kind": "field",
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "attribute": "doc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "docVersion",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1",
-              "attribute": "docVersion",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "element",
-              "type": {
-                "text": "Element"
-              },
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "nsdoc",
-              "type": {
-                "text": "Nsdoc"
-              },
-              "attribute": "nsdoc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              },
-              "default": "[]",
-              "attribute": "ancestors",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "selectedLNClasses",
-              "type": {
-                "text": "string[]"
-              },
-              "default": "[]",
-              "fieldName": "selectedLNClasses"
-            },
-            {
-              "name": "expanded",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "expanded"
-            },
-            {
-              "name": "doc",
-              "type": {
-                "text": "XMLDocument"
-              },
-              "fieldName": "doc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "name": "docVersion",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1",
-              "fieldName": "docVersion",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "name": "nsdoc",
-              "type": {
-                "text": "Nsdoc"
-              },
-              "fieldName": "nsdoc",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            },
-            {
-              "name": "ancestors",
-              "type": {
-                "text": "Element[]"
-              },
-              "default": "[]",
-              "fieldName": "ancestors",
-              "inheritedFrom": {
-                "name": "BaseContainer",
-                "module": "src/components/base-container.ts"
-              }
-            }
-          ],
-          "mixins": [
-            {
-              "name": "ScopedElementsMixin",
-              "package": "@open-wc/scoped-elements/lit-element.js"
-            }
-          ],
-          "superclass": {
-            "name": "BaseContainer",
-            "module": "/src/components/base-container.js"
-          }
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "LDeviceContainer",
-          "declaration": {
-            "name": "LDeviceContainer",
-            "module": "src/components/ldevice/ldevice-container.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/components/lnode/ln-container.spec.ts",
       "declarations": [],
       "exports": [
@@ -5380,6 +5177,262 @@
           "declaration": {
             "name": "LNContainer",
             "module": "src/components/lnode/ln-container.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/ldevice/ldevice-container.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "[[`IED`]] plugin subeditor for editing `LDevice` element.",
+          "name": "LDeviceContainer",
+          "members": [
+            {
+              "kind": "field",
+              "name": "scopedElements",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ 'oscd-action-pane': OscdActionPane, 'oscd-icon-button': OscdIconButton, 'oscd-scl-icon': OscdSclIcon, 'oscd-icon': OscdIcon, 'ln-container': LNContainer, 'oscd-scl-dialogs': OscdSclDialogs, }"
+            },
+            {
+              "kind": "field",
+              "name": "selectedLNClasses",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "attribute": "selectedLNClasses"
+            },
+            {
+              "kind": "field",
+              "name": "expanded",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "expanded"
+            },
+            {
+              "kind": "field",
+              "name": "oscdSclDialogs",
+              "type": {
+                "text": "OscdSclDialogs"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "handleAddLN",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "handleEditLDevice",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "removeLDevice",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggleExpanded",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "header",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "getLnElements",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Element[]"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "attribute": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "docVersion",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "attribute": "docVersion",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "element",
+              "type": {
+                "text": "Element"
+              },
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "attribute": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "attribute": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "selectedLNClasses",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "fieldName": "selectedLNClasses"
+            },
+            {
+              "name": "expanded",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "expanded"
+            },
+            {
+              "name": "doc",
+              "type": {
+                "text": "XMLDocument"
+              },
+              "fieldName": "doc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "docVersion",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "fieldName": "docVersion",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "nsdoc",
+              "type": {
+                "text": "Nsdoc"
+              },
+              "fieldName": "nsdoc",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            },
+            {
+              "name": "ancestors",
+              "type": {
+                "text": "Element[]"
+              },
+              "default": "[]",
+              "fieldName": "ancestors",
+              "inheritedFrom": {
+                "name": "BaseContainer",
+                "module": "src/components/base-container.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "ScopedElementsMixin",
+              "package": "@open-wc/scoped-elements/lit-element.js"
+            }
+          ],
+          "superclass": {
+            "name": "BaseContainer",
+            "module": "/src/components/base-container.js"
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LDeviceContainer",
+          "declaration": {
+            "name": "LDeviceContainer",
+            "module": "src/components/ldevice/ldevice-container.ts"
           }
         }
       ]

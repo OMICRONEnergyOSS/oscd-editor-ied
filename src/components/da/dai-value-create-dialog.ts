@@ -8,8 +8,10 @@ import { OscdOutlinedButton } from '@omicronenergy/oscd-ui/button/OscdOutlinedBu
 import { OscdFilledButton } from '@omicronenergy/oscd-ui/button/OscdFilledButton.js';
 import { OscdFilledTextField } from '@omicronenergy/oscd-ui/textfield/OscdFilledTextField.js';
 import {
-  determineUninitializedStructure,
-  initializeElements,
+  daSupportsMultipleValues,
+  getNumOfSGs,
+  getTemplatePath,
+  planDaiCreation,
 } from '../../foundation/dai.js';
 import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
 import {
@@ -20,6 +22,8 @@ import {
   DaiTimestampField,
   DaiTimestampFieldChange,
 } from './fields/dai-timestamp-field.js';
+import { EditV2 } from '@openscd/oscd-api';
+import { createElement } from '@openscd/scl-lib/dist/foundation/utils.js';
 
 export class DaiValueCreateDialog extends ScopedElementsMixin(LitElement) {
   static scopedElements = {
@@ -31,8 +35,15 @@ export class DaiValueCreateDialog extends ScopedElementsMixin(LitElement) {
     'dai-timestamp-field': DaiTimestampField,
   };
 
+  _templateElement!: Element;
   @property({ attribute: false })
-  templateElement!: Element;
+  get templateElement(): Element {
+    return this._templateElement;
+  }
+  set templateElement(value: Element) {
+    this._templateElement = value;
+    this.bType = value.getAttribute('bType');
+  }
 
   @property({ attribute: false })
   instanceElement: Element | null = null;
@@ -46,79 +57,96 @@ export class DaiValueCreateDialog extends ScopedElementsMixin(LitElement) {
   @query('oscd-dialog')
   private dialog!: OscdDialog;
 
-  private dialogTitle = '';
-
-  private bType = '';
+  private bType: string | null = null;
 
   private templateValue: string | null = null;
 
   private multipleSettings: number | null = null;
 
-  private targetDai: Element | null = null;
-
-  private insertElement: Element | null = null;
-
-  private lnElement: Element | null = null;
-
   private editedValues = new Map<number, string>();
 
+  private getMultipleSettingGroupCount(): number | null {
+    if (!daSupportsMultipleValues(this.templateElement)) {
+      return null;
+    }
+
+    return getNumOfSGs(this.ancestors);
+  }
+
   public show(): void {
-    const bType = this.templateElement?.getAttribute('bType') ?? '';
-    if (!bType) {
+    if (!this.bType || !this.templateElement) {
       return;
     }
 
+    // Reset UI-only state
     this.editedValues.clear();
-    this.bType = bType;
-    if (bType !== 'Enum') {
-      this.enumValues = [];
-    }
     this.multipleSettings = this.getMultipleSettingGroupCount();
+
+    // Read-only hint for the user
     this.templateValue =
-      this.templateElement?.querySelector('Val')?.textContent?.trim() ?? null;
-
-    if (this.instanceElement) {
-      this.targetDai = this.instanceElement;
-      this.insertElement = null;
-      this.lnElement = null;
-      this.dialogTitle = `Create DAI "${this.instanceElement.getAttribute('name') ?? ''}"`;
-    } else {
-      const lnElement =
-        this.ancestors.find(element =>
-          ['LN0', 'LN'].includes(element.tagName),
-        ) ?? null;
-      if (!lnElement) {
-        return;
-      }
-
-      const templateStructure = this.getTemplateStructure();
-      const [_, uninitializedTemplateStructure] =
-        determineUninitializedStructure(lnElement, templateStructure);
-      const insertElement = initializeElements(uninitializedTemplateStructure);
-      const targetDai =
-        insertElement.tagName === 'DAI'
-          ? insertElement
-          : insertElement.querySelector('DAI');
-      if (!targetDai) {
-        return;
-      }
-
-      this.lnElement = lnElement;
-      this.insertElement = insertElement;
-      this.targetDai = targetDai;
-      this.dialogTitle = `Create DAI "${targetDai.getAttribute('name') ?? ''}"`;
-    }
+      this.templateElement.querySelector('Val')?.textContent?.trim() ?? null;
 
     this.requestUpdate();
     this.dialog.show();
   }
 
+  private confirm(): void {
+    if (!this.templateElement) {
+      return;
+    }
+
+    const lnElement =
+      this.ancestors.find(el => el.tagName === 'LN' || el.tagName === 'LN0') ??
+      null;
+
+    if (!lnElement) {
+      return;
+    }
+
+    // Collect user intent (values to create)
+    const values = Array.from(this.editedValues.entries())
+      .filter(([_, value]) => value)
+      .map(([index, value]) => ({
+        value,
+        sGroup: this.multipleSettings ? index + 1 : undefined,
+      }));
+
+    if (values.length === 0) {
+      // Contract: create-dialog must create at least one Val
+      return;
+    }
+
+    const templatePath = getTemplatePath(this.templateElement, this.ancestors);
+
+    const plan = planDaiCreation(lnElement, templatePath);
+
+    const edits: EditV2[] = [];
+
+    if (plan.kind === 'insert-structure') {
+      edits.push({
+        parent: plan.parent,
+        node: plan.node,
+        reference: null,
+      });
+    }
+
+    for (const { value, sGroup } of values) {
+      edits.push({
+        parent: plan.dai,
+        node: this.buildValElement(value, sGroup),
+        reference: null,
+      });
+    }
+
+    this.dispatchEvent(
+      newEditEventV2(edits.map(edit => ({ ...edit, squash: true }))),
+    );
+
+    this.close();
+  }
+
   private close(): void {
     this.dialog.close();
-    this.targetDai = null;
-    this.insertElement = null;
-    this.lnElement = null;
-    this.dialogTitle = '';
     this.bType = '';
     this.templateValue = null;
     this.multipleSettings = null;
@@ -127,114 +155,13 @@ export class DaiValueCreateDialog extends ScopedElementsMixin(LitElement) {
     this.requestUpdate();
   }
 
-  private confirm(): void {
-    if (!this.targetDai) {
-      return;
-    }
-
-    const values = this.getResolvedValues();
-    Array.from(this.targetDai.querySelectorAll('Val')).forEach(val =>
-      val.remove(),
-    );
-    if (this.multipleSettings) {
-      values.forEach((value, index) => {
-        this.targetDai!.append(this.buildValElement(value, index + 1));
-      });
-    } else {
-      this.targetDai.append(this.buildValElement(values[0] ?? ''));
-    }
-
-    if (this.insertElement && this.lnElement) {
-      this.dispatchEvent(
-        newEditEventV2({
-          parent: this.lnElement,
-          node: this.insertElement,
-          reference: null,
-        }),
-      );
-      this.close();
-      return;
-    }
-
-    const edits = [
-      ...Array.from(this.targetDai.querySelectorAll('Val')).map(
-        existingVal => ({
-          node: existingVal,
-        }),
-      ),
-      ...(this.multipleSettings
-        ? values.map((value, index) => ({
-            parent: this.targetDai!,
-            node: this.buildValElement(value, index + 1),
-            reference: null,
-          }))
-        : [
-            {
-              parent: this.targetDai!,
-              node: this.buildValElement(values[0] ?? ''),
-              reference: null,
-            },
-          ]),
-    ];
-
-    this.dispatchEvent(newEditEventV2(edits));
-    this.close();
-  }
-
-  private getTemplateStructure(): Element[] {
-    const doElement = this.ancestors.find(element => element.tagName === 'DO');
-    if (!doElement) {
-      return [this.templateElement];
-    }
-
-    const dataStructure = this.ancestors.slice(
-      this.ancestors.indexOf(doElement),
-    );
-    dataStructure.push(this.templateElement);
-    return dataStructure;
-  }
-
-  private getMultipleSettingGroupCount(): number | null {
-    let daElement = this.templateElement;
-    if (this.templateElement.tagName === 'BDA') {
-      const daTypeId = this.templateElement.parentElement?.getAttribute('id');
-      const root = this.templateElement.getRootNode() as Document | Element;
-      const referencedDa = root.querySelector(
-        `DOType > DA[type="${daTypeId}"]`,
-      );
-      if (referencedDa) {
-        daElement = referencedDa;
-      }
-    }
-
-    const fc = daElement.getAttribute('fc') ?? '';
-    const iedElement = this.ancestors.find(
-      element => element.tagName === 'IED',
-    );
-    const settingControl = iedElement?.querySelector('SettingControl');
-    const numOfSGs = settingControl?.getAttribute('numOfSGs') ?? '';
-    const count = parseInt(numOfSGs);
-
-    if (
-      (fc === 'SG' || fc === 'SE') &&
-      numOfSGs !== '' &&
-      !Number.isNaN(count)
-    ) {
-      return count;
-    }
-
-    return null;
-  }
-
   private buildValElement(value: string, sGroup?: number): Element {
-    const val = this.templateElement.ownerDocument.createElementNS(
-      'http://www.iec.ch/61850/2003/SCL',
+    const val = createElement(
+      this.templateElement.ownerDocument,
       'Val',
+      sGroup ? { sGroup: `${sGroup}` } : {},
     );
     val.textContent = value ?? '';
-    if (sGroup) {
-      val.setAttribute('sGroup', `${sGroup}`);
-    }
     return val;
   }
 
@@ -252,57 +179,18 @@ export class DaiValueCreateDialog extends ScopedElementsMixin(LitElement) {
     this.editedValues.set(index, event.detail.value ?? '');
   }
 
-  private getInstanceValue(index: number): string | null {
-    if (!this.instanceElement) {
-      return null;
-    }
-
-    const values = Array.from(this.instanceElement.querySelectorAll('Val'));
-    if (!values.length) {
-      return null;
-    }
-
-    if (this.multipleSettings) {
-      const sGroup = `${index + 1}`;
-      const match = values.find(val => val.getAttribute('sGroup') === sGroup);
-      if (match) {
-        return match.textContent?.trim() ?? '';
-      }
-    }
-
-    const fallback = values[index] ?? values[0];
-    return fallback?.textContent?.trim() ?? '';
-  }
-
-  private getCurrentValue(index: number): string {
-    if (this.editedValues.has(index)) {
-      return this.editedValues.get(index) ?? '';
-    }
-
-    const instanceValue = this.getInstanceValue(index);
-    if (instanceValue !== null) {
-      return instanceValue;
-    }
-
-    return this.templateValue ?? '';
-  }
-
-  private getResolvedValues(): string[] {
-    const count = this.multipleSettings ?? 1;
-    return Array.from({ length: count }, (_, index) =>
-      this.getCurrentValue(index),
-    );
-  }
-
-  private renderValueField(index: number): TemplateResult {
-    const { bType, enumValues } = this;
+  private renderValueField(index: number) {
     const label = this.multipleSettings
       ? msg(`Val for sGroup ${index + 1}`)
       : msg('Val');
-    const value = this.getCurrentValue(index);
+    const value = this.editedValues.get(index) ?? '';
     const sGroup = this.multipleSettings ? index + 1 : null;
 
-    if (bType === 'Timestamp') {
+    if (!this.bType) {
+      return nothing;
+    }
+
+    if (this.bType === 'Timestamp') {
       const labelDate = this.multipleSettings
         ? msg(`Val (Date) for sGroup ${index + 1}`)
         : msg('Val (Date)');
@@ -323,10 +211,10 @@ export class DaiValueCreateDialog extends ScopedElementsMixin(LitElement) {
 
     return html`
       <dai-value-field
-        .bType=${bType}
+        .bType=${this.bType}
         .value=${value}
         .label=${label}
-        .enumValues=${enumValues}
+        .enumValues=${this.enumValues}
         .sGroup=${sGroup}
         @change=${this.handleValueChange}
       ></dai-value-field>
@@ -345,7 +233,9 @@ export class DaiValueCreateDialog extends ScopedElementsMixin(LitElement) {
   render(): TemplateResult {
     return html`
       <oscd-dialog @closed=${this.close}>
-        <div slot="headline">${this.dialogTitle}</div>
+        <div slot="headline">
+          ${`Create DAI "${this.templateElement?.getAttribute('name') ?? ''}"`}
+        </div>
         <div slot="content" class="dialog-content">
           ${this.renderFields()}
           ${this.templateValue

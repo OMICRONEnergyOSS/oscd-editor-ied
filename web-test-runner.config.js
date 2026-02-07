@@ -63,6 +63,7 @@ function defaultGetImageDiff({ baselineImage, image, options }) {
 }
 
 export default /** @type {import("@web/test-runner").TestRunnerConfig} */ ({
+  testsFinishTimeout: 4000,
   coverageConfig: {
     include: ['dist/**/*.js'],
     exclude: ['**/node_modules/**', '**/__wds-outside-root__/**'],

@@ -13,24 +13,79 @@
                 <Authentication/>
                 <LDevice inst="LD1">
                     <LN0 lnClass="LLN0" inst="" lnType="LLN0_Test">
-                        <SettingControl numOfSGs="2"/>
+                        <SettingControl numOfSGs="5"/>
                     </LN0>
                     <LN lnClass="TCTR" inst="1" lnType="TCTR_Test">
+                        <DOI name="Beh">
+                            <DAI name="stVal">
+                                <Val>blocked</Val>
+                            </DAI>
+                        </DOI>
                         <DOI name="ARtg">
                             <DAI name="setVal">
                                 <Val sGroup="1">10</Val>
                                 <Val sGroup="2">12</Val>
+                                <Val sGroup="3">13</Val>
+                                <Val sGroup="4">14</Val>
+                                <Val sGroup="5">15</Val>
                             </DAI>
                             <DAI name="setMag">
                                 <Val sGroup="1">100</Val>
-                                <Val sGroup="2">120</Val>
+                                <Val sGroup="5">120</Val>
                             </DAI>
                         </DOI>
                     </LN>
                 </LDevice>
                 <LDevice inst="LD2">
-                    <LN0 lnClass="LLN0" inst="" lnType="LLN0_Test"/>
+                    <LN0 lnClass="LLN0" inst="" lnType="LLN0_Test">
+                        <SettingControl numOfSGs="7"/>
+                    </LN0>
                     <LN lnClass="TCTR" inst="2" lnType="TCTR_Test"/>
+                </LDevice>
+                <LDevice inst="LD3">
+                    <LN0 lnClass="LLN0" inst="" lnType="LLN0_Test"/>
+                    <!-- Case 1: LN has nothing -->
+                    <LN lnClass="TCTR" inst="1" lnType="TCTR_Test"/>
+                    <!-- Case 2: DOI exists, empty -->
+                    <LN lnClass="TCTR" inst="2" lnType="TCTR_Test">
+                        <DOI name="HzRtg"/>
+                    </LN>
+                    <!-- Case 3: DOI exists, unrelated DAI -->
+                    <LN lnClass="TCTR" inst="3" lnType="TCTR_Test">
+                        <DOI name="HzRtg">
+                            <DAI name="units"/>
+                        </DOI>
+                    </LN>
+                    <!-- Case 4: DOI exists, SDI exists, but missing target DAI -->
+                    <LN lnClass="TCTR" inst="4" lnType="TCTR_Test">
+                        <DOI name="HzRtg">
+                            <SDI name="setMag"/>
+                        </DOI>
+                    </LN>
+                    <!-- Case 5: SDI exists, DAI exists, but no Val -->
+                    <LN lnClass="TCTR" inst="5" lnType="TCTR_Test">
+                        <DOI name="HzRtg">
+                            <SDI name="setMag">
+                                <DAI name="i"/>
+                            </SDI>
+                        </DOI>
+                    </LN>
+                    <!-- Case 6: Everything exists, must not touch -->
+                    <LN lnClass="TCTR" inst="6" lnType="TCTR_Test">
+                        <DOI name="HzRtg">
+                            <SDI name="setMag">
+                                <DAI name="i">
+                                    <Val>50</Val>
+                                </DAI>
+                            </SDI>
+                        </DOI>
+                    </LN>
+                    <!-- Case 7: Simple DA, DOI exists but wrong DAI -->
+                    <LN lnClass="TCTR" inst="7" lnType="TCTR_Test">
+                        <DOI name="ARtg">
+                            <DAI name="setMag"/>
+                        </DOI>
+                    </LN>
                 </LDevice>
             </Server>
         </AccessPoint>
@@ -50,8 +105,10 @@
             <DA name="t" fc="ST" bType="Timestamp"/>
         </DOType>
         <DOType cdc="ASG" id="ARtg_Test">
-            <DA name="setVal" fc="SG" bType="INT32"/>
-            <DA name="setMag" fc="SE" bType="INT32"/>
+            <DA name="setVal" desc="fc=SG" fc="SG" bType="INT32"/>
+            <DA name="setMag" desc="fc=SE" fc="SE" bType="INT32">
+                <Val>555</Val>
+            </DA>
         </DOType>
         <DOType cdc="ASG" id="HzRtg_Test">
             <DA name="setMag" fc="SE" bType="Struct" type="AnalogueValueCtl"/>

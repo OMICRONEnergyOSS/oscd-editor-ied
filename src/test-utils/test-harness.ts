@@ -15,6 +15,8 @@ export const nsdocStub: Nsdoc = {
   }),
 };
 
+export const enumValues = ['on', 'blocked', 'test', 'test/blocked', 'off'];
+
 function getElement(
   baseElement: Element | XMLDocument,
   selector: string,

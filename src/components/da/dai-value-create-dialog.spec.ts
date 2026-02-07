@@ -1,155 +1,169 @@
-import {
-  expect,
-  fixture as openWcFixture,
-  html,
-  waitUntil,
-} from '@open-wc/testing';
-import { OscdDialog } from '@omicronenergy/oscd-ui/dialog/OscdDialog.js';
+import { expect, fixture, html, waitUntil } from '@open-wc/testing';
 import { OscdFilledTextField } from '@omicronenergy/oscd-ui/textfield/OscdFilledTextField.js';
 import { DaiValueCreateDialog } from './dai-value-create-dialog.js';
 import { DaiValueField } from './fields/dai-value-field.js';
 import { parseDoc, testDocs } from '../../test-utils/test-files.js';
 import { getFirstAndAssertBySelector } from '../../test-utils/queries.js';
-import { getAncestors } from '../../test-utils/test-harness.js';
-import { EditV2, CommitOptions, Commit } from '@openscd/oscd-api';
+import { enumValues, getAncestors } from '../../test-utils/test-harness.js';
+import { EditV2 } from '@openscd/oscd-api';
 import { XMLEditor } from '@openscd/oscd-editor';
-import { TemplateResult } from 'lit';
 import Sinon from 'sinon';
 import { OscdFilledButton } from '@omicronenergy/oscd-ui/button/OscdFilledButton.js';
 
-const enumValues = ['on', 'blocked', 'test', 'test/blocked', 'off'];
+customElements.define('dai-value-create-dialog', DaiValueCreateDialog);
 
-if (!customElements.get('dai-value-create-dialog')) {
-  customElements.define('dai-value-create-dialog', DaiValueCreateDialog);
-}
+type TestSetupProps = {
+  docContents: string;
+  templateSelector: string;
+  doElementSelector?: string;
+  instanceSelector?: string;
+  instancePathSelectors: string[];
+};
 
-function getOscdDialog(element: HTMLElement): OscdDialog | null {
-  return element.shadowRoot?.querySelector('oscd-dialog') ?? null;
-}
-
-describe('dai-value-create-dialog', () => {
-  let xmlEditor: XMLEditor;
-  let dialog: DaiValueCreateDialog;
-  let editSpy: Sinon.SinonSpy<
-    [edit: EditV2, options?: CommitOptions],
-    Commit<EditV2>
-  >;
-  let oscdDialog: OscdDialog | null;
-  let saveButton: OscdFilledButton | null;
+/*
+ * Don't call this directly, instead call the testSetup function located in the top-level describe.
+ * It will automatically delegate to this but also handle cleanup after each test.
+ */
+const createTestHarness = async ({
+  docContents,
+  templateSelector,
+  doElementSelector,
+  instanceSelector,
+  instancePathSelectors: ancestorsSelectors = [],
+}: TestSetupProps) => {
+  const xmlEditor = new XMLEditor();
+  const editSpy = Sinon.spy(xmlEditor, 'commit');
 
   const handleEditEvent = (event: Event) => {
     const editEvent = event as CustomEvent<{ edit: EditV2 }>;
     xmlEditor.commit(editEvent.detail.edit);
   };
 
-  beforeEach(() => {
-    xmlEditor = new XMLEditor();
-    editSpy = Sinon.spy(xmlEditor, 'commit');
-  });
+  const doc = parseDoc(docContents);
+  const templateElement = getFirstAndAssertBySelector(doc, templateSelector);
+  const instanceElement = instanceSelector
+    ? getFirstAndAssertBySelector(doc, instanceSelector)
+    : null;
+  const doElement = doElementSelector
+    ? getFirstAndAssertBySelector(doc, doElementSelector)
+    : null;
+  const ancestors = [
+    ...getAncestors(doc, ancestorsSelectors),
+    ...(doElement ? [doElement] : []),
+  ];
 
-  afterEach(() => {
-    dialog.removeEventListener('oscd-edit-v2', handleEditEvent);
-    dialog.remove();
-    editSpy.restore();
-  });
+  const daiValueCreateDialog = await fixture<DaiValueCreateDialog>(html`
+    <dai-value-create-dialog
+      .templateElement=${templateElement}
+      .instanceElement=${instanceElement}
+      .enumValues=${enumValues}
+      .ancestors=${ancestors}
+    ></dai-value-create-dialog>
+  `);
 
-  const fixture = async (template: TemplateResult) => {
-    dialog = await openWcFixture<DaiValueCreateDialog>(template);
-    dialog.addEventListener('oscd-edit-v2', handleEditEvent);
+  daiValueCreateDialog.addEventListener('oscd-edit-v2', handleEditEvent);
 
-    oscdDialog = getOscdDialog(dialog);
-    saveButton = dialog.shadowRoot?.querySelector(
-      'oscd-filled-button[slot="primaryAction"]',
-    ) as OscdFilledButton | null;
-
-    return dialog;
-  };
+  const innerDialog =
+    daiValueCreateDialog.shadowRoot?.querySelector('oscd-dialog') ?? null;
+  expect(innerDialog).to.exist;
 
   const openDialog = async () => {
-    dialog.show();
-
-    const oscdDialog = getOscdDialog(dialog);
-    expect(oscdDialog).to.exist;
-    return await waitUntil(() => oscdDialog?.open === true);
+    expect(innerDialog).to.exist;
+    daiValueCreateDialog.show();
+    await waitUntil(() => innerDialog?.open === true);
   };
 
-  const clickSaveButton = async () => {
-    expect(saveButton).to.exist;
-    saveButton!.click();
-    await waitUntil(
-      () => oscdDialog?.open === false,
-      'Dialog did not close after save',
-    );
-    return dialog.updateComplete;
+  const clickAndWaitToClose = async (button: OscdFilledButton) => {
+    expect(button).to.exist;
+    button!.click();
+    await waitUntil(() => innerDialog?.open === false, 'dialog did not close');
+    await daiValueCreateDialog.updateComplete;
   };
+
+  const clickSave = async () => {
+    const saveButton = daiValueCreateDialog.shadowRoot?.querySelector(
+      'oscd-filled-button[slot="primaryAction"]',
+    ) as OscdFilledButton | null;
+    await clickAndWaitToClose(saveButton!);
+  };
+
+  const clickCancel = async () => {
+    const cancelButton = daiValueCreateDialog.shadowRoot?.querySelector(
+      'oscd-outlined-button[slot="secondaryAction"]',
+    ) as OscdFilledButton | null;
+    await clickAndWaitToClose(cancelButton!);
+  };
+
+  const dispose = async () => {
+    daiValueCreateDialog.removeEventListener('oscd-edit-v2', handleEditEvent);
+    daiValueCreateDialog.remove();
+    editSpy.restore();
+  };
+
+  await daiValueCreateDialog.updateComplete;
+  return {
+    doc,
+    templateElement,
+    instanceElement,
+    ancestors,
+    daiValueCreateDialog,
+    innerDialog: innerDialog!,
+    openDialog,
+    clickSave,
+    clickCancel,
+    editSpy,
+    dispose,
+  };
+};
+
+describe('dai-value-create-dialog', () => {
+  let disposeFn: (() => Promise<void>) | null = null;
+
+  const testSetup = async (options: TestSetupProps) => {
+    const harness = await createTestHarness(options);
+    disposeFn = harness.dispose;
+    return harness;
+  };
+
+  afterEach(() => {
+    disposeFn?.();
+  });
 
   it('opens and renders template value', async () => {
-    const doc = parseDoc(testDocs.withIED);
-
-    const doElement = getFirstAndAssertBySelector(
-      doc,
-      'LNodeType[id="PlaceholderLLN0"] > DO[name="Beh"]',
-    );
-    const daElement = getFirstAndAssertBySelector(
-      doc,
-      'DOType[id="Beh_Test"] > DA[name="stVal"]',
-    );
-
-    const ancestors = [
-      ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN0']),
-      doElement,
-    ];
-
-    const dialog = await fixture(
-      html`<dai-value-create-dialog
-        .templateElement=${daElement}
-        .ancestors=${ancestors}
-        .enumValues=${enumValues}
-      ></dai-value-create-dialog>`,
-    );
+    const { daiValueCreateDialog, openDialog, clickCancel } = await testSetup({
+      docContents: testDocs.withIED,
+      templateSelector: 'DOType[id="Beh_Test"] > DA[name="stVal"]',
+      instancePathSelectors: ['IED', 'AccessPoint', 'LDevice', 'LN0'],
+    });
 
     await openDialog();
 
-    const templateField = dialog.shadowRoot?.querySelector(
+    const templateField = daiValueCreateDialog.shadowRoot?.querySelector(
       'oscd-filled-text-field[label="DA template value"]',
     ) as OscdFilledTextField | null;
     expect(templateField).to.exist;
     expect(templateField?.value).to.equal('blocked');
 
-    await clickSaveButton();
+    await clickCancel();
   });
 
   it('creates values and inserts the DAI structure', async () => {
-    const doc = parseDoc(testDocs.withIED);
-    const daElement = getFirstAndAssertBySelector(
-      doc,
-      'DOType[id="Beh_Test"] > DA[name="stVal"]',
-    );
-    const doElement = getFirstAndAssertBySelector(
-      doc,
-      'LNodeType[id="PlaceholderLLN0"] > DO[name="Beh"]',
-    );
-    const ancestors = [
-      ...getAncestors(doc, [
-        'IED',
-        'AccessPoint',
-        'LDevice[inst="LD2"]',
-        'LN0',
-      ]),
-      doElement,
-    ];
-
-    const dialog = await fixture(
-      html`<dai-value-create-dialog
-        .templateElement=${daElement}
-        .ancestors=${ancestors}
-        .enumValues=${enumValues}
-      ></dai-value-create-dialog>`,
-    );
+    const { openDialog, daiValueCreateDialog, clickSave, doc } =
+      await testSetup({
+        docContents: testDocs.withIED,
+        templateSelector: 'DOType[id="Beh_Test"] > DA[name="stVal"]',
+        doElementSelector: 'LNodeType[id="PlaceholderLLN0"] > DO[name="Beh"]',
+        instancePathSelectors: [
+          'IED',
+          'AccessPoint',
+          'LDevice[inst="LD2"]',
+          'LN0',
+        ],
+      });
 
     await openDialog();
 
-    const field = dialog.shadowRoot?.querySelector(
+    const field = daiValueCreateDialog.shadowRoot?.querySelector(
       'dai-value-field',
     ) as DaiValueField | null;
     expect(field).to.exist;
@@ -161,7 +175,7 @@ describe('dai-value-create-dialog', () => {
       }),
     );
 
-    await clickSaveButton();
+    await clickSave();
 
     expect(
       doc.querySelector(
@@ -176,86 +190,66 @@ describe('dai-value-create-dialog', () => {
      * is applied.
      * This test ensures that if some of the sGroups are missing, the dialog still displays all
      */
-    const doc = parseDoc(testDocs.withIED_instanciated);
 
-    const daElement = getFirstAndAssertBySelector(
-      doc,
-      'DOType[id="ARtg_Test"] > DA[name="setMag"]',
-    );
-    const doElement = getFirstAndAssertBySelector(
-      doc,
-      'LNodeType[id="TCTR_Test"] > DO[name="ARtg"]',
-    );
-    const ancestors = [
-      ...getAncestors(doc, ['IED', 'AccessPoint', 'LDevice', 'LN']),
-      doElement,
-    ];
-    const daiElement = getFirstAndAssertBySelector(
-      doc,
-      'LN[lnClass="TCTR"][inst="1"] > DOI[name="ARtg"] > DAI[name="setVal"]',
-    );
+    const { daiValueCreateDialog, ancestors, openDialog, clickSave } =
+      await testSetup({
+        docContents: testDocs.withIED_instanciated,
+        templateSelector: 'DOType[id="ARtg_Test"] > DA[name="setMag"]',
+        doElementSelector: 'LNodeType[id="TCTR_Test"] > DO[name="ARtg"]',
+        instancePathSelectors: [
+          'IED',
+          'AccessPoint',
+          'LDevice[inst="LD2"]',
+          'LN[lnClass="TCTR"][inst="2"]',
+        ],
+      });
 
-    const dialog = await fixture(
-      html`<dai-value-create-dialog
-        .templateElement=${daElement}
-        .ancestors=${ancestors}
-        .enumValues=${enumValues}
-      ></dai-value-create-dialog>`,
-    );
+    await openDialog();
 
     const fields = Array.from(
-      dialog.shadowRoot?.querySelectorAll('dai-value-field') ?? [],
+      daiValueCreateDialog.shadowRoot?.querySelectorAll('dai-value-field') ??
+        [],
     ) as DaiValueField[];
-    expect(fields.length).to.equal(5);
-    expect(fields[0].value).to.equal('10');
-    expect(fields[1].value).to.equal('');
-    expect(fields[2].value).to.equal('');
-    expect(fields[3].value).to.equal('');
-    expect(fields[4].value).to.equal('50');
-
-    let lastEdit: unknown = null;
-    dialog.addEventListener('oscd-edit-v2', event => {
-      lastEdit = (event as CustomEvent<{ edit: unknown }>).detail.edit;
+    expect(fields.length).to.equal(7);
+    fields.forEach((field, index) => {
+      field.dispatchEvent(
+        new CustomEvent('change', {
+          detail: { value: (index + 1) * 10, sGroup: index + 1 },
+          bubbles: true,
+          composed: true,
+        }),
+      );
     });
 
-    fields[1].dispatchEvent(
-      new CustomEvent('change', {
-        detail: { value: '20', sGroup: 2 },
-        bubbles: true,
-        composed: true,
-      }),
-    );
-    fields[3].dispatchEvent(
-      new CustomEvent('change', {
-        detail: { value: '40', sGroup: 4 },
-        bubbles: true,
-        composed: true,
-      }),
+    await clickSave();
+
+    const ldElement = ancestors.find(el => el.tagName === 'LDevice')!;
+    const lnElement = ancestors.find(el => el.tagName === 'LN')!;
+    const numberOfSGs = Number(
+      getFirstAndAssertBySelector(
+        ldElement,
+        'LN0 > SettingControl',
+      ).getAttribute('numOfSGs'),
     );
 
-    const saveButton = dialog.shadowRoot?.querySelector(
-      'oscd-filled-button[slot="primaryAction"]',
-    ) as HTMLElement | null;
-    expect(saveButton).to.exist;
-    saveButton!.click();
-
-    const edits = lastEdit as Array<{
-      parent?: Element;
-      node?: Element;
-      reference?: Element | null;
-    }>;
-    const inserted = edits.filter(edit => edit.parent === daiElement);
-    expect(inserted.length).to.equal(5);
-    const valuesByGroup = new Map(
-      inserted.map(edit => [
-        edit.node?.getAttribute('sGroup') ?? '',
-        edit.node?.textContent ?? '',
-      ]),
+    const doiElement = getFirstAndAssertBySelector(
+      lnElement,
+      'DOI[name="ARtg"]',
     );
-    expect(valuesByGroup.get('1')).to.equal('10');
-    expect(valuesByGroup.get('2')).to.equal('20');
-    expect(valuesByGroup.get('3')).to.equal('30');
-    expect(valuesByGroup.get('4')).to.equal('40');
-    expect(valuesByGroup.get('5')).to.equal('50');
+    const daiElement = getFirstAndAssertBySelector(
+      doiElement,
+      'DAI[name="setMag"]',
+    );
+
+    const valElements = Array.from(daiElement.getElementsByTagName('Val'));
+    expect(
+      valElements.length,
+      'Number of Val elements does not match numberOfSGs',
+    ).to.equal(numberOfSGs);
+    valElements.forEach(valEl => {
+      const sGroup = valEl.getAttribute('sGroup');
+      const value = valEl.textContent?.trim();
+      expect(value).to.equal((Number(sGroup) * 10).toString());
+    });
   });
 });
