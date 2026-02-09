@@ -130,8 +130,6 @@ export class VirtualIedCreateDialog extends ScopedElementsMixin(LitElement) {
   }
 
   static styles = css`
-    oscd-dialog {
-    }
     .dialog-content {
       margin-top: 16px;
     }
