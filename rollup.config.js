@@ -17,7 +17,7 @@ const name = packageJson.name.split('/').pop();
 
 export default [
   {
-    input: `${name}.ts`,
+    input: `src/${name}.ts`,
     output: {
       sourcemap: true, // Add source map to build output
       format: 'es', // ES module type export
