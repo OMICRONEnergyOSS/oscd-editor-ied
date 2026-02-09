@@ -1,0 +1,41 @@
+import { LitElement, TemplateResult } from 'lit';
+import { OscdDialog } from '@omicronenergy/oscd-ui/dialog/OscdDialog.js';
+import { OscdOutlinedButton } from '@omicronenergy/oscd-ui/button/OscdOutlinedButton.js';
+import { OscdFilledButton } from '@omicronenergy/oscd-ui/button/OscdFilledButton.js';
+import { OscdFilledTextField } from '@omicronenergy/oscd-ui/textfield/OscdFilledTextField.js';
+import { DaiValueField } from './fields/dai-value-field.js';
+import { DaiTimestampField } from './fields/dai-timestamp-field.js';
+declare const DaiValueEditDialog_base: typeof LitElement & import("@open-wc/scoped-elements/lit-element.js").ScopedElementsHostConstructor;
+export declare class DaiValueEditDialog extends DaiValueEditDialog_base {
+    static scopedElements: {
+        'oscd-dialog': typeof OscdDialog;
+        'oscd-outlined-button': typeof OscdOutlinedButton;
+        'oscd-filled-button': typeof OscdFilledButton;
+        'oscd-filled-text-field': typeof OscdFilledTextField;
+        'dai-value-field': typeof DaiValueField;
+        'dai-timestamp-field': typeof DaiTimestampField;
+    };
+    templateElement: Element;
+    instanceElement: Element | null;
+    enumValues: string[];
+    valElement: Element | null;
+    sGroup: number | null;
+    private dialog;
+    private dialogTitle;
+    private bType;
+    private templateValue;
+    show(): void;
+    private reset;
+    private close;
+    private confirm;
+    private editedValue;
+    private buildValElement;
+    private getInstanceValue;
+    private findInsertReference;
+    private handleValueChange;
+    private handleTimestampChange;
+    private renderValueField;
+    render(): TemplateResult;
+    static styles: import("lit").CSSResult;
+}
+export {};
