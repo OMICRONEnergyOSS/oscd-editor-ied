@@ -37511,6 +37511,11 @@ class DaiValueField extends ScopedElementsMixin(i$3) {
         this.sGroup = null;
         this.disabled = false;
     }
+    static { this.scopedElements = {
+        'oscd-filled-text-field': OscdFilledTextField,
+        'oscd-filled-select': OscdFilledSelect,
+        'oscd-select-option': OscdSelectOption,
+    }; }
     emitChange(value) {
         this.dispatchEvent(new CustomEvent('change', {
             detail: { value, sGroup: this.sGroup },
@@ -37571,17 +37576,12 @@ class DaiValueField extends ScopedElementsMixin(i$3) {
         }
         return this.renderText();
     }
-}
-DaiValueField.scopedElements = {
-    'oscd-filled-text-field': OscdFilledTextField,
-    'oscd-filled-select': OscdFilledSelect,
-    'oscd-select-option': OscdSelectOption,
-};
-DaiValueField.styles = i$6 `
+    static { this.styles = i$6 `
     :host {
       display: block;
     }
-  `;
+  `; }
+}
 __decorate([
     n$3({ type: String })
 ], DaiValueField.prototype, "bType", void 0);
@@ -37645,6 +37645,9 @@ class DaiTimestampField extends ScopedElementsMixin(i$3) {
         this.dateValue = '';
         this.timeValue = '';
     }
+    static { this.scopedElements = {
+        'oscd-filled-text-field': OscdFilledTextField,
+    }; }
     willUpdate(changed) {
         if (changed.has('value')) {
             this.dateValue = getDateValue(this.value);
@@ -37691,17 +37694,14 @@ class DaiTimestampField extends ScopedElementsMixin(i$3) {
       ></oscd-filled-text-field>
     `;
     }
-}
-DaiTimestampField.scopedElements = {
-    'oscd-filled-text-field': OscdFilledTextField,
-};
-DaiTimestampField.styles = i$6 `
+    static { this.styles = i$6 `
     :host {
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
-  `;
+  `; }
+}
 __decorate([
     n$3({ type: String })
 ], DaiTimestampField.prototype, "value", void 0);
@@ -37735,6 +37735,14 @@ class DaiValueCreateDialog extends ScopedElementsMixin(i$3) {
         this.multipleSettings = null;
         this.editedValues = new Map();
     }
+    static { this.scopedElements = {
+        'oscd-dialog': OscdDialog,
+        'oscd-outlined-button': OscdOutlinedButton,
+        'oscd-filled-button': OscdFilledButton,
+        'oscd-filled-text-field': OscdFilledTextField,
+        'dai-value-field': DaiValueField,
+        'dai-timestamp-field': DaiTimestampField,
+    }; }
     get templateElement() {
         return this._templateElement;
     }
@@ -37893,16 +37901,7 @@ class DaiValueCreateDialog extends ScopedElementsMixin(i$3) {
       </oscd-dialog>
     `;
     }
-}
-DaiValueCreateDialog.scopedElements = {
-    'oscd-dialog': OscdDialog,
-    'oscd-outlined-button': OscdOutlinedButton,
-    'oscd-filled-button': OscdFilledButton,
-    'oscd-filled-text-field': OscdFilledTextField,
-    'dai-value-field': DaiValueField,
-    'dai-timestamp-field': DaiTimestampField,
-};
-DaiValueCreateDialog.styles = i$6 `
+    static { this.styles = i$6 `
     :host {
       --md-filled-text-field-disabled-input-text-opacity: 0.8;
       --md-filled-text-field-disabled-label-text-opacity: 0.8;
@@ -37926,7 +37925,8 @@ DaiValueCreateDialog.styles = i$6 `
       flex-direction: column;
       gap: 8px;
     }
-  `;
+  `; }
+}
 __decorate([
     n$3({ attribute: false })
 ], DaiValueCreateDialog.prototype, "templateElement", null);
@@ -37955,6 +37955,14 @@ class DaiValueEditDialog extends ScopedElementsMixin(i$3) {
         this.templateValue = null;
         this.editedValue = null;
     }
+    static { this.scopedElements = {
+        'oscd-dialog': OscdDialog,
+        'oscd-outlined-button': OscdOutlinedButton,
+        'oscd-filled-button': OscdFilledButton,
+        'oscd-filled-text-field': OscdFilledTextField,
+        'dai-value-field': DaiValueField,
+        'dai-timestamp-field': DaiTimestampField,
+    }; }
     show() {
         this.bType = this.templateElement?.getAttribute('bType') ?? '';
         if (!this.instanceElement || !this.bType) {
@@ -38084,16 +38092,7 @@ class DaiValueEditDialog extends ScopedElementsMixin(i$3) {
       </oscd-dialog>
     `;
     }
-}
-DaiValueEditDialog.scopedElements = {
-    'oscd-dialog': OscdDialog,
-    'oscd-outlined-button': OscdOutlinedButton,
-    'oscd-filled-button': OscdFilledButton,
-    'oscd-filled-text-field': OscdFilledTextField,
-    'dai-value-field': DaiValueField,
-    'dai-timestamp-field': DaiTimestampField,
-};
-DaiValueEditDialog.styles = i$6 `
+    static { this.styles = i$6 `
     [slot='content'] {
       width: 320px;
       max-width: 100vw;
@@ -38108,7 +38107,8 @@ DaiValueEditDialog.styles = i$6 `
       flex-direction: column;
       gap: 8px;
     }
-  `;
+  `; }
+}
 __decorate([
     n$3({ attribute: false })
 ], DaiValueEditDialog.prototype, "templateElement", void 0);
@@ -38147,6 +38147,11 @@ class InfoDialog extends ScopedElementsMixin(i$3) {
         this.infoGroups = [];
         this.headline = 'Show Info';
     }
+    static { this.scopedElements = {
+        'oscd-dialog': OscdDialog,
+        'oscd-filled-button': OscdFilledButton,
+        'oscd-filled-text-field': OscdFilledTextField,
+    }; }
     show() {
         this.dialog.show();
     }
@@ -38173,13 +38178,7 @@ class InfoDialog extends ScopedElementsMixin(i$3) {
       </oscd-dialog>
     `;
     }
-}
-InfoDialog.scopedElements = {
-    'oscd-dialog': OscdDialog,
-    'oscd-filled-button': OscdFilledButton,
-    'oscd-filled-text-field': OscdFilledTextField,
-};
-InfoDialog.styles = i$6 `
+    static { this.styles = i$6 `
     :host {
       --md-filled-text-field-disabled-input-text-opacity: 0.8;
       --md-filled-text-field-disabled-label-text-opacity: 0.8;
@@ -38203,7 +38202,8 @@ InfoDialog.styles = i$6 `
       background: var(--oscd-base1);
       margin: 4px 0;
     }
-  `;
+  `; }
+}
 __decorate([
     n$3({ attribute: false })
 ], InfoDialog.prototype, "infoGroups", void 0);
@@ -38508,6 +38508,9 @@ class DoInfoDialog extends ScopedElementsMixin(i$3) {
         super(...arguments);
         this.infoGroups = [];
     }
+    static { this.scopedElements = {
+        'info-dialog': InfoDialog,
+    }; }
     show() {
         this.infoGroups = buildDoInfoGroups({
             ancestors: this.ancestors,
@@ -38527,9 +38530,6 @@ class DoInfoDialog extends ScopedElementsMixin(i$3) {
     `;
     }
 }
-DoInfoDialog.scopedElements = {
-    'info-dialog': InfoDialog,
-};
 __decorate([
     n$3({ attribute: false })
 ], DoInfoDialog.prototype, "ancestors", void 0);
@@ -38603,6 +38603,9 @@ class DaInfoDialog extends ScopedElementsMixin(i$3) {
         super(...arguments);
         this.infoGroups = [];
     }
+    static { this.scopedElements = {
+        'info-dialog': InfoDialog,
+    }; }
     show() {
         this.infoGroups = buildDaInfoGroups({
             ancestors: this.ancestors,
@@ -38621,9 +38624,6 @@ class DaInfoDialog extends ScopedElementsMixin(i$3) {
     `;
     }
 }
-DaInfoDialog.scopedElements = {
-    'info-dialog': InfoDialog,
-};
 __decorate([
     n$3({ attribute: false })
 ], DaInfoDialog.prototype, "ancestors", void 0);
@@ -38712,6 +38712,16 @@ class DAContainer extends ScopedElementsMixin(BaseContainer) {
         this.instanceElement = null;
         this.expanded = false;
     }
+    static { this.scopedElements = {
+        'oscd-action-pane': OscdActionPane,
+        'oscd-icon-button': OscdIconButton,
+        'oscd-scl-icon': OscdSclIcon,
+        'oscd-icon': OscdIcon,
+        'da-container': DAContainer,
+        'dai-value-create-dialog': DaiValueCreateDialog,
+        'dai-value-edit-dialog': DaiValueEditDialog,
+        'da-info-dialog': DaInfoDialog,
+    }; }
     openCreateDialog() {
         const bType = this.element.getAttribute('bType');
         if (!bType || !supportedDaiTypes.has(bType)) {
@@ -38893,18 +38903,7 @@ class DAContainer extends ScopedElementsMixin(BaseContainer) {
       ></da-info-dialog>
     `;
     }
-}
-DAContainer.scopedElements = {
-    'oscd-action-pane': OscdActionPane,
-    'oscd-icon-button': OscdIconButton,
-    'oscd-scl-icon': OscdSclIcon,
-    'oscd-icon': OscdIcon,
-    'da-container': DAContainer,
-    'dai-value-create-dialog': DaiValueCreateDialog,
-    'dai-value-edit-dialog': DaiValueEditDialog,
-    'da-info-dialog': DaInfoDialog,
-};
-DAContainer.styles = i$6 `
+    static { this.styles = i$6 `
     h4 {
       color: var(--mdc-theme-on-surface);
       font-family: 'Roboto', sans-serif;
@@ -38934,7 +38933,8 @@ DAContainer.styles = i$6 `
     oscd-icon-button {
       color: var(--mdc-theme-on-surface);
     }
-  `;
+  `; }
+}
 __decorate([
     n$3({ attribute: false })
 ], DAContainer.prototype, "instanceElement", void 0);
@@ -38956,6 +38956,16 @@ class DOContainer extends ScopedElementsMixin(BaseContainer) {
         super(...arguments);
         this.expanded = false;
     }
+    static { this.scopedElements = {
+        'oscd-outlined-button': OscdOutlinedButton,
+        'oscd-icon-button': OscdIconButton,
+        'oscd-scl-icon': OscdSclIcon,
+        'oscd-icon': OscdIcon,
+        'oscd-action-pane': OscdActionPane,
+        'do-container': DOContainer,
+        'da-container': DAContainer,
+        'do-info-dialog': DoInfoDialog,
+    }; }
     openInfoDialog() {
         this.doInfoDialog.show();
     }
@@ -39068,16 +39078,6 @@ class DOContainer extends ScopedElementsMixin(BaseContainer) {
       ></do-info-dialog>`;
     }
 }
-DOContainer.scopedElements = {
-    'oscd-outlined-button': OscdOutlinedButton,
-    'oscd-icon-button': OscdIconButton,
-    'oscd-scl-icon': OscdSclIcon,
-    'oscd-icon': OscdIcon,
-    'oscd-action-pane': OscdActionPane,
-    'do-container': DOContainer,
-    'da-container': DAContainer,
-    'do-info-dialog': DoInfoDialog,
-};
 __decorate([
     n$3({ attribute: false })
 ], DOContainer.prototype, "instanceElement", void 0);
@@ -39094,6 +39094,14 @@ class LNContainer extends ScopedElementsMixin(BaseContainer) {
         super(...arguments);
         this.expanded = false;
     }
+    static { this.scopedElements = {
+        'oscd-outlined-button': OscdOutlinedButton,
+        'oscd-icon-button': OscdIconButton,
+        'oscd-scl-icon': OscdSclIcon,
+        'oscd-action-pane': OscdActionPane,
+        'oscd-icon': OscdIcon,
+        'do-container': DOContainer,
+    }; }
     openEditWizard() {
         this.dispatchEvent(newEditElementEvent({ element: this.element }));
     }
@@ -39189,14 +39197,6 @@ class LNContainer extends ScopedElementsMixin(BaseContainer) {
     </oscd-action-pane>`;
     }
 }
-LNContainer.scopedElements = {
-    'oscd-outlined-button': OscdOutlinedButton,
-    'oscd-icon-button': OscdIconButton,
-    'oscd-scl-icon': OscdSclIcon,
-    'oscd-action-pane': OscdActionPane,
-    'oscd-icon': OscdIcon,
-    'do-container': DOContainer,
-};
 __decorate([
     n$3({ type: Boolean })
 ], LNContainer.prototype, "expanded", void 0);
@@ -54425,6 +54425,14 @@ class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
         this.selectedLNClasses = [];
         this.expanded = false;
     }
+    static { this.scopedElements = {
+        'oscd-action-pane': OscdActionPane,
+        'oscd-icon-button': OscdIconButton,
+        'oscd-scl-icon': OscdSclIcon,
+        'oscd-icon': OscdIcon,
+        'ln-container': LNContainer,
+        'oscd-scl-dialogs': OscdSclDialogs,
+    }; }
     async handleAddLN(event) {
         const trigger = event.currentTarget;
         let edits;
@@ -54520,16 +54528,7 @@ class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
         </div> </oscd-action-pane
       ><oscd-scl-dialogs></oscd-scl-dialogs>`;
     }
-}
-LDeviceContainer.scopedElements = {
-    'oscd-action-pane': OscdActionPane,
-    'oscd-icon-button': OscdIconButton,
-    'oscd-scl-icon': OscdSclIcon,
-    'oscd-icon': OscdIcon,
-    'ln-container': LNContainer,
-    'oscd-scl-dialogs': OscdSclDialogs,
-};
-LDeviceContainer.styles = i$6 `
+    static { this.styles = i$6 `
     #lnContainer {
       display: grid;
       grid-gap: 12px;
@@ -54546,7 +54545,8 @@ LDeviceContainer.styles = i$6 `
         grid-template-columns: repeat(auto-fit, minmax(196px, auto));
       }
     }
-  `;
+  `; }
+}
 __decorate([
     n$3()
 ], LDeviceContainer.prototype, "selectedLNClasses", void 0);
@@ -54563,6 +54563,14 @@ class ServerContainer extends ScopedElementsMixin(BaseContainer) {
         super(...arguments);
         this.selectedLNClasses = [];
     }
+    static { this.scopedElements = {
+        'oscd-icon': OscdIcon,
+        'oscd-scl-icon': OscdSclIcon,
+        'oscd-icon-button': OscdIconButton,
+        'oscd-action-pane': OscdActionPane,
+        'ldevice-container': LDeviceContainer,
+        'oscd-scl-dialogs': OscdSclDialogs,
+    }; }
     async handleCreateLDevice(event) {
         const trigger = event.currentTarget;
         const createType = {
@@ -54638,14 +54646,6 @@ class ServerContainer extends ScopedElementsMixin(BaseContainer) {
       <oscd-scl-dialogs></oscd-scl-dialogs> `;
     }
 }
-ServerContainer.scopedElements = {
-    'oscd-icon': OscdIcon,
-    'oscd-scl-icon': OscdSclIcon,
-    'oscd-icon-button': OscdIconButton,
-    'oscd-action-pane': OscdActionPane,
-    'ldevice-container': LDeviceContainer,
-    'oscd-scl-dialogs': OscdSclDialogs,
-};
 __decorate([
     n$3()
 ], ServerContainer.prototype, "selectedLNClasses", void 0);
@@ -55651,6 +55651,13 @@ class AccessPointEditDialog extends ScopedElementsMixin(i$3) {
         this.apName = '';
         this.desc = null;
     }
+    static { this.scopedElements = {
+        'oscd-dialog': OscdDialog,
+        'oscd-filled-text-field': OscdFilledTextField,
+        'oscd-filled-button': OscdFilledButton,
+        'oscd-outlined-button': OscdOutlinedButton,
+        'oscd-scl-text-field': OscdSclTextField,
+    }; }
     show() {
         this.apName = this.element.getAttribute('name') ?? '';
         this.desc = this.element.getAttribute('desc') ?? null;
@@ -55710,15 +55717,7 @@ class AccessPointEditDialog extends ScopedElementsMixin(i$3) {
       </oscd-dialog>
     `;
     }
-}
-AccessPointEditDialog.scopedElements = {
-    'oscd-dialog': OscdDialog,
-    'oscd-filled-text-field': OscdFilledTextField,
-    'oscd-filled-button': OscdFilledButton,
-    'oscd-outlined-button': OscdOutlinedButton,
-    'oscd-scl-text-field': OscdSclTextField,
-};
-AccessPointEditDialog.styles = i$6 `
+    static { this.styles = i$6 `
     [slot='content'] {
       width: 320px;
       height: 200px;
@@ -55728,7 +55727,8 @@ AccessPointEditDialog.styles = i$6 `
       flex-direction: column;
       gap: 8px;
     }
-  `;
+  `; }
+}
 __decorate([
     n$3()
 ], AccessPointEditDialog.prototype, "doc", void 0);
@@ -55757,13 +55757,15 @@ class AccessPointContainer extends ScopedElementsMixin(BaseContainer) {
         super(...arguments);
         this.selectedLNClasses = [];
     }
-    openSettingsWizard(services) {
-        // const wizard = editServicesWizard(services);
-        // if (wizard) {
-        //   this.dispatchEvent(newWizardEvent(wizard));
-        // }
-        console.log('Please implement me', this, services);
-    }
+    static { this.scopedElements = {
+        'oscd-icon': OscdIcon,
+        'oscd-scl-icon': OscdSclIcon,
+        'oscd-icon-button': OscdIconButton,
+        'oscd-action-pane': OscdActionPane,
+        'server-container': ServerContainer,
+        'ln-container': LNContainer,
+        'access-point-edit-dialog': AccessPointEditDialog,
+    }; }
     removeAccessPoint() {
         const name = this.header();
         this.dispatchEvent(newConfirmDeleteEvent({
@@ -55794,19 +55796,6 @@ class AccessPointContainer extends ScopedElementsMixin(BaseContainer) {
             return this.selectedLNClasses.includes(lnClass);
         });
     }
-    renderServicesIcon() {
-        const services = this.element.querySelector('Services');
-        if (!services) {
-            return x ``;
-        }
-        return x ` <oscd-icon-button
-      slot="action"
-      title="${msg('Show Services the IED/AccessPoint provides')}"
-      @click=${() => this.openSettingsWizard(services)}
-    >
-      <oscd-icon>settings</oscd-icon>
-    </oscd-icon-button>`;
-    }
     render() {
         const lnElements = this.getLnElements();
         return x `<oscd-action-pane .label="${this.header()}">
@@ -55827,7 +55816,6 @@ class AccessPointContainer extends ScopedElementsMixin(BaseContainer) {
         >
           <oscd-icon>edit</oscd-icon>
         </oscd-icon-button>
-        ${this.renderServicesIcon()}
         ${Array.from(this.element.querySelectorAll(':scope > Server')).map(server => x `<server-container
               .docVersion=${this.docVersion}
               .doc=${this.doc}
@@ -55860,17 +55848,7 @@ class AccessPointContainer extends ScopedElementsMixin(BaseContainer) {
         .onConfirm=${(data) => this.updateAccessPoint(data)}
       ></access-point-edit-dialog>`;
     }
-}
-AccessPointContainer.scopedElements = {
-    'oscd-icon': OscdIcon,
-    'oscd-scl-icon': OscdSclIcon,
-    'oscd-icon-button': OscdIconButton,
-    'oscd-action-pane': OscdActionPane,
-    'server-container': ServerContainer,
-    'ln-container': LNContainer,
-    'access-point-edit-dialog': AccessPointEditDialog,
-};
-AccessPointContainer.styles = i$6 `
+    static { this.styles = i$6 `
     #lnContainer {
       display: grid;
       grid-gap: 12px;
@@ -55883,7 +55861,8 @@ AccessPointContainer.styles = i$6 `
         grid-template-columns: repeat(auto-fit, minmax(196px, auto));
       }
     }
-  `;
+  `; }
+}
 __decorate([
     n$3()
 ], AccessPointContainer.prototype, "selectedLNClasses", void 0);
@@ -55901,6 +55880,16 @@ class AccessPointCreateDialog extends ScopedElementsMixin(i$3) {
         this.serverAtApName = '';
         this.serverAtDesc = '';
     }
+    static { this.scopedElements = {
+        'oscd-dialog': OscdDialog,
+        'oscd-filled-text-field': OscdFilledTextField,
+        'oscd-filled-button': OscdFilledButton,
+        'oscd-outlined-button': OscdOutlinedButton,
+        'oscd-switch': OscdSwitch,
+        'oscd-filled-select': OscdFilledSelect,
+        'oscd-select-option': OscdSelectOption,
+        'oscd-scl-text-field': OscdSclTextField,
+    }; }
     show() {
         this.reset();
         this.dialog.show();
@@ -56012,18 +56001,7 @@ class AccessPointCreateDialog extends ScopedElementsMixin(i$3) {
       </oscd-dialog>
     `;
     }
-}
-AccessPointCreateDialog.scopedElements = {
-    'oscd-dialog': OscdDialog,
-    'oscd-filled-text-field': OscdFilledTextField,
-    'oscd-filled-button': OscdFilledButton,
-    'oscd-outlined-button': OscdOutlinedButton,
-    'oscd-switch': OscdSwitch,
-    'oscd-filled-select': OscdFilledSelect,
-    'oscd-select-option': OscdSelectOption,
-    'oscd-scl-text-field': OscdSclTextField,
-};
-AccessPointCreateDialog.styles = i$6 `
+    static { this.styles = i$6 `
     [slot='content'] {
       width: 320px;
       height: 380px;
@@ -56039,7 +56017,8 @@ AccessPointCreateDialog.styles = i$6 `
       align-items: center;
       gap: 8px;
     }
-  `;
+  `; }
+}
 __decorate([
     n$3()
 ], AccessPointCreateDialog.prototype, "doc", void 0);
@@ -56071,12 +56050,2057 @@ __decorate([
     e$3('#apName')
 ], AccessPointCreateDialog.prototype, "apNameField", void 0);
 
+function renderLogSettingsServices() {
+    return x `
+    <oscd-form-divider
+      label=${msg('Log Control Configuration')}
+    ></oscd-form-divider>
+
+    <oscd-form-group>
+      <oscd-form-field
+        name="logSettings.cbName"
+        type="select"
+        .enumValues=${['Conf', 'Fix']}
+        label=${msg('cbName')}
+        helper=${msg('Whether log control block name is configurable offline (Conf) or fixed (Fix)')}
+        readonly
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="logSettings.datSet"
+        type="select"
+        .enumValues=${['Dyn', 'Conf', 'Fix']}
+        label=${msg('datSet')}
+        helper=${msg('Whether log control blocks data set is configurable offline (Conf), online (Dyn) or fixed (Fix)')}
+        readonly
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="logSettings.logEna"
+        type="select"
+        .enumValues=${['Dyn', 'Conf', 'Fix']}
+        label=${msg('logEna')}
+        helper=${msg('Whether log control blocks attribute logEna is configurable offline (Conf), online (Dyn) or fixed (Fix)')}
+        readonly
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="logSettings.trgOps"
+        type="select"
+        .enumValues=${['Dyn', 'Conf', 'Fix']}
+        label=${msg('trgOps')}
+        helper=${msg('Whether log control blocks trigger options are configurable offline (Conf), online (Dyn) or fixed (Fix)')}
+        readonly
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="logSettings.intgPd"
+        type="select"
+        .enumValues=${['Dyn', 'Conf', 'Fix']}
+        label=${msg('intgPd')}
+        helper=${msg('Whether log control blocks integrity period is configurable offline (Conf), online (Dyn) or fixed (Fix)')}
+        readonly
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-divider label=${msg('Log Capabilities')}></oscd-form-divider>
+
+    <oscd-form-group>
+      <oscd-form-field
+        name="confLogControl.max"
+        label=${msg('Max')}
+        helper=${msg('The maximum number of log control blocks instantiable by system configuration tool')}
+        readonly
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-divider label=${msg('Client Capabilities')}></oscd-form-divider>
+
+    <oscd-form-group>
+      <oscd-form-field
+        name="clientServices.readLog"
+        type="checkbox"
+        label=${msg('Read Log')}
+        helper=${msg('Whether IED supports services to handle logs as a client')}
+        readonly
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-divider
+      label=${msg('DataSet Configuration')}
+    ></oscd-form-divider>
+
+    <oscd-form-group>
+      <oscd-form-field
+        name="dataSet.max"
+        label=${msg('Max')}
+        helper=${msg('The maximum allowed DataSets in this IED')}
+        readonly
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="dataSet.maxAttributes"
+        label=${msg('Max attributes')}
+        helper=${msg('The maximum number of FCDA elements per DataSet')}
+        readonly
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="dataSet.modify"
+        type="checkbox"
+        label=${msg('Modify')}
+        helper=${msg('Whether DataSet can be modified by SCT')}
+        readonly
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-divider label=${msg('Setting Group')}></oscd-form-divider>
+
+    <oscd-form-group>
+      <oscd-form-field
+        name="settingGroups.sgEdit"
+        type="checkbox"
+        label=${msg('SGEdit')}
+        helper=${msg('Whether IED allows manipulating editable setting groups online')}
+        readonly
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="settingGroups.confSG"
+        type="checkbox"
+        label=${msg('ConfSG')}
+        helper=${msg('Whether IED accepts the system configuration tool to configure the number of setting groups')}
+        readonly
+      ></oscd-form-field>
+    </oscd-form-group>
+  `;
+}
+
+class OscdFormGroup extends i$3 {
+    // eslint-disable-next-line class-methods-use-this
+    render() {
+        return x `<slot></slot>`;
+    }
+    static { this.styles = i$6 `
+    :host {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+  `; }
+}
+
+class OscdFormDivider extends ScopedElementsMixin(i$3) {
+    static { this.scopedElements = {
+        'oscd-divider': OscdDivider,
+    }; }
+    render() {
+        return x `
+      ${this.label ? x `<h4 class="header">${this.label}</h4>` : null}
+      <oscd-divider></oscd-divider>
+    `;
+    }
+    static { this.styles = i$6 `
+    :host {
+      display: block;
+    }
+
+    .header {
+      margin: 0 0 4px 0;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .separator {
+      height: 0;
+      margin: 10px 0;
+      border-bottom: 1px solid var(--oscd-divider-color, rgba(0, 0, 0, 0.12));
+    }
+  `; }
+}
+__decorate([
+    n$3()
+], OscdFormDivider.prototype, "label", void 0);
+
+class OscdForm extends i$3 {
+    getValue(path) {
+        return path.split('.').reduce((acc, key) => {
+            if (acc && typeof acc === 'object' && key in acc) {
+                return acc[key];
+            }
+            return null;
+        }, this.data);
+    }
+    // eslint-disable-next-line class-methods-use-this
+    setValue(_path, _value) {
+        // No-op for now (readonly)
+    }
+    // eslint-disable-next-line class-methods-use-this
+    getError(_path) {
+        // No validation yet
+        return null;
+    }
+    // eslint-disable-next-line class-methods-use-this
+    render() {
+        return x `<slot></slot>`;
+    }
+    static { this.styles = i$6 ``; }
+}
+__decorate([
+    n$3({ attribute: false })
+], OscdForm.prototype, "data", void 0);
+
+function extractServicesData(ied) {
+    const services = ied.querySelector('Services');
+    if (!services) {
+        return null;
+    }
+    const logSettings = services.querySelector('LogSettings');
+    const confLogControl = services.querySelector('ConfLogControl');
+    const reportSettings = services.querySelector('ReportSettings');
+    const confReportControl = services.querySelector('ConfReportControl');
+    const clientServices = services.querySelector('ClientServices');
+    const csTimeSyncProt = clientServices?.querySelector('TimeSyncProt');
+    const csMcSecurity = clientServices?.querySelector('McSecurity');
+    const dynDataSet = services.querySelector('DynDataSet');
+    const gseSettings = services.querySelector('GSESettings');
+    const gseSettingsMcSecurity = gseSettings?.querySelector('McSecurity');
+    const goose = services.querySelector('GOOSE');
+    const supSubscription = services.querySelector('SupSubscription');
+    const gsse = services.querySelector('GSSE');
+    const fileHandling = services.querySelector('FileHandling');
+    const timeSyncProt = services.querySelector('TimeSyncProt');
+    const redProt = services.querySelector('RedProt');
+    const commProt = services.querySelector('CommProt');
+    const smvSettings = services.querySelector('SMVSettings');
+    const smvMcSecurity = smvSettings?.querySelector('McSecurity');
+    const smvPublisher = services.querySelector('SMVsc');
+    const dynAssociation = services.querySelector('DynAssociation');
+    return {
+        logSettings: {
+            cbName: logSettings?.getAttribute('cbName') ?? null,
+            datSet: logSettings?.getAttribute('datSet') ?? null,
+            logEna: logSettings?.getAttribute('logEna') ?? null,
+            trgOps: logSettings?.getAttribute('trgOps') ?? null,
+            intgPd: logSettings?.getAttribute('intgPd') ?? null,
+        },
+        confLogControl: {
+            max: confLogControl?.getAttribute('max') ?? null,
+        },
+        clientServices: {
+            goose: clientServices?.getAttribute('goose') ?? null,
+            gsse: clientServices?.getAttribute('gsse') ?? null,
+            bufReport: clientServices?.getAttribute('bufReport') ?? null,
+            unbufReport: clientServices?.getAttribute('unbufReport') ?? null,
+            readLog: clientServices?.getAttribute('readLog') ?? null,
+            sv: clientServices?.getAttribute('sv') ?? null,
+            supportsLdName: clientServices?.getAttribute('supportsLdName') ?? null,
+            rGOOSE: clientServices?.getAttribute('rGOOSE') ?? null,
+            rSV: clientServices?.getAttribute('rSV') ?? null,
+            noIctBinding: clientServices?.getAttribute('noIctBinding') ?? null,
+            maxAttributes: clientServices?.getAttribute('maxAttributes') ?? null,
+            maxReports: clientServices?.getAttribute('maxReports') ?? null,
+            maxGOOSE: clientServices?.getAttribute('maxGOOSE') ?? null,
+            maxSMV: clientServices?.getAttribute('maxSMV') ?? null,
+            timeSyncProt: csTimeSyncProt
+                ? {
+                    yes: csTimeSyncProt.getAttribute('yes') ?? null,
+                    sntp: csTimeSyncProt.getAttribute('sntp') ?? null,
+                    iec61850_9_3: csTimeSyncProt.getAttribute('iec61850_9_3') ?? null,
+                    c37_238: csTimeSyncProt.getAttribute('c37_238') ?? null,
+                    other: csTimeSyncProt.getAttribute('other') ?? null,
+                }
+                : null,
+            mcSecurity: csMcSecurity
+                ? {
+                    signature: csMcSecurity.getAttribute('signature') ?? null,
+                    encryption: csMcSecurity.getAttribute('encryption') ?? null,
+                }
+                : null,
+        },
+        dataSet: {
+            max: services.querySelector('ConfDataSet')?.getAttribute('max') ??
+                String(services.parentElement?.querySelectorAll('DataSet').length ?? 0),
+            maxAttributes: services.querySelector('ConfDataSet')?.getAttribute('maxAttributes') ??
+                null,
+            modify: services.querySelector('ConfDataSet')?.getAttribute('modify') ?? 'true',
+        },
+        settingGroups: {
+            sgEdit: services
+                .querySelector('SettingGroups > SGEdit')
+                ?.getAttribute('resvTms') ?? null,
+            confSG: services
+                .querySelector('SettingGroups > ConfSG')
+                ?.getAttribute('resvTms') ?? null,
+        },
+        reportSettings: {
+            cbName: reportSettings?.getAttribute('cbName') ?? null,
+            datSet: reportSettings?.getAttribute('datSet') ?? null,
+            rptID: reportSettings?.getAttribute('rptID') ?? null,
+            optFields: reportSettings?.getAttribute('optFields') ?? null,
+            bufTime: reportSettings?.getAttribute('bufTime') ?? null,
+            trgOps: reportSettings?.getAttribute('trgOps') ?? null,
+            intgPd: reportSettings?.getAttribute('intgPd') ?? null,
+            resvTms: reportSettings?.getAttribute('resvTms') ?? null,
+            owner: reportSettings?.getAttribute('owner') ?? null,
+        },
+        confReportControl: {
+            max: confReportControl?.getAttribute('max') ?? null,
+            bufMode: confReportControl?.getAttribute('bufMode') ?? null,
+            maxBuf: confReportControl?.getAttribute('maxBuf') ?? null,
+            bufConf: confReportControl?.getAttribute('bufConf') ?? null,
+        },
+        dynDataSet: {
+            max: dynDataSet?.getAttribute('max') ?? null,
+            maxAttributes: dynDataSet?.getAttribute('maxAttributes') ?? null,
+        },
+        gseSettings: {
+            cbName: gseSettings?.getAttribute('cbName') ?? null,
+            datSet: gseSettings?.getAttribute('datSet') ?? null,
+            appID: gseSettings?.getAttribute('appID') ?? null,
+            dataLabel: gseSettings?.getAttribute('dataLabel') ?? null,
+            kdaParticipant: gseSettings?.getAttribute('kdaParticipant') ?? null,
+            signature: gseSettingsMcSecurity?.getAttribute('signature') ?? null,
+            encryption: gseSettingsMcSecurity?.getAttribute('encryption') ?? null,
+        },
+        goose: {
+            max: goose?.getAttribute('max') ?? null,
+            fixedOffs: goose?.getAttribute('fixedOffs') ?? null,
+            goose: goose?.getAttribute('goose') ?? null,
+            rGOOSE: goose?.getAttribute('rGOOSE') ?? null,
+        },
+        supSubscription: {
+            maxGo: supSubscription?.getAttribute('maxGo') ?? null,
+            maxSv: supSubscription?.getAttribute('maxSv') ?? null,
+        },
+        gsse: {
+            max: gsse?.getAttribute('max') ?? null,
+        },
+        fileHandling: {
+            mms: fileHandling?.getAttribute('mms') ?? null,
+            ftp: fileHandling?.getAttribute('ftp') ?? null,
+            ftps: fileHandling?.getAttribute('ftps') ?? null,
+        },
+        timeSyncProt: timeSyncProt
+            ? {
+                yes: timeSyncProt.getAttribute('yes') ?? null,
+                sntp: timeSyncProt.getAttribute('sntp') ?? null,
+                iec61850_9_3: timeSyncProt.getAttribute('iec61850_9_3') ?? null,
+                c37_238: timeSyncProt.getAttribute('c37_238') ?? null,
+                other: timeSyncProt.getAttribute('other') ?? null,
+            }
+            : null,
+        redProt: {
+            hsr: redProt?.getAttribute('hsr') ?? null,
+            prp: redProt?.getAttribute('prp') ?? null,
+            rstp: redProt?.getAttribute('rstp') ?? null,
+        },
+        commProt: {
+            ipv6: commProt?.getAttribute('ipv6') ?? null,
+        },
+        smvSettings: {
+            cbName: smvSettings?.getAttribute('cbName') ?? null,
+            datSet: smvSettings?.getAttribute('datSet') ?? null,
+            svID: smvSettings?.getAttribute('svID') ?? null,
+            optFields: smvSettings?.getAttribute('optFields') ?? null,
+            smpRate: smvSettings?.getAttribute('smpRate') ?? null,
+            nofASDU: smvSettings?.getAttribute('nofASDU') ?? null,
+            samplesPerSec: smvSettings?.getAttribute('samplesPerSec') ?? null,
+            synchSrcId: smvSettings?.getAttribute('synchSrcId') ?? null,
+            pdcTimeStamp: smvSettings?.getAttribute('pdcTimeStamp') ?? null,
+            kdaParticipant: smvSettings?.getAttribute('kdaParticipant') ?? null,
+            mcSecurity: smvMcSecurity
+                ? {
+                    signature: smvMcSecurity.getAttribute('signature') ?? null,
+                    encryption: smvMcSecurity.getAttribute('encryption') ?? null,
+                }
+                : null,
+            smpRateVal: smvSettings?.querySelector('SmpRate')?.textContent ?? null,
+            samplesPerSecVal: smvSettings?.querySelector('SamplesPerSec')?.textContent ?? null,
+            secPerSamplesVal: smvSettings?.querySelector('SecPerSamples')?.textContent ?? null,
+        },
+        smvPublisher: {
+            max: smvPublisher?.getAttribute('max') ?? null,
+            delivery: smvPublisher?.getAttribute('delivery') ?? null,
+            deliveryConf: smvPublisher?.getAttribute('deliveryConf') ?? null,
+            sv: smvPublisher?.getAttribute('sv') ?? null,
+            rSV: smvPublisher?.getAttribute('rSV') ?? null,
+        },
+        dynamicAssociations: {
+            max: dynAssociation?.getAttribute('max') ?? null,
+        },
+        discoverCapabilities: {
+            getDirectory: services.querySelector('GetDirectory') ? 'true' : null,
+            getDataObjectDefinition: services.querySelector('GetDataObjectDefinition')
+                ? 'true'
+                : null,
+            dataObjectDirectory: services.querySelector('DataObjectDirectory')
+                ? 'true'
+                : null,
+            getDataSetValue: services.querySelector('GetDataSetValue')
+                ? 'true'
+                : null,
+            setDataSetValue: services.querySelector('SetDataSetValue')
+                ? 'true'
+                : null,
+            setDataSetDirectory: services.querySelector('DataSetDirectory')
+                ? 'true'
+                : null,
+            readWrite: services.querySelector('ReadWrite') ? 'true' : null,
+        },
+        functionalNaming: {
+            confLdName: services.querySelector('ConfLdName') ? 'true' : null,
+            supportsLdName: clientServices?.getAttribute('supportsLdName') ?? null,
+        },
+        clientCapabilities: {
+            maxAttributes: clientServices?.getAttribute('maxAttributes') ?? null,
+            timerActivatedControl: services.querySelector('TimerActivatedControl')
+                ? 'true'
+                : null,
+            getCBValues: services.querySelector('GetCBValues') ? 'true' : null,
+            GSEDir: services.querySelector('GSEDir') ? 'true' : null,
+        },
+        valKindManipulationConfig: {
+            setToRO: services.querySelector('ValueHandling')?.getAttribute('setToRO') ??
+                null,
+        },
+        signalReferenceConfig: {
+            max: services.querySelector('ConfSigRef')?.getAttribute('max') ?? null,
+        },
+    };
+}
+
+/**
+ * @tag oscd-scl-select
+ * TextField designed to be used for SCL element */
+class OscdSclSelect extends ScopedElementsMixin(i$3) {
+    constructor() {
+        super(...arguments);
+        /** Whether [[`value`]] may be set to `null` by nullSwitch */
+        this.nullable = false;
+        this.selectValue = '';
+        /** Value array be be renders as selection option inside the selection input */
+        this.selectOptions = [];
+        this.disabled = false;
+        this.label = '';
+        this.required = false;
+        this.supportingText = '';
+        this.error = false;
+        this.isNull = false;
+        this.parkedValue = null;
+    }
+    /** SCL attributes `value`, can only be `null` if [[`nullable`]]. */
+    set value(value) {
+        if (value === null) {
+            this.null = true;
+        }
+        else {
+            this.null = false;
+            this.selectValue = value;
+        }
+    }
+    get value() {
+        return this.null ? null : this.selectValue;
+    }
+    get null() {
+        return this.nullable && this.isNull;
+    }
+    set null(value) {
+        if (!this.nullable || value === this.isNull) {
+            return;
+        }
+        this.isNull = value;
+        if (this.isNull) {
+            this.parkedValue = this.selectValue;
+        }
+        else {
+            this.selectValue = this.parkedValue ?? '';
+            this.parkedValue = null;
+        }
+    }
+    reportValidity() {
+        return this.selectInput.reportValidity();
+    }
+    setCustomValidity(message) {
+        this.selectInput?.setCustomValidity(message);
+    }
+    checkValidity() {
+        return this.selectInput.checkValidity();
+    }
+    renderNullSwitch() {
+        if (this.nullable) {
+            return x `<oscd-switch
+        class="nullswitch element"
+        ?selected=${!this.null}
+        ?disabled=${this.disabled}
+        @input="${async (evt) => {
+                /** TODO(jakob-vogelsang): change when
+                 * https://github.com/material-components/material-web/issues/5486
+                 * is fixed */
+                evt.stopPropagation();
+            }}"
+        @change="${async (evt) => {
+                this.null = !evt.target.selected;
+                await this.updateComplete;
+                this.dispatchEvent(new Event('input'));
+            }}"
+      ></oscd-switch>`;
+        }
+        return x ``;
+    }
+    renderSelectOption(selectOption) {
+        return x `<oscd-select-option
+      ?selected=${this.value === selectOption}
+      value="${selectOption}"
+      ><div slot="headline">${selectOption}</div></oscd-select-option
+    >`;
+    }
+    render() {
+        return x `
+      <div style="display: flex; flex-direction: row;">
+        <div class="input container">
+          <oscd-filled-select
+            class="input element"
+            @input="${(evt) => {
+            this.selectValue = evt.target.value;
+        }}"
+            value="${this.selectValue}"
+            ?disabled=${this.disabled || this.isNull}
+            label="${this.label}"
+            ?required=${this.required}
+            supporting-text="${this.supportingText}"
+            ?error=${this.error}
+            error-text="${o(this.errorText)}"
+            >${this.selectOptions.map(selectOption => this.renderSelectOption(selectOption))}</oscd-filled-select
+          >
+        </div>
+        <div class="nullswitch container">${this.renderNullSwitch()}</div>
+      </div>
+    `;
+    }
+}
+OscdSclSelect.scopedElements = {
+    'oscd-switch': OscdSwitch,
+    'oscd-filled-select': OscdFilledSelect,
+    'oscd-select-option': OscdSelectOption,
+};
+OscdSclSelect.styles = i$6 `
+    .nullswitch.element {
+      margin-left: 12px;
+    }
+
+    .nullswitch.container {
+      display: flex;
+      align-items: center;
+      height: 56px;
+    }
+
+    .input.container {
+      flex: auto;
+    }
+
+    .input.element {
+      width: 100%;
+    }
+  `;
+__decorate([
+    n$3({ type: Boolean })
+], OscdSclSelect.prototype, "nullable", void 0);
+__decorate([
+    r$1()
+], OscdSclSelect.prototype, "selectValue", void 0);
+__decorate([
+    n$3({ attribute: false })
+], OscdSclSelect.prototype, "value", null);
+__decorate([
+    n$3({ type: Array })
+], OscdSclSelect.prototype, "selectOptions", void 0);
+__decorate([
+    n$3({ type: Boolean })
+], OscdSclSelect.prototype, "disabled", void 0);
+__decorate([
+    n$3({ type: String })
+], OscdSclSelect.prototype, "label", void 0);
+__decorate([
+    n$3({ type: Boolean })
+], OscdSclSelect.prototype, "required", void 0);
+__decorate([
+    n$3({ type: String })
+], OscdSclSelect.prototype, "supportingText", void 0);
+__decorate([
+    n$3({ type: Boolean })
+], OscdSclSelect.prototype, "error", void 0);
+__decorate([
+    n$3({ type: String })
+], OscdSclSelect.prototype, "errorText", void 0);
+__decorate([
+    r$1()
+], OscdSclSelect.prototype, "isNull", void 0);
+__decorate([
+    r$1()
+], OscdSclSelect.prototype, "null", null);
+__decorate([
+    e$3('.nullswitch.element')
+], OscdSclSelect.prototype, "nullSwitch", void 0);
+__decorate([
+    e$3('.input.element')
+], OscdSclSelect.prototype, "selectInput", void 0);
+
+/**
+ * @tag oscd-scl-checkbox
+ * TextField designed to be used for SCL element */
+class OscdSclCheckbox extends ScopedElementsMixin(i$3) {
+    constructor() {
+        super(...arguments);
+        /** Whether [[`value`]] may be set to `null` by nullSwitch */
+        this.nullable = false;
+        this.checkboxValue = 'false';
+        this.disabled = false;
+        this.label = '';
+        this.supportingText = '';
+        this.isNull = false;
+        this.parkedValue = null;
+    }
+    /** SCL attributes `value`, can only be `null` if [[`nullable`]]. */
+    set value(value) {
+        if (value === null) {
+            this.null = true;
+        }
+        else {
+            this.null = false;
+            this.checkboxValue = value;
+        }
+    }
+    get value() {
+        return this.null ? null : this.checkboxValue;
+    }
+    get userText() {
+        return `${this.label}${this.supportingText !== '' ? ` (${this.supportingText})` : ''}`;
+    }
+    get null() {
+        return this.nullable && this.isNull;
+    }
+    set null(value) {
+        if (!this.nullable || value === this.isNull) {
+            return;
+        }
+        this.isNull = value;
+        if (this.isNull) {
+            this.parkedValue = this.checkboxValue;
+            if (this.defaultValue) {
+                this.checkboxValue = this.defaultValue;
+            }
+        }
+        else {
+            this.checkboxValue = this.parkedValue;
+            this.parkedValue = null;
+        }
+    }
+    // TODO (jakob-vogelsang): only make sense with the introduction of fixed value
+    // eslint-disable-next-line class-methods-use-this
+    reportValidity() {
+        return true;
+    }
+    // TODO (jakob-vogelsang): only make sense with the introduction of fixed value
+    // eslint-disable-next-line class-methods-use-this
+    checkValidity() {
+        return true;
+    }
+    renderNullSwitch() {
+        if (this.nullable) {
+            return x `<oscd-switch
+        class="nullswitch element"
+        ?selected=${!this.null}
+        ?disabled=${this.disabled}
+        @input="${async (evt) => {
+                /** TODO(jakob-vogelsang): change when
+                 * https://github.com/material-components/material-web/issues/5486
+                 * is fixed */
+                evt.stopPropagation();
+            }}"
+        @change="${async (evt) => {
+                this.null = !evt.target.selected;
+                await this.updateComplete;
+                this.dispatchEvent(new Event('input'));
+            }}"
+      ></oscd-switch>`;
+        }
+        return x ``;
+    }
+    render() {
+        return x `
+      <div style="display: flex; flex-direction: row;">
+        <div class="input container">
+          <label
+            class="input element"
+            style="${this.disabled || this.isNull
+            ? `color:rgba(0, 0, 0, 0.38)`
+            : ``}"
+          >
+            <oscd-checkbox
+              touch-target="wrapper"
+              ?checked=${this.checkboxValue === 'true'}
+              ?disabled=${this.disabled || this.isNull}
+              @input="${async (evt) => {
+            this.checkboxValue =
+                evt.target.checked === true
+                    ? 'true'
+                    : 'false';
+            await this.updateComplete; // we want the changes of the value to be certain
+        }}"
+            ></oscd-checkbox>
+            ${this.userText}
+          </label>
+        </div>
+        <div class="nullswitch container">${this.renderNullSwitch()}</div>
+      </div>
+    `;
+    }
+}
+OscdSclCheckbox.scopedElements = {
+    'oscd-switch': OscdSwitch,
+    'oscd-checkbox': OscdCheckbox,
+};
+OscdSclCheckbox.styles = i$6 `
+    .nullswitch.element {
+      margin-left: 12px;
+    }
+
+    .nullswitch.container {
+      display: flex;
+      align-items: center;
+      height: 56px;
+    }
+
+    .input.container {
+      flex: auto;
+    }
+
+    .input.element {
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+  `;
+__decorate([
+    n$3({ type: Boolean })
+], OscdSclCheckbox.prototype, "nullable", void 0);
+__decorate([
+    n$3({ type: String })
+], OscdSclCheckbox.prototype, "defaultValue", void 0);
+__decorate([
+    r$1()
+], OscdSclCheckbox.prototype, "checkboxValue", void 0);
+__decorate([
+    n$3({ attribute: false })
+], OscdSclCheckbox.prototype, "value", null);
+__decorate([
+    n$3({ type: Boolean })
+], OscdSclCheckbox.prototype, "disabled", void 0);
+__decorate([
+    n$3({ type: String })
+], OscdSclCheckbox.prototype, "label", void 0);
+__decorate([
+    n$3({ type: String })
+], OscdSclCheckbox.prototype, "supportingText", void 0);
+__decorate([
+    r$1()
+], OscdSclCheckbox.prototype, "userText", null);
+__decorate([
+    r$1()
+], OscdSclCheckbox.prototype, "isNull", void 0);
+__decorate([
+    r$1()
+], OscdSclCheckbox.prototype, "null", null);
+__decorate([
+    e$3('.nullswitch.element')
+], OscdSclCheckbox.prototype, "nullSwitch", void 0);
+
+class OscdFormField extends ScopedElementsMixin(i$3) {
+    constructor() {
+        super(...arguments);
+        this.label = '';
+        this.helper = '';
+        this.readonly = false;
+        this.required = false;
+        this.type = 'text';
+    }
+    static { this.scopedElements = {
+        'oscd-scl-select': OscdSclSelect,
+        'oscd-scl-text-field': OscdSclTextField,
+        'oscd-scl-checkbox': OscdSclCheckbox,
+    }; }
+    get form() {
+        return this.closest('oscd-form');
+    }
+    get value() {
+        return this.form?.getValue(this.name) ?? null;
+    }
+    get error() {
+        return this.form?.getError(this.name) ?? null;
+    }
+    handleTextChange(event) {
+        if (this.readonly) {
+            return;
+        }
+        const target = event.target;
+        this.form?.setValue(this.name, target.value);
+    }
+    handleCheckboxChange(event) {
+        if (this.readonly) {
+            return;
+        }
+        this.form?.setValue(this.name, event.detail?.value ?? null);
+    }
+    handleSelectChange(event) {
+        if (this.readonly) {
+            return;
+        }
+        this.form?.setValue(this.name, event.detail?.value ?? null);
+    }
+    render() {
+        switch (this.type) {
+            case 'checkbox': {
+                return x `
+          <abbr title=${this.helper}>
+            <oscd-scl-checkbox
+              .label=${this.label}
+              nullable
+              .value=${this.value}
+              ?required=${this.required}
+              ?disabled=${this.readonly}
+              @change=${this.handleCheckboxChange}
+            ></oscd-scl-checkbox>
+          </abbr>
+        `;
+            }
+            case 'select': {
+                return x `
+          <abbr title=${this.helper}>
+            <oscd-scl-select
+              .label=${this.label}
+              nullable
+              .value=${this.value}
+              ?required=${this.required}
+              ?disabled=${this.readonly}
+              @change=${this.handleSelectChange}
+              .selectOptions=${this.enumValues ?? []}
+            >
+            </oscd-scl-select>
+          </abbr>
+        `;
+            }
+            default: {
+                return x `
+          <abbr title=${this.helper}>
+            <oscd-scl-text-field
+              .label=${this.label}
+              nullable
+              .value=${this.value}
+              ?required=${this.required}
+              ?disabled=${this.readonly}
+              .validationMessage=${this.error ?? ''}
+              @input=${this.handleTextChange}
+            ></oscd-scl-text-field>
+          </abbr>
+        `;
+            }
+        }
+    }
+    static { this.styles = i$6 `
+    * {
+      --md-filled-text-field-disabled-input-text-opacity: 0.8;
+      --md-filled-text-field-disabled-label-text-opacity: 0.8;
+      --md-filled-text-field-disabled-container-color: transparent;
+
+      --md-filled-select-text-field-disabled-input-text-opacity: 0.8;
+      --md-filled-select-text-field-disabled-label-text-opacity: 0.8;
+      --md-filled-select-text-field-disabled-container-color: transparent;
+
+      --md-filled-select-text-field-disabled-supporting-text-opacity: 0.8;
+
+      --md-filled-text-field-disabled-active-indicator-color: transparent;
+      --md-filled-text-field-active-indicator-height: 0px;
+    }
+  `; }
+}
+__decorate([
+    n$3()
+], OscdFormField.prototype, "name", void 0);
+__decorate([
+    n$3()
+], OscdFormField.prototype, "label", void 0);
+__decorate([
+    n$3()
+], OscdFormField.prototype, "helper", void 0);
+__decorate([
+    n$3({ type: Boolean })
+], OscdFormField.prototype, "readonly", void 0);
+__decorate([
+    n$3({ type: Boolean })
+], OscdFormField.prototype, "required", void 0);
+__decorate([
+    n$3()
+], OscdFormField.prototype, "type", void 0);
+__decorate([
+    n$3({ attribute: false })
+], OscdFormField.prototype, "enumValues", void 0);
+
+function renderReportConfigurationsServices() {
+    return x `
+    <oscd-form-group>
+      <oscd-form-divider>
+        ${msg('Control Block Configuration')}
+      </oscd-form-divider>
+
+      <oscd-form-field
+        name="reportSettings.cbName"
+        type="select"
+        .options=${['Conf', 'Fix']}
+        .defaultValue=${'Fix'}
+        nullable
+        ?readonly=${true}
+        label=${msg('cbName')}
+        helper=${msg('Whether report control block name is configurable offline (Conf) or fixed (Fix)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="reportSettings.datSet"
+        type="select"
+        .options=${['Dyn', 'Conf', 'Fix']}
+        .defaultValue=${'Fix'}
+        nullable
+        ?readonly=${true}
+        label=${msg('datSet')}
+        helper=${msg('Whether report control blocks data set and its structure is configurable offline (Conf), online (Dyn) or is fixed (Fix)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="reportSettings.rptID"
+        type="select"
+        .options=${['Dyn', 'Conf', 'Fix']}
+        .defaultValue=${'Fix'}
+        nullable
+        ?readonly=${true}
+        label=${msg('rptID')}
+        helper=${msg('Whether report control blocks ID is configurable offline (Conf), online (Dyn) or is fixed (Fix)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="reportSettings.optFields"
+        type="select"
+        .options=${['Dyn', 'Conf', 'Fix']}
+        .defaultValue=${'Fix'}
+        nullable
+        ?readonly=${true}
+        label=${msg('optFields')}
+        helper=${msg('Whether report control blocks optional fields are configurable offline (Conf), online (Dyn) or are fixed (Fix)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="reportSettings.bufTime"
+        type="select"
+        .options=${['Dyn', 'Conf', 'Fix']}
+        .defaultValue=${'Fix'}
+        nullable
+        ?readonly=${true}
+        label=${msg('bufTime')}
+        helper=${msg('Whether report control blocks bufTime attribute is configurable offline (Conf), online (Dyn) or is fixed (Fix)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="reportSettings.trgOps"
+        type="select"
+        .options=${['Dyn', 'Conf', 'Fix']}
+        .defaultValue=${'Fix'}
+        nullable
+        ?readonly=${true}
+        label=${msg('trgOps')}
+        helper=${msg('Whether report control blocks trigger options are configurable offline (Conf), online (Dyn) or are fixed (Fix)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="reportSettings.intgPd"
+        type="select"
+        .options=${['Dyn', 'Conf', 'Fix']}
+        .defaultValue=${'Fix'}
+        nullable
+        ?readonly=${true}
+        label=${msg('intgPd')}
+        helper=${msg('Whether report control blocks integrity period is configurable offline (Conf), online (Dyn) or is fixed (Fix)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="reportSettings.resvTms"
+        type="checkbox"
+        nullable
+        ?readonly=${true}
+        label=${msg('resvTms')}
+        helper=${msg('Whether reserve time exists in all buffered report control blocks')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="reportSettings.owner"
+        type="checkbox"
+        nullable
+        ?readonly=${true}
+        label=${msg('owner')}
+        helper=${msg('Whether owner attribute exists on all buffered report control blocks')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider> ${msg('Publisher Capabilities')} </oscd-form-divider>
+
+      <oscd-form-field
+        name="confReportControl.max"
+        type="textfield"
+        required
+        ?readonly=${true}
+        label=${msg('max')}
+        helper=${msg('The maximum number of report control blocks instantiable by system configuration tool')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="confReportControl.bufMode"
+        type="select"
+        .options=${['unbuffered', 'buffered', 'both']}
+        .defaultValue=${'both'}
+        nullable
+        ?readonly=${true}
+        label=${msg('bufMode')}
+        helper=${msg('Whether buffered, unbuffered or both type of report control block can be created by system configuration tool')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="confReportControl.maxBuf"
+        type="textfield"
+        ?readonly=${true}
+        label=${msg('maxBuf')}
+        helper=${msg('The maximum number of BUFFERED report control blocks instantiable by system configuration tool')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="confReportControl.bufConf"
+        type="checkbox"
+        nullable
+        ?readonly=${true}
+        label=${msg('bufConf')}
+        helper=${msg('Whether buffered attribute can be configured by system configuration tool')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider> ${msg('Client Capabilities')} </oscd-form-divider>
+
+      <oscd-form-field
+        name="clientServices.maxReports"
+        type="textfield"
+        required
+        ?readonly=${true}
+        label=${msg('maxReports')}
+        helper=${msg('The maximal number of report control blocks the client can work with')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="clientServices.bufReport"
+        type="checkbox"
+        nullable
+        ?readonly=${true}
+        label=${msg('bufReport')}
+        helper=${msg('Whether the IED can use buffered report control blocks as a client')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="clientServices.unbufReport"
+        type="checkbox"
+        nullable
+        ?readonly=${true}
+        label=${msg('unbufReport')}
+        helper=${msg('Whether the IED can use un-buffered report control blocks as a client')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider>
+        ${msg('Dynamic Reporting/DataSets')}
+      </oscd-form-divider>
+
+      <oscd-form-field
+        name="dynDataSet.max"
+        type="textfield"
+        required
+        ?readonly=${true}
+        label=${msg('max')}
+        helper=${msg('The maximum number data sets (including preconfigured ones)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="dynDataSet.maxAttributes"
+        type="textfield"
+        ?readonly=${true}
+        label=${msg('maxAttributes')}
+        helper=${msg('The maximum number of data entries (FCDA) allowed within a dynamic data set')}
+      ></oscd-form-field>
+    </oscd-form-group>
+  `;
+}
+
+function renderGseControlServices() {
+    return x `
+    <oscd-form-group>
+      <oscd-form-divider>
+        ${msg('Control Block Configuration')}
+      </oscd-form-divider>
+
+      <oscd-form-field
+        name="gseSettings.cbName"
+        type="select"
+        .options=${['Conf', 'Fix']}
+        .defaultValue=${'Fix'}
+        nullable
+        readonly
+        label=${msg('cbName')}
+        helper=${msg('Whether GSE control block (GOOSE) name is configurable offline (Conf) or fixed (Fix)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="gseSettings.datSet"
+        type="select"
+        .options=${['Dyn', 'Conf', 'Fix']}
+        .defaultValue=${'Fix'}
+        nullable
+        readonly
+        label=${msg('datSet')}
+        helper=${msg('Whether GSE control blocks (GOOSE) data set and its structure is configurable offline (Conf), online (Dyn) or is fixed (Fix)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="gseSettings.appID"
+        type="select"
+        .options=${['Dyn', 'Conf', 'Fix']}
+        .defaultValue=${'Fix'}
+        nullable
+        readonly
+        label=${msg('appID')}
+        helper=${msg('Whether GSE control blocks (GOOSE) ID is configurable offline (Conf), online (Dyn) or is fixed (Fix)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="gseSettings.dataLabel"
+        type="select"
+        .options=${['Dyn', 'Conf', 'Fix']}
+        .defaultValue=${'Fix'}
+        nullable
+        readonly
+        label=${msg('dataLabel')}
+        helper=${msg('Deprecated: Whether GSSE object reference is configurable offline (Conf), online (Dyn) or fixed (Fix)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="gseSettings.kdaParticipant"
+        type="checkbox"
+        nullable
+        readonly
+        label=${msg('kdaParticipant')}
+        helper=${msg('Whether key delivery assurance (KDA) is supported by the server')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="gseSettings.signature"
+        type="checkbox"
+        nullable
+        readonly
+        label=${msg('signature')}
+        helper=${msg('Whether calculation of a signature is supported for each GOOSE')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="gseSettings.encryption"
+        type="checkbox"
+        nullable
+        readonly
+        label=${msg('encryption')}
+        helper=${msg('Whether message encryption is supported for each GOOSE')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider> ${msg('Publisher Capabilities')} </oscd-form-divider>
+
+      <oscd-form-field
+        name="goose.max"
+        type="textfield"
+        required
+        readonly
+        label=${msg('max')}
+        helper=${msg('The maximum number of configurable GOOSE control blocks. 0 means no GOOSE publishing supported')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="goose.fixedOffs"
+        type="checkbox"
+        nullable
+        readonly
+        label=${msg('fixedOffs')}
+        helper=${msg('Whether encoding with fixed offsets is configurable for each GSE control block (GOOSE). See also IEC 61850-8-1')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="goose.goose"
+        type="checkbox"
+        nullable
+        readonly
+        label=${msg('goose')}
+        helper=${msg('Whether GOOSE publishing is supported')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="goose.rGOOSE"
+        type="checkbox"
+        nullable
+        readonly
+        label=${msg('rGOOSE')}
+        helper=${msg('Whether GOOSE with network layer 3 (IP) is supported')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider>
+        ${msg('Subscription Capabilities')}
+      </oscd-form-divider>
+
+      <oscd-form-field
+        name="clientServices.goose"
+        type="checkbox"
+        nullable
+        readonly
+        label=${msg('goose')}
+        helper=${msg('Whether the IED supports client side GOOSE related services')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="clientServices.maxGOOSE"
+        type="textfield"
+        required
+        readonly
+        label=${msg('maxGOOSE')}
+        helper=${msg('The maximal number of GOOSEs the client can subscribe to')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="clientServices.rGOOSE"
+        type="checkbox"
+        nullable
+        readonly
+        label=${msg('rGOOSE')}
+        helper=${msg('The maximal number of GOOSEs with network layer 3 the client can subscribe to')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="clientServices.gsse"
+        type="checkbox"
+        nullable
+        readonly
+        label=${msg('gsse')}
+        helper=${msg('Whether the IED supports client side GSSE related services')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider>
+        ${msg('Supervision Capabilities')}
+      </oscd-form-divider>
+
+      <oscd-form-field
+        name="supSubscription.maxGo"
+        type="textfield"
+        readonly
+        label=${msg('maxGo')}
+        helper=${msg('The maximum number of GOOSE supervision supported by this IED (LGOS)')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider> ${msg('GSSE Capabilities')} </oscd-form-divider>
+
+      <oscd-form-field
+        name="gsse.max"
+        type="textfield"
+        required
+        readonly
+        label=${msg('max')}
+        helper=${msg('The maximum number of GSSE supported as publisher. 0 means IED can only subscribe on GSSE messages')}
+      ></oscd-form-field>
+    </oscd-form-group>
+  `;
+}
+
+function renderNetworkingServices() {
+    return x `
+    <oscd-form-group>
+      <oscd-form-divider>${msg('File Handling')}</oscd-form-divider>
+
+      <oscd-form-field
+        name="fileHandling.mms"
+        type="checkbox"
+        readonly
+        label=${msg('mms')}
+        helper=${msg('Whether the IED supports file transfer as defined by the manufacturer messaging service (MMS)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="fileHandling.ftp"
+        type="checkbox"
+        readonly
+        label=${msg('ftp')}
+        helper=${msg('Whether the IED supports file transfer service (FTP)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="fileHandling.ftps"
+        type="checkbox"
+        readonly
+        label=${msg('ftps')}
+        helper=${msg('Whether the IED supports encrypted file transfer service (FTPS)')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider>
+        ${msg('Time Server Capabilities')}
+      </oscd-form-divider>
+
+      <oscd-form-field
+        name="timeSyncProt.sntp"
+        type="checkbox"
+        readonly
+        label=${msg('sntp')}
+        helper=${msg('Whether the IED supports simple network time protocol as time-server')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="timeSyncProt.iec61850_9_3"
+        type="checkbox"
+        readonly
+        label=${msg('iec61850_9_3')}
+        helper=${msg('Whether the IED supports precision time protocol (PTP) acc. to IEC 61850-9-3 as time-server')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="timeSyncProt.c37_238"
+        type="checkbox"
+        readonly
+        label=${msg('c37_238')}
+        helper=${msg('Whether the IED supports precision time protocol (PTP) acc. to C37.238 as time-server')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="timeSyncProt.other"
+        type="checkbox"
+        readonly
+        label=${msg('other')}
+        helper=${msg('Whether IED supports other type of synchronization as time-server (e.g. PPS)')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider>
+        ${msg('Time Client Capabilities')}
+      </oscd-form-divider>
+
+      <oscd-form-field
+        name="clientServices.timeSyncProt.sntp"
+        type="checkbox"
+        readonly
+        label=${msg('sntp')}
+        helper=${msg('Whether the IED supports simple network time protocol as time-client')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="clientServices.timeSyncProt.iec61850_9_3"
+        type="checkbox"
+        readonly
+        label=${msg('iec61850_9_3')}
+        helper=${msg('Whether the IED supports precision time protocol (PTP) acc. to IEC 61850-9-3 as time-client')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="clientServices.timeSyncProt.c37_238"
+        type="checkbox"
+        readonly
+        label=${msg('c37_238')}
+        helper=${msg('Whether the IED supports precision time protocol (PTP) acc. to C37.238 as time-client')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="clientServices.timeSyncProt.other"
+        type="checkbox"
+        readonly
+        label=${msg('other')}
+        helper=${msg('Whether IED supports other type of synchronization as time-client (e.g. PPS)')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider>
+        ${msg('Multicast Security on Server')}
+      </oscd-form-divider>
+
+      <oscd-form-field
+        name="clientServices.mcSecurity.signature"
+        type="checkbox"
+        readonly
+        label=${msg('signature')}
+        helper=${msg('Whether calculation of a signature is supported for SMV/GOOSE on this IED/access point')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="clientServices.mcSecurity.encryption"
+        type="checkbox"
+        readonly
+        label=${msg('encryption')}
+        helper=${msg('Whether message encryption is supported for SMV/GOOSE on this IED/access point')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider> ${msg('Redundancy Protocols')} </oscd-form-divider>
+
+      <oscd-form-field
+        name="redProt.hsr"
+        type="checkbox"
+        readonly
+        label=${msg('hsr')}
+        helper=${msg('Whether the IED supports redundancy protocol HSR')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="redProt.prp"
+        type="checkbox"
+        readonly
+        label=${msg('prp')}
+        helper=${msg('Whether the IED supports redundancy protocol PRP')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="redProt.rstp"
+        type="checkbox"
+        readonly
+        label=${msg('rstp')}
+        helper=${msg('Whether the IED supports redundancy protocol RSTP')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider>${msg('Others')}</oscd-form-divider>
+
+      <oscd-form-field
+        name="commProt.ipv6"
+        type="checkbox"
+        readonly
+        label=${msg('ipv6')}
+        helper=${msg('Whether the IED supports IP version 6')}
+      ></oscd-form-field>
+    </oscd-form-group>
+  `;
+}
+
+function renderSampledValuesServices() {
+    return x `
+    <oscd-form-group>
+      <oscd-form-divider>
+        ${msg('Control Block Configuration')}
+      </oscd-form-divider>
+
+      <oscd-form-field
+        name="smvSettings.cbName"
+        type="select"
+        .options=${['Conf', 'Fix']}
+        .defaultValue=${'Fix'}
+        readonly
+        label=${msg('cbName')}
+        helper=${msg('Whether SMV control block name is configurable offline (Conf) or fixed (Fix)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="smvSettings.datSet"
+        type="select"
+        .options=${['Dyn', 'Conf', 'Fix']}
+        .defaultValue=${'Fix'}
+        readonly
+        label=${msg('datSet')}
+        helper=${msg('Whether SMV control blocks data set and its structure is configurable offline (Conf), online (Dyn) or is fixed (Fix)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="smvSettings.svID"
+        type="select"
+        .options=${['Dyn', 'Conf', 'Fix']}
+        .defaultValue=${'Fix'}
+        readonly
+        label=${msg('svID')}
+        helper=${msg('Whether SMV control blocks ID is configurable offline (Conf), online (Dyn) or is fixed (Fix)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="smvSettings.optFields"
+        type="select"
+        .options=${['Dyn', 'Conf', 'Fix']}
+        .defaultValue=${'Fix'}
+        readonly
+        label=${msg('optFields')}
+        helper=${msg('Whether SMV control blocks optional fields are configurable offline (Conf), online (Dyn) or are fixed (Fix)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="smvSettings.smpRate"
+        type="select"
+        .options=${['Dyn', 'Conf', 'Fix']}
+        .defaultValue=${'Fix'}
+        readonly
+        label=${msg('smpRate')}
+        helper=${msg('Whether SMV control blocks attribute smpRate is configurable offline (Conf), online (Dyn) or is fixed (Fix)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="smvSettings.nofASDU"
+        type="select"
+        .options=${['Conf', 'Fix']}
+        .defaultValue=${'Fix'}
+        readonly
+        label=${msg('nofASDU')}
+        helper=${msg('Whether SMV control blocks attribute noASDU is configurable offline (Conf) or fixed (Fix)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="smvSettings.samplesPerSec"
+        type="checkbox"
+        readonly
+        label=${msg('samplesPerSec')}
+        helper=${msg('Whether SMV supports sample rate definition as SamplesPerSec or SecPerSamples')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="smvSettings.synchSrcId"
+        type="checkbox"
+        readonly
+        label=${msg('synchSrcId')}
+        helper=${msg('Whether grandmaster clock ID can be included in the SMV')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="smvSettings.pdcTimeStamp"
+        type="checkbox"
+        readonly
+        label=${msg('pdcTimeStamp')}
+        helper=${msg('Whether the PDC timestamp can be included into SMV')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="smvSettings.kdaParticipant"
+        type="checkbox"
+        readonly
+        label=${msg('kdaParticipant')}
+        helper=${msg('Whether server supports key delivery assurance (KDA)')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="smvSettings.mcSecurity.signature"
+        type="checkbox"
+        readonly
+        label=${msg('signature')}
+        helper=${msg('Whether calculation of a signature is supported for SMV')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="smvSettings.mcSecurity.encryption"
+        type="checkbox"
+        readonly
+        label=${msg('encryption')}
+        helper=${msg('Whether message encryption is supported for SMV')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="smvSettings.smpRateVal"
+        type="textfield"
+        readonly
+        label=${msg('SmpRate')}
+        helper=${msg('Defines the implemented SmpRate in the IED')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="smvSettings.samplesPerSecVal"
+        type="textfield"
+        readonly
+        label=${msg('SamplesPerSec')}
+        helper=${msg('Defines the implemented SamplesPerSec in the IED')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="smvSettings.secPerSamplesVal"
+        type="textfield"
+        readonly
+        label=${msg('SecPerSamples')}
+        helper=${msg('Defines the implemented SecPerSamples in the IED')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider> ${msg('Publisher Capabilities')} </oscd-form-divider>
+
+      <oscd-form-field
+        name="smvPublisher.max"
+        type="textfield"
+        readonly
+        label=${msg('max')}
+        helper=${msg('The maximum number of SMV control blocks the IED can publish')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="smvPublisher.delivery"
+        type="select"
+        .options=${['unicast', 'multicast', 'both']}
+        .defaultValue=${'multicast'}
+        readonly
+        label=${msg('delivery')}
+        helper=${msg('Whether the IED supports publishing of multicast, unicast or both types of SMV streams')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="smvPublisher.deliveryConf"
+        type="checkbox"
+        readonly
+        label=${msg('deliveryConf')}
+        helper=${msg('Whether the system configurator is allowed to configure SMV control blocks')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="smvPublisher.sv"
+        type="checkbox"
+        readonly
+        label=${msg('sv')}
+        helper=${msg('Whether IED supports layer 2 sampled value streams')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="smvPublisher.rSV"
+        type="checkbox"
+        readonly
+        label=${msg('rSV')}
+        helper=${msg('Whether the IED supports layer 3 sampled value streams')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider> ${msg('Client Capabilities')} </oscd-form-divider>
+
+      <oscd-form-field
+        name="clientServices.sv"
+        type="checkbox"
+        readonly
+        label=${msg('sv')}
+        helper=${msg('Whether the IED supports client side SMV related services')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="clientServices.maxSMV"
+        type="textfield"
+        readonly
+        label=${msg('maxSMV')}
+        helper=${msg('The maximal number of layer 2 sampled value streams the client can subscribe to')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="clientServices.rSV"
+        type="checkbox"
+        readonly
+        label=${msg('rSV')}
+        helper=${msg('The maximal number of layer 3 sampled value streams the client can subscribe to')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider>
+        ${msg('Dynamic Reporting/DataSets')}
+      </oscd-form-divider>
+
+      <oscd-form-field
+        name="supSubscription.maxSv"
+        type="textfield"
+        readonly
+        label=${msg('maxSv')}
+        helper=${msg('The maximum number of SMV supervision supported by this IED (LSVS)')}
+      ></oscd-form-field>
+    </oscd-form-group>
+  `;
+}
+
+function renderClientServerServices() {
+    return x `
+    <oscd-form-group>
+      <oscd-form-divider>${msg('Dynamic Associations')}</oscd-form-divider>
+
+      <oscd-form-field
+        name="dynamicAssociations.max"
+        type="textfield"
+        readonly
+        label=${msg('max')}
+        helper=${msg('The maximum number of guaranteed parallel association with the IED. If missing, no association is possible')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider>${msg('Discover Capabilities')}</oscd-form-divider>
+
+      <oscd-form-field
+        name="discoverCapabilities.getDirectory"
+        type="checkbox"
+        readonly
+        label=${msg('GetDirectory')}
+        helper=${msg('Whether IED supports GetServerDirectory, GetLogicalDeviceDirectory, GetLogicalNodeDirectory')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="discoverCapabilities.getDataObjectDefinition"
+        type="checkbox"
+        readonly
+        label=${msg('GetDataObjectDefinition')}
+        helper=${msg('Whether IED supports the service GetDataDefinition')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="discoverCapabilities.dataObjectDirectory"
+        type="checkbox"
+        readonly
+        label=${msg('DataObjectDirectory')}
+        helper=${msg('Whether IED supports the service GetDataDirectory')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="discoverCapabilities.getDataSetValue"
+        type="checkbox"
+        readonly
+        label=${msg('GetDataSetValue')}
+        helper=${msg('Whether IED supports the service GetDataSetValues')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="discoverCapabilities.setDataSetValue"
+        type="checkbox"
+        readonly
+        label=${msg('SetDataSetValue')}
+        helper=${msg('Whether IED supports the service SetDataSetValue')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="discoverCapabilities.setDataSetDirectory"
+        type="checkbox"
+        readonly
+        label=${msg('SetDataSetDirectory')}
+        helper=${msg('Whether IED supports the service SetDataSetDirectory')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="discoverCapabilities.readWrite"
+        type="checkbox"
+        readonly
+        label=${msg('ReadWrite')}
+        helper=${msg('Whether IED supports the service GetData, SetData, and Operate')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider>${msg('Functional Naming')}</oscd-form-divider>
+
+      <oscd-form-field
+        name="functionalNaming.confLdName"
+        type="checkbox"
+        readonly
+        label=${msg('ConfLdName')}
+        helper=${msg('Whether the IED allows defining the attribute ldName in logical devices')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="functionalNaming.supportsLdName"
+        type="checkbox"
+        readonly
+        label=${msg('supportsLdName')}
+        helper=${msg('Whether the IED understands the logical device name as a client')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider>${msg('Client Capabilities')}</oscd-form-divider>
+
+      <oscd-form-field
+        name="clientCapabilities.maxAttributes"
+        type="textfield"
+        readonly
+        label=${msg('maxAttributes')}
+        helper=${msg('The maximum receivable data attributes across all data sets')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="clientCapabilities.timerActivatedControl"
+        type="checkbox"
+        readonly
+        label=${msg('TimerActivatedControl')}
+        helper=${msg('Whether IED supports time activated control')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="clientCapabilities.getCBValues"
+        type="checkbox"
+        readonly
+        label=${msg('GetCBValues')}
+        helper=${msg('Whether IED can read control blocks online')}
+      ></oscd-form-field>
+
+      <oscd-form-field
+        name="clientCapabilities.GSEDir"
+        type="checkbox"
+        readonly
+        label=${msg('GSEDir')}
+        helper=${msg('Whether IED supports GSE directory services acc. to IEC 61850-7-2')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider>
+        ${msg('ValKind Manipulation Configuration')}
+      </oscd-form-divider>
+
+      <oscd-form-field
+        name="valKindManipulationConfig.setToRO"
+        type="checkbox"
+        readonly
+        label=${msg('setToRO')}
+        helper=${msg('Whether valKind attributes can be modified to RO')}
+      ></oscd-form-field>
+    </oscd-form-group>
+
+    <oscd-form-group>
+      <oscd-form-divider>
+        ${msg('Signal Reference Configuration')}
+      </oscd-form-divider>
+
+      <oscd-form-field
+        name="signalReferenceConfig.max"
+        type="textfield"
+        readonly
+        label=${msg('max')}
+        helper=${msg('The maximum object references the IED can create')}
+      ></oscd-form-field>
+    </oscd-form-group>
+  `;
+}
+
+class IedServicesAction extends ScopedElementsMixin(i$3) {
+    constructor() {
+        super(...arguments);
+        this.services = null;
+        this.activeIndex = 0;
+        this.headline = msg('Services');
+        this.pages = [
+            {
+                title: msg('Log Settings'),
+                renderer: renderLogSettingsServices,
+            },
+            {
+                title: msg('Report Configurations'),
+                renderer: renderReportConfigurationsServices,
+            },
+            {
+                title: msg('GSE Control'),
+                renderer: renderGseControlServices,
+            },
+            {
+                title: msg('Networking'),
+                renderer: renderNetworkingServices,
+            },
+            {
+                title: msg('Sampled Values'),
+                renderer: renderSampledValuesServices,
+            },
+            {
+                title: msg('Edit Client Server Services'),
+                renderer: renderClientServerServices,
+            },
+        ];
+    }
+    static { this.scopedElements = {
+        'oscd-icon': OscdIcon,
+        'oscd-icon-button': OscdIconButton,
+        'oscd-dialog': OscdDialog,
+        'oscd-filled-button': OscdFilledButton,
+        'oscd-outlined-button': OscdOutlinedButton,
+        'oscd-form': OscdForm,
+        'oscd-form-field': OscdFormField,
+        'oscd-form-divider': OscdFormDivider,
+        'oscd-form-group': OscdFormGroup,
+    }; }
+    set ied(value) {
+        this._ied = value;
+        this.services = extractServicesData(this._ied);
+    }
+    get ied() {
+        return this._ied;
+    }
+    show() {
+        this.activeIndex = 0;
+        if (!this.pages || this.pages.length === 0) {
+            return;
+        }
+        this.dialog.show();
+    }
+    close() {
+        this.dialog.close();
+    }
+    goNext() {
+        if (this.activeIndex < this.pages.length - 1) {
+            this.activeIndex++;
+        }
+    }
+    goBack() {
+        if (this.activeIndex > 0) {
+            this.activeIndex--;
+        }
+    }
+    selectIndex(e, index) {
+        e.preventDefault();
+        this.activeIndex = index;
+    }
+    render() {
+        const active = this.pages[this.activeIndex];
+        return x `
+      <oscd-icon-button ?disabled=${!this.services} @click=${() => this.show()}
+        ><oscd-icon>settings</oscd-icon></oscd-icon-button
+      >
+      <oscd-dialog @closed=${this.close}>
+        <div slot="headline">${this.headline}</div>
+        <div slot="content" class="dialog-content">
+          <aside class="nav">
+            <ul>
+              ${this.pages.map((p, i) => x `
+                  <li class=${i === this.activeIndex ? 'active' : ''}>
+                    <button @click=${(e) => this.selectIndex(e, i)}>
+                      ${p.title}
+                    </button>
+                  </li>
+                `)}
+            </ul>
+          </aside>
+          <section class="page">
+            <oscd-form .data=${this.services}>
+              ${active
+            ? active.renderer()
+            : x `<div>No pages available</div>`}
+            </oscd-form>
+          </section>
+        </div>
+        <div slot="actions">
+          <oscd-outlined-button slot="secondaryAction" @click=${this.close}
+            >Cancel</oscd-outlined-button
+          >
+          <oscd-outlined-button
+            slot="secondaryAction"
+            @click=${this.goBack}
+            ?disabled=${this.activeIndex === 0}
+            >Back</oscd-outlined-button
+          >
+          <oscd-filled-button
+            slot="primaryAction"
+            @click=${this.goNext}
+            ?disabled=${this.activeIndex === this.pages.length - 1}
+            >Next</oscd-filled-button
+          >
+        </div>
+      </oscd-dialog>
+    `;
+    }
+    static { this.styles = i$6 `
+    oscd-dialog {
+      max-width: min(800px, 100% - 48px);
+    }
+
+    oscd-dialog [slot='content'] {
+      display: flex;
+      gap: 12px;
+      box-sizing: border-box;
+      width: 640px;
+      max-width: 100vw;
+    }
+
+    oscd-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .nav {
+      width: 180px;
+      border-right: 1px solid var(--oscd-base1);
+      padding-right: 8px;
+    }
+    .nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .nav li button {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+    }
+    .nav li.active button {
+      font-weight: 600;
+    }
+    .page {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 8px;
+    }
+  `; }
+}
+__decorate([
+    n$3({ type: Element })
+], IedServicesAction.prototype, "ied", null);
+__decorate([
+    r$1()
+], IedServicesAction.prototype, "services", void 0);
+__decorate([
+    r$1()
+], IedServicesAction.prototype, "activeIndex", void 0);
+__decorate([
+    n$3({ type: String })
+], IedServicesAction.prototype, "headline", void 0);
+__decorate([
+    e$3('oscd-dialog')
+], IedServicesAction.prototype, "dialog", void 0);
+
 /** [[`IED`]] plugin subeditor for editing `IED` element. */
 class IedContainer extends ScopedElementsMixin(BaseContainer) {
     constructor() {
         super(...arguments);
         this.selectedLNClasses = [];
     }
+    static { this.scopedElements = {
+        'oscd-icon': OscdIcon,
+        'oscd-icon-button': OscdIconButton,
+        'oscd-action-pane': OscdActionPane,
+        'access-point-container': AccessPointContainer,
+        'access-point-create-dialog': AccessPointCreateDialog,
+        'ied-services-action': IedServicesAction,
+    }; }
     handleEditIed() {
         this.dispatchEvent(newEditElementEvent({ element: this.element }));
     }
@@ -56106,9 +58130,6 @@ class IedContainer extends ScopedElementsMixin(BaseContainer) {
         }
         this.dispatchEvent(newEditEventV2(inserts));
     }
-    handleEditServices(services) {
-        console.log('Please implement me', this.element.getAttribute('name'), new XMLSerializer().serializeToString(services));
-    }
     removeIED() {
         const heading = this.header();
         this.dispatchEvent(newConfirmDeleteEvent({
@@ -56123,22 +58144,6 @@ class IedContainer extends ScopedElementsMixin(BaseContainer) {
         const name = this.element.getAttribute('name') ?? '';
         const desc = this.element.getAttribute('desc');
         return `${name}${desc ? ` \u2014 ${desc}` : ''}`;
-    }
-    renderServicesIcon() {
-        const services = this.element.querySelector('Services');
-        if (!services) {
-            return x ``;
-        }
-        return x ` <abbr
-      slot="action"
-      title="${msg('Show Services the IED/AccessPoint provides')}"
-    >
-      <oscd-icon-button
-        disabled
-        @click=${() => this.handleEditServices(services)}
-        ><oscd-icon>settings</oscd-icon></oscd-icon-button
-      >
-    </abbr>`;
     }
     render() {
         return x ` <oscd-action-pane .label="${this.header()}">
@@ -56162,7 +58167,12 @@ class IedContainer extends ScopedElementsMixin(BaseContainer) {
           <oscd-icon>edit</oscd-icon></oscd-icon-button
         >
       </abbr>
-      ${this.renderServicesIcon()}
+      <abbr
+        slot="action"
+        title="${msg('Show Services the IED/AccessPoint provides')}"
+      >
+        <ied-services-action .ied=${this.element}></ied-services-action>
+      </abbr>
       <abbr slot="action" title="${msg('Add AccessPoint')}">
         <oscd-icon-button
           data-testid="add-access-point-button"
@@ -56186,20 +58196,13 @@ class IedContainer extends ScopedElementsMixin(BaseContainer) {
       ></access-point-create-dialog>
     </oscd-action-pane>`;
     }
-}
-IedContainer.scopedElements = {
-    'oscd-icon': OscdIcon,
-    'oscd-icon-button': OscdIconButton,
-    'oscd-action-pane': OscdActionPane,
-    'access-point-container': AccessPointContainer,
-    'access-point-create-dialog': AccessPointCreateDialog,
-};
-IedContainer.styles = i$6 `
+    static { this.styles = i$6 `
     abbr {
       text-decoration: none;
       border-bottom: none;
     }
-  `;
+  `; }
+}
 __decorate([
     n$3({ type: Array })
 ], IedContainer.prototype, "selectedLNClasses", void 0);
@@ -56215,8 +58218,7 @@ class ElementPath extends ScopedElementsMixin(i$3) {
     render() {
         return x ` <h3>${this.paths.join(' / ')}</h3> `;
     }
-}
-ElementPath.styles = i$6 `
+    static { this.styles = i$6 `
     :host {
       display: block;
       min-width: 0;
@@ -56234,7 +58236,8 @@ ElementPath.styles = i$6 `
       transition: background-color 150ms linear;
       width: 100%; /* Ensure it respects parent width */
     }
-  `;
+  `; }
+}
 __decorate([
     r$1()
 ], ElementPath.prototype, "paths", void 0);
@@ -56246,6 +58249,11 @@ class ConfirmDeleteDialog extends ScopedElementsMixin(i$3) {
         this.heading = '';
         this.message = '';
     }
+    static { this.scopedElements = {
+        'oscd-dialog': OscdDialog,
+        'oscd-outlined-button': OscdOutlinedButton,
+        'oscd-filled-button': OscdFilledButton,
+    }; }
     confirmDelete(details) {
         this.heading = details.heading;
         this.message = details.message;
@@ -56286,13 +58294,7 @@ class ConfirmDeleteDialog extends ScopedElementsMixin(i$3) {
       </oscd-dialog>
     `;
     }
-}
-ConfirmDeleteDialog.scopedElements = {
-    'oscd-dialog': OscdDialog,
-    'oscd-outlined-button': OscdOutlinedButton,
-    'oscd-filled-button': OscdFilledButton,
-};
-ConfirmDeleteDialog.styles = i$6 `
+    static { this.styles = i$6 `
     oscd-filled-button {
       --md-sys-color-primary: var(--oscd-error);
       --oscd-filled-button-color: var(--oscd-base03);
@@ -56300,7 +58302,8 @@ ConfirmDeleteDialog.styles = i$6 `
     .dialog-content {
       margin-top: 16px;
     }
-  `;
+  `; }
+}
 __decorate([
     r$1()
 ], ConfirmDeleteDialog.prototype, "heading", void 0);
@@ -56320,6 +58323,12 @@ class VirtualIedCreateDialog extends ScopedElementsMixin(i$3) {
         super(...arguments);
         this.newIedName = '';
     }
+    static { this.scopedElements = {
+        'oscd-dialog': OscdDialog,
+        'oscd-filled-textfield': OscdFilledTextField,
+        'oscd-outlined-button': OscdOutlinedButton,
+        'oscd-filled-button': OscdFilledButton,
+    }; }
     show() {
         this.newIedName = '';
         this.dialog.show();
@@ -56407,18 +58416,12 @@ class VirtualIedCreateDialog extends ScopedElementsMixin(i$3) {
       </oscd-dialog>
     `;
     }
-}
-VirtualIedCreateDialog.scopedElements = {
-    'oscd-dialog': OscdDialog,
-    'oscd-filled-textfield': OscdFilledTextField,
-    'oscd-outlined-button': OscdOutlinedButton,
-    'oscd-filled-button': OscdFilledButton,
-};
-VirtualIedCreateDialog.styles = i$6 `
+    static { this.styles = i$6 `
     .dialog-content {
       margin-top: 16px;
     }
-  `;
+  `; }
+}
 __decorate([
     n$3()
 ], VirtualIedCreateDialog.prototype, "doc", void 0);
@@ -56455,7 +58458,7 @@ function getLnClassSelectItem(lnClass, selectedLNClasses, nsdoc) {
     };
 }
 /** An editor [[`plugin`]] for editing the `IED` section. */
-class IedPlugin extends ScopedElementsMixin(i$3) {
+class OscdEditorIED extends ScopedElementsMixin(i$3) {
     constructor() {
         super(...arguments);
         this.docVersion = -1;
@@ -56468,6 +58471,18 @@ class IedPlugin extends ScopedElementsMixin(i$3) {
         this.selectedElementPath = [];
         this.lNClassListOpenedOnce = false;
     }
+    static { this.scopedElements = {
+        'oscd-outlined-button': OscdOutlinedButton,
+        'oscd-filter-button': OscdFilterButton,
+        'oscd-list-item': OscdListItem,
+        'oscd-scl-icon': OscdSclIcon,
+        'oscd-icon': OscdIcon,
+        'element-path': ElementPath,
+        'ied-container': IedContainer,
+        'oscd-scl-dialogs': OscdSclDialogs,
+        'virtual-ied-create-dialog': VirtualIedCreateDialog,
+        'confirm-delete-dialog': ConfirmDeleteDialog,
+    }; }
     get iedList() {
         const ieds = this.doc
             ? Array.from(this.doc.querySelectorAll(':root > IED')).sort((a, b) => compareNames(a, b))
@@ -56720,20 +58735,7 @@ class IedPlugin extends ScopedElementsMixin(i$3) {
       <confirm-delete-dialog></confirm-delete-dialog>
     </div>`;
     }
-}
-IedPlugin.scopedElements = {
-    'oscd-outlined-button': OscdOutlinedButton,
-    'oscd-filter-button': OscdFilterButton,
-    'oscd-list-item': OscdListItem,
-    'oscd-scl-icon': OscdSclIcon,
-    'oscd-icon': OscdIcon,
-    'element-path': ElementPath,
-    'ied-container': IedContainer,
-    'oscd-scl-dialogs': OscdSclDialogs,
-    'virtual-ied-create-dialog': VirtualIedCreateDialog,
-    'confirm-delete-dialog': ConfirmDeleteDialog,
-};
-IedPlugin.styles = i$6 `
+    static { this.styles = i$6 `
     * {
       /* patch theme colors defined in shell until we can correct them */
       --md-icon-button-disabled-icon-color: var(--oscd-base00);
@@ -56774,55 +58776,56 @@ IedPlugin.styles = i$6 `
     oscd-action-pane {
       --oscd-action-pane-theme-on-primary: var(--oscd-base2);
     }
-  `;
+  `; }
+}
 __decorate([
     n$3({ type: Object })
-], IedPlugin.prototype, "doc", void 0);
+], OscdEditorIED.prototype, "doc", void 0);
 __decorate([
     n$3({ type: Object })
-], IedPlugin.prototype, "docs", void 0);
+], OscdEditorIED.prototype, "docs", void 0);
 __decorate([
     n$3({ type: String })
-], IedPlugin.prototype, "docName", void 0);
+], OscdEditorIED.prototype, "docName", void 0);
 __decorate([
     n$3({ type: Number })
-], IedPlugin.prototype, "docVersion", void 0);
+], OscdEditorIED.prototype, "docVersion", void 0);
 __decorate([
     n$3({ type: Object })
-], IedPlugin.prototype, "nsdoc", void 0);
+], OscdEditorIED.prototype, "nsdoc", void 0);
 __decorate([
     n$3({ type: Object })
-], IedPlugin.prototype, "oscdApi", void 0);
+], OscdEditorIED.prototype, "oscdApi", void 0);
 __decorate([
     r$1()
-], IedPlugin.prototype, "selectedIEDs", void 0);
+], OscdEditorIED.prototype, "selectedIEDs", void 0);
 __decorate([
     r$1()
-], IedPlugin.prototype, "selectedLNClasses", void 0);
+], OscdEditorIED.prototype, "selectedLNClasses", void 0);
 __decorate([
     r$1()
-], IedPlugin.prototype, "iedMap", void 0);
+], OscdEditorIED.prototype, "iedMap", void 0);
 __decorate([
     r$1()
-], IedPlugin.prototype, "selectedElementPath", void 0);
+], OscdEditorIED.prototype, "selectedElementPath", void 0);
 __decorate([
     r$1()
-], IedPlugin.prototype, "iedList", null);
+], OscdEditorIED.prototype, "iedList", null);
 __decorate([
     r$1()
-], IedPlugin.prototype, "lnClassList", null);
+], OscdEditorIED.prototype, "lnClassList", null);
 __decorate([
     r$1()
-], IedPlugin.prototype, "selectedIed", null);
+], OscdEditorIED.prototype, "selectedIed", null);
 __decorate([
     e$3('oscd-scl-dialogs')
-], IedPlugin.prototype, "sclDialog", void 0);
+], OscdEditorIED.prototype, "sclDialog", void 0);
 __decorate([
     e$3('virtual-ied-create-dialog')
-], IedPlugin.prototype, "createIedDialog", void 0);
+], OscdEditorIED.prototype, "createIedDialog", void 0);
 __decorate([
     e$3('confirm-delete-dialog')
-], IedPlugin.prototype, "confimDeleteDialog", void 0);
+], OscdEditorIED.prototype, "confimDeleteDialog", void 0);
 
-export { IedPlugin as default };
+export { OscdEditorIED };
 //# sourceMappingURL=oscd-editor-ied.js.map

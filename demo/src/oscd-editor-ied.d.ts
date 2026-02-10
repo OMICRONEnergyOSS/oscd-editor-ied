@@ -12,9 +12,9 @@ import { ConfirmDeleteEvent, EditElementEvent } from './foundation/events.js';
 import { ConfirmDeleteDialog } from './components/confirm-delete-dialog.js';
 import { VirtualIedCreateDialog } from './components/virtual-ied-create-dialog.js';
 import OscdSclDialogs from '@omicronenergy/oscd-scl-dialogs/OscdSclDialogs.js';
-declare const IedPlugin_base: typeof LitElement & import("@open-wc/scoped-elements/lit-element.js").ScopedElementsHostConstructor;
+declare const OscdEditorIED_base: typeof LitElement & import("@open-wc/scoped-elements/lit-element.js").ScopedElementsHostConstructor;
 /** An editor [[`plugin`]] for editing the `IED` section. */
-export default class IedPlugin extends IedPlugin_base {
+export declare class OscdEditorIED extends OscdEditorIED_base {
     static scopedElements: {
         'oscd-outlined-button': typeof OscdOutlinedButton;
         'oscd-filter-button': typeof OscdFilterButton;

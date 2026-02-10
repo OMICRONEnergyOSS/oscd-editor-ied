@@ -1,5 +1,4 @@
 /** [[`IED`]] plugin subeditor for editing `AccessPoint` element. */
-import { TemplateResult } from 'lit';
 import { BaseContainer } from '../base-container.js';
 import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
 import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
@@ -21,13 +20,11 @@ export declare class AccessPointContainer extends AccessPointContainer_base {
     };
     selectedLNClasses: string[];
     accessPointDialog: AccessPointEditDialog;
-    private openSettingsWizard;
     private removeAccessPoint;
     updateAccessPoint(data: AccessPointEditData): void;
     private header;
     private getLnElements;
-    private renderServicesIcon;
-    render(): TemplateResult<1>;
+    render(): import("lit-html").TemplateResult<1>;
     static styles: import("lit").CSSResult;
 }
 export {};
