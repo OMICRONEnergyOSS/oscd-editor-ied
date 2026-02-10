@@ -4,6 +4,7 @@ import OscdEditorSource from '@omicronenergy/oscd-editor-source';
 
 import { OscdEditorIED } from '../src/oscd-editor-ied.ts';
 
+// eslint-disable-next-line no-undef
 const oscdShell = document.querySelector('oscd-shell');
 if (oscdShell) {
   oscdShell.registry.define('oscd-menu-open', OscdMenuOpen);

@@ -82,7 +82,7 @@ export class IedServicesAction extends ScopedElementsMixin(LitElement) {
       renderer: renderSampledValuesServices,
     },
     {
-      title: msg('Edit Client Server Services'),
+      title: msg('Client Server Services'),
       renderer: renderClientServerServices,
     },
   ];

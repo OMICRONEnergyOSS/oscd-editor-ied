@@ -1,22 +1,17 @@
 {
   "compilerOptions": {
-    "target": "es2022",
-    "module": "esnext",
+    "target": "ES2022",
+    "module": "ESNext",
     "moduleResolution": "bundler",
-    "noEmitOnError": true,
-    "lib": ["es2022", "dom"],
+    "lib": ["ES2022", "DOM"],
+
     "strict": true,
-    "esModuleInterop": false,
-    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+
     "experimentalDecorators": true,
     "useDefineForClassFields": false,
-    "importHelpers": true,
-    "outDir": "dist",
-    "sourceMap": true,
-    "inlineSources": true,
-    "rootDir": "./",
-    "declaration": true,
-    "skipLibCheck": true
+
+    "types": []
   },
-  "include": ["**/*.ts"]
+  "include": ["src", "demo", "test"]
 }

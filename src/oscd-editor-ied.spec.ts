@@ -1,9 +1,9 @@
-import { expect, fixture, html, waitUntil } from '@open-wc/testing';
+import { expect, describe, beforeEach, afterEach, it, vi } from 'vitest';
+import { fixture, PluginTestHarness } from './test-utils/test-harness.js';
 import { OscdEditorIED } from './oscd-editor-ied.js';
 import { LitElement } from 'lit';
 import { parseDoc, testDocs } from './test-utils/test-files.js';
 import { getNamedElement } from './test-utils/queries.js';
-import { PluginTestHarness } from './test-utils/test-harness.js';
 import { Plugin } from '@openscd/oscd-api';
 import { typeIn } from './test-utils/actions.js';
 import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
@@ -19,7 +19,10 @@ describe('oscd-editor-ied', () => {
   let doc: XMLDocument;
 
   beforeEach(async () => {
-    oscdEditorIED = await fixture(html`<oscd-editor-ied></oscd-editor-ied>`);
+    oscdEditorIED = await fixture(
+      `<oscd-editor-ied></oscd-editor-ied>`,
+      'oscd-editor-ied',
+    );
     harness = new PluginTestHarness(oscdEditorIED);
     doc = parseDoc(testDocs.withIED);
     harness.setDoc('testdoc.scd', doc);
@@ -76,7 +79,7 @@ describe('oscd-editor-ied', () => {
     expect(createButton).to.exist;
     harness.commitSpy.resetHistory();
     createButton.click();
-    await waitUntil(() => harness.commitSpy.called, 'edit not committed');
+    await vi.waitFor(() => harness.commitSpy.called);
     await oscdEditorIED.updateComplete;
 
     expect(getNamedElement(oscdEditorIED.doc, 'IED', 'IED_NEW')).to.exist;

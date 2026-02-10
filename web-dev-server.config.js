@@ -1,6 +1,6 @@
 import { hmrPlugin, presets } from '@open-wc/dev-server-hmr';
 import { esbuildPlugin } from '@web/dev-server-esbuild';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, URL } from 'url';
 
 const tsConfigPath = fileURLToPath(new URL('./tsconfig.json', import.meta.url));
 

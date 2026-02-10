@@ -1,12 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-/* eslint-disable import-x/no-extraneous-dependencies */
 import { EditV2, CommitOptions, Commit, Plugin } from '@openscd/oscd-api';
 import { XMLEditor } from '@openscd/oscd-editor';
-import { LitElement } from 'lit';
+import { LitElement, render, TemplateResult } from 'lit';
 
 import sinon from 'sinon';
 import { ConfirmDeleteEvent, EVENTS } from '../foundation/events.js';
-import { expect } from '@open-wc/testing';
 import { Nsdoc } from '../foundation/nsdoc.js';
 
 export const nsdocStub: Nsdoc = {
@@ -14,6 +12,28 @@ export const nsdocStub: Nsdoc = {
     label: `${element.tagName}-label`,
   }),
 };
+
+export async function fixture<T extends LitElement>(
+  template: TemplateResult,
+  tagName: string,
+): Promise<T> {
+  const container = document.createElement('div');
+  document.body.appendChild(container);
+
+  render(template, container);
+
+  const el = container.querySelector(tagName);
+
+  if (!el) {
+    throw new Error(`Missing element for ${tagName}`);
+  }
+
+  if (el instanceof LitElement) {
+    await el.updateComplete;
+  }
+
+  return el as T;
+}
 
 export const enumValues = ['on', 'blocked', 'test', 'test/blocked', 'off'];
 

@@ -1,10 +1,13 @@
-import { LitElement } from 'lit';
-import { expect, fixture, html, waitUntil } from '@open-wc/testing';
+import { html, LitElement } from 'lit';
+import { expect, describe, beforeEach, afterEach, it, vi } from 'vitest';
+import {
+  fixture,
+  ComponentTestHarness,
+} from '../../test-utils/test-harness.js';
 import { OscdSclTextField } from '@omicronenergy/oscd-ui/scl-textfield/OscdSclTextField.js';
 import { parseDoc, testDocs } from '../../test-utils/test-files.js';
 import { setSclTextFieldValue, typeIn } from '../../test-utils/actions.js';
 import { getNamedElement } from '../../test-utils/queries.js';
-import { ComponentTestHarness } from '../../test-utils/test-harness.js';
 import { AccessPointContainer } from './access-point-container.js';
 import { OscdIconButton } from '@omicronenergy/oscd-ui/iconbutton/OscdIconButton.js';
 import { initializeNsdoc } from '../../foundation/nsdoc.js';
@@ -24,7 +27,7 @@ describe('access-point-container', () => {
   beforeEach(async () => {
     doc = parseDoc(testDocs.withIED);
     const element = getNamedElement(doc, 'AccessPoint', 'AP1')!;
-    apContainer = await fixture(
+    apContainer = await fixture<AccessPointContainer>(
       html`<access-point-container
         .doc=${doc}
         .nsdoc=${initializeNsdoc()}
@@ -32,6 +35,7 @@ describe('access-point-container', () => {
         .selectedLNClasses=${[]}
         .element=${element}
       ></access-point-container>`,
+      'access-point-container',
     );
     harness = new ComponentTestHarness(apContainer);
 
@@ -76,7 +80,7 @@ describe('access-point-container', () => {
     ) as HTMLElement;
     harness.commitSpy.resetHistory();
     saveButton.click();
-    await waitUntil(() => harness.commitSpy.called, 'edit not committed');
+    await vi.waitFor(() => harness.commitSpy.called);
     await harness.element.updateComplete;
   }
 

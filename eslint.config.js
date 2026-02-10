@@ -5,7 +5,6 @@ import { fileURLToPath } from 'node:url';
 import js from '@eslint/js';
 import { FlatCompat } from '@eslint/eslintrc';
 import eslintPluginTSDoc from 'eslint-plugin-tsdoc';
-import openWcConfig from '@open-wc/eslint-config';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -17,7 +16,6 @@ const compat = new FlatCompat({
 });
 
 export default [
-  ...openWcConfig,
   ...compat.extends(
     'eslint:recommended',
     'plugin:@typescript-eslint/eslint-recommended',
@@ -63,27 +61,6 @@ export default [
         'error',
         {
           ignoreRestArgs: true,
-        },
-      ],
-      'import-x/no-extraneous-dependencies': [
-        'error',
-        {
-          devDependencies: [
-            '**/*.test.ts',
-            '**/*.spec.ts',
-            'eslint.config.js',
-            'rollup.config.js',
-            'web-test-runner.config.js',
-            'web-dev-server.*',
-          ],
-        },
-      ],
-      'import-x/no-unresolved': 'off',
-      'import-x/extensions': [
-        'error',
-        'always',
-        {
-          ignorePackages: true,
         },
       ],
     },
