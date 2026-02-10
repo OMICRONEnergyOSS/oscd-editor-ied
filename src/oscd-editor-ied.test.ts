@@ -10,7 +10,7 @@ function timeout(ms: number) {
   });
 }
 mocha.timeout(2000 * factor);
-import OscdEditorIED from './oscd-editor-ied.js';
+import { OscdEditorIED } from './oscd-editor-ied.js';
 import { parseDoc, testDocs } from './test-utils/test-files.js';
 
 customElements.define('oscd-editor-ied', OscdEditorIED);
