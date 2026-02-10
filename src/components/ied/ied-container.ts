@@ -1,4 +1,4 @@
-import { css, html, TemplateResult } from 'lit';
+import { css, html } from 'lit';
 import { property, query } from 'lit/decorators.js';
 import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
 import { msg } from '@lit/localize';
@@ -25,6 +25,7 @@ import {
 } from '../../foundation.js';
 import { Insert } from '@openscd/oscd-api';
 import { removeIED } from '@openscd/scl-lib';
+import { IedServicesAction } from './services/ied-services-action.js';
 
 /** [[`IED`]] plugin subeditor for editing `IED` element. */
 export class IedContainer extends ScopedElementsMixin(BaseContainer) {
@@ -34,6 +35,7 @@ export class IedContainer extends ScopedElementsMixin(BaseContainer) {
     'oscd-action-pane': OscdActionPane,
     'access-point-container': AccessPointContainer,
     'access-point-create-dialog': AccessPointCreateDialog,
+    'ied-services-action': IedServicesAction,
   };
 
   @property({ type: Array })
@@ -79,14 +81,6 @@ export class IedContainer extends ScopedElementsMixin(BaseContainer) {
     this.dispatchEvent(newEditEventV2(inserts));
   }
 
-  private handleEditServices(services: Element): void {
-    console.log(
-      'Please implement me',
-      this.element.getAttribute('name'),
-      new XMLSerializer().serializeToString(services),
-    );
-  }
-
   private removeIED(): void {
     const heading = this.header();
     this.dispatchEvent(
@@ -107,25 +101,6 @@ export class IedContainer extends ScopedElementsMixin(BaseContainer) {
     const desc = this.element.getAttribute('desc');
 
     return `${name}${desc ? ` \u2014 ${desc}` : ''}`;
-  }
-
-  private renderServicesIcon(): TemplateResult {
-    const services: Element | null = this.element.querySelector('Services');
-
-    if (!services) {
-      return html``;
-    }
-
-    return html` <abbr
-      slot="action"
-      title="${msg('Show Services the IED/AccessPoint provides')}"
-    >
-      <oscd-icon-button
-        disabled
-        @click=${() => this.handleEditServices(services)}
-        ><oscd-icon>settings</oscd-icon></oscd-icon-button
-      >
-    </abbr>`;
   }
 
   render() {
@@ -150,7 +125,12 @@ export class IedContainer extends ScopedElementsMixin(BaseContainer) {
           <oscd-icon>edit</oscd-icon></oscd-icon-button
         >
       </abbr>
-      ${this.renderServicesIcon()}
+      <abbr
+        slot="action"
+        title="${msg('Show Services the IED/AccessPoint provides')}"
+      >
+        <ied-services-action .ied=${this.element}></ied-services-action>
+      </abbr>
       <abbr slot="action" title="${msg('Add AccessPoint')}">
         <oscd-icon-button
           data-testid="add-access-point-button"

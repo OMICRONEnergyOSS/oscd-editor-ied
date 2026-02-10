@@ -2,7 +2,7 @@
 
 // import { wizards } from '@omicronenergy/oscd-scl-dialogs/wizards.js';
 import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
-import { TemplateResult, html, css } from 'lit';
+import { html, css } from 'lit';
 import { property, query } from 'lit/decorators.js';
 import { BaseContainer } from '../base-container.js';
 import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
@@ -36,14 +36,6 @@ export class AccessPointContainer extends ScopedElementsMixin(BaseContainer) {
 
   @query('access-point-edit-dialog')
   accessPointDialog!: AccessPointEditDialog;
-
-  private openSettingsWizard(services: Element): void {
-    // const wizard = editServicesWizard(services);
-    // if (wizard) {
-    //   this.dispatchEvent(newWizardEvent(wizard));
-    // }
-    console.log('Please implement me', this, services);
-  }
 
   private removeAccessPoint(): void {
     const name = this.header();
@@ -88,22 +80,6 @@ export class AccessPointContainer extends ScopedElementsMixin(BaseContainer) {
     );
   }
 
-  private renderServicesIcon(): TemplateResult {
-    const services: Element | null = this.element.querySelector('Services');
-
-    if (!services) {
-      return html``;
-    }
-
-    return html` <oscd-icon-button
-      slot="action"
-      title="${msg('Show Services the IED/AccessPoint provides')}"
-      @click=${() => this.openSettingsWizard(services)}
-    >
-      <oscd-icon>settings</oscd-icon>
-    </oscd-icon-button>`;
-  }
-
   override render() {
     const lnElements = this.getLnElements();
 
@@ -125,7 +101,6 @@ export class AccessPointContainer extends ScopedElementsMixin(BaseContainer) {
         >
           <oscd-icon>edit</oscd-icon>
         </oscd-icon-button>
-        ${this.renderServicesIcon()}
         ${Array.from(this.element.querySelectorAll(':scope > Server')).map(
           server =>
             html`<server-container
