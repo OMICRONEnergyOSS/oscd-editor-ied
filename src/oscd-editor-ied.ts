@@ -74,7 +74,7 @@ function getLnClassSelectItem(
 }
 
 /** An editor [[`plugin`]] for editing the `IED` section. */
-export default class IedPlugin extends ScopedElementsMixin(LitElement) {
+export class OscdEditorIED extends ScopedElementsMixin(LitElement) {
   static scopedElements = {
     'oscd-outlined-button': OscdOutlinedButton,
     'oscd-filter-button': OscdFilterButton,

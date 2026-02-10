@@ -1,5 +1,5 @@
 import { expect, fixture, html, waitUntil } from '@open-wc/testing';
-import OscdEditorIED from './oscd-editor-ied.js';
+import { OscdEditorIED } from './oscd-editor-ied.js';
 import { LitElement } from 'lit';
 import { parseDoc, testDocs } from './test-utils/test-files.js';
 import { getNamedElement } from './test-utils/queries.js';

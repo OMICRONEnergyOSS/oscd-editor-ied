@@ -2,7 +2,7 @@ import OscdMenuOpen from '@omicronenergy/oscd-menu-open';
 import OscdMenuSave from '@omicronenergy/oscd-menu-save';
 import OscdEditorSource from '@omicronenergy/oscd-editor-source';
 
-import OscdEditorIED from '../dist/oscd-editor-ied.js';
+import { OscdEditorIED } from '../src/oscd-editor-ied.ts';
 
 const oscdShell = document.querySelector('oscd-shell');
 if (oscdShell) {

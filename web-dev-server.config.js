@@ -1,23 +1,25 @@
 import { hmrPlugin, presets } from '@open-wc/dev-server-hmr';
+import { esbuildPlugin } from '@web/dev-server-esbuild';
+import { fileURLToPath } from 'url';
 
-// eslint-disable-next-line no-undef
-const hmr = process.argv.includes('--hmr');
+const tsConfigPath = fileURLToPath(new URL('./tsconfig.json', import.meta.url));
 
-//Details & options: https://modern-web.dev/docs/dev-server/overview/
-export default /** @type {import('@web/dev-server').DevServerConfig} */ ({
-  rootDir: './',
+export default {
+  rootDir: '.',
   open: '/demo/',
-  /** Use regular watch mode if HMR is not enabled. */
-  watch: !hmr,
+  watch: true,
 
   plugins: [
-    /** Use Hot Module Replacement by uncommenting. Requires @open-wc/dev-server-hmr plugin */
-    hmr &&
-      //Details & options: https://open-wc.org/docs/development/hot-module-replacement/
-      hmrPlugin({
-        include: ['src/**/*'],
-        exclude: ['dist/**/*', '**/*/node_modules/**/*'],
-        presets: [presets.lit, presets.litElement],
-      }),
+    esbuildPlugin({
+      ts: true,
+      target: 'es2022',
+      tsconfig: tsConfigPath,
+    }),
+
+    hmrPlugin({
+      include: ['src/**/*'],
+      exclude: ['coverage/**/*', 'dist/**/*', '**/*/node_modules/**/*'],
+      presets: [presets.lit],
+    }),
   ],
-});
+};
