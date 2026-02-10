@@ -82,6 +82,72 @@ export const testDocs = {
 		<AccessPoint name="AP1">
 			<Server>
 				<Authentication/>
+				<Services>
+					<DynAssociation />
+
+					<SettingGroups>
+						<SGEdit resvTms="true" />
+						<ConfSG resvTms="true" />
+					</SettingGroups>
+
+					<GetDirectory />
+					<GetDataObjectDefinition />
+					<GetDataSetValue />
+					<DataSetDirectory />
+					<ReadWrite />
+
+					<ConfDataSet max="16" maxAttributes="256" modify="true" />
+
+					<LogSettings
+						cbName="Fix"
+						datSet="Conf"
+						logEna="Conf"
+						trgOps="Conf"
+						intgPd="Conf"
+					/>
+					<ConfLogControl max="8" />
+
+					<ReportSettings
+						cbName="Fix"
+						datSet="Conf"
+						rptID="Conf"
+						optFields="Conf"
+						bufTime="Conf"
+						trgOps="Conf"
+						intgPd="Conf"
+					/>
+					<ConfReportControl max="8" buffered="true" />
+
+					<GSESettings cbName="Fix" datSet="Conf" />
+					<ConfGSEControl max="8" />
+
+					<SMVSettings cbName="Fix" datSet="Conf">
+						<McSecurity signature="true" encryption="true" />
+						<SamplesPerSec>4000</SamplesPerSec>
+						<SecPerSamples>80</SecPerSamples>
+					</SMVSettings>
+					<ConfSMVControl max="4" />
+
+					<ClientServices readLog="true">
+						<TimeSyncProt
+						yes="true"
+						sntp="true"
+						iec61850_9_3="true"
+						c37_238="false"
+						other="false"
+						/>
+						<McSecurity signature="true" encryption="false" />
+					</ClientServices>
+
+					<TimeSyncProt
+						yes="true"
+						sntp="true"
+						iec61850_9_3="false"
+						c37_238="false"
+						other="false"
+					/>
+				</Services>
+
 				<LDevice inst="LD1">
 					<LN0 lnClass="LLN0" inst="" lnType="LLN0_Test">
 						<SettingControl numOfSGs="5"/>
