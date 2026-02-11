@@ -25,9 +25,8 @@ export declare class IedServicesAction extends IedServicesAction_base {
         'oscd-form-divider': typeof OscdFormDivider;
         'oscd-form-group': typeof OscdFormGroup;
     };
-    set ied(value: Element);
-    get ied(): Element;
     private _ied;
+    set ied(value: Element);
     private services;
     activeIndex: number;
     headline: string;
@@ -35,8 +34,6 @@ export declare class IedServicesAction extends IedServicesAction_base {
     private pages;
     show(): void;
     private close;
-    private goNext;
-    private goBack;
     private selectIndex;
     render(): TemplateResult<1>;
     static styles: import("lit").CSSResult;

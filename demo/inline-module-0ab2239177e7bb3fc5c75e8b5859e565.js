@@ -103258,6 +103258,12 @@ __decorate$1([
     n$3({ attribute: false })
 ], OscdForm.prototype, "data", void 0);
 
+function attr(el, name) {
+    return el?.getAttribute(name) ?? null;
+}
+function hasChild(parent, childSelector) {
+    return parent.querySelector(childSelector) ? 'true' : null;
+}
 function extractServicesData(ied) {
     const services = ied.querySelector('Services');
     if (!services) {
@@ -103272,7 +103278,7 @@ function extractServicesData(ied) {
     const csMcSecurity = clientServices?.querySelector('McSecurity');
     const dynDataSet = services.querySelector('DynDataSet');
     const gseSettings = services.querySelector('GSESettings');
-    const gseSettingsMcSecurity = gseSettings?.querySelector('McSecurity');
+    const gseSettingsMcSecurity = gseSettings?.querySelector('McSecurity') ?? null;
     const goose = services.querySelector('GOOSE');
     const supSubscription = services.querySelector('SupSubscription');
     const gsse = services.querySelector('GSSE');
@@ -103281,146 +103287,141 @@ function extractServicesData(ied) {
     const redProt = services.querySelector('RedProt');
     const commProt = services.querySelector('CommProt');
     const smvSettings = services.querySelector('SMVSettings');
-    const smvMcSecurity = smvSettings?.querySelector('McSecurity');
+    const smvMcSecurity = smvSettings?.querySelector('McSecurity') ?? null;
     const smvPublisher = services.querySelector('SMVsc');
     const dynAssociation = services.querySelector('DynAssociation');
     return {
         logSettings: {
-            cbName: logSettings?.getAttribute('cbName') ?? null,
-            datSet: logSettings?.getAttribute('datSet') ?? null,
-            logEna: logSettings?.getAttribute('logEna') ?? null,
-            trgOps: logSettings?.getAttribute('trgOps') ?? null,
-            intgPd: logSettings?.getAttribute('intgPd') ?? null,
+            cbName: attr(logSettings, 'cbName'),
+            datSet: attr(logSettings, 'datSet'),
+            logEna: attr(logSettings, 'logEna'),
+            trgOps: attr(logSettings, 'trgOps'),
+            intgPd: attr(logSettings, 'intgPd'),
         },
         confLogControl: {
-            max: confLogControl?.getAttribute('max') ?? null,
+            max: attr(confLogControl, 'max'),
         },
         clientServices: {
-            goose: clientServices?.getAttribute('goose') ?? null,
-            gsse: clientServices?.getAttribute('gsse') ?? null,
-            bufReport: clientServices?.getAttribute('bufReport') ?? null,
-            unbufReport: clientServices?.getAttribute('unbufReport') ?? null,
-            readLog: clientServices?.getAttribute('readLog') ?? null,
-            sv: clientServices?.getAttribute('sv') ?? null,
-            supportsLdName: clientServices?.getAttribute('supportsLdName') ?? null,
-            rGOOSE: clientServices?.getAttribute('rGOOSE') ?? null,
-            rSV: clientServices?.getAttribute('rSV') ?? null,
-            noIctBinding: clientServices?.getAttribute('noIctBinding') ?? null,
-            maxAttributes: clientServices?.getAttribute('maxAttributes') ?? null,
-            maxReports: clientServices?.getAttribute('maxReports') ?? null,
-            maxGOOSE: clientServices?.getAttribute('maxGOOSE') ?? null,
-            maxSMV: clientServices?.getAttribute('maxSMV') ?? null,
+            goose: attr(clientServices, 'goose'),
+            gsse: attr(clientServices, 'gsse'),
+            bufReport: attr(clientServices, 'bufReport'),
+            unbufReport: attr(clientServices, 'unbufReport'),
+            readLog: attr(clientServices, 'readLog'),
+            sv: attr(clientServices, 'sv'),
+            supportsLdName: attr(clientServices, 'supportsLdName'),
+            rGOOSE: attr(clientServices, 'rGOOSE'),
+            rSV: attr(clientServices, 'rSV'),
+            noIctBinding: attr(clientServices, 'noIctBinding'),
+            maxAttributes: attr(clientServices, 'maxAttributes'),
+            maxReports: attr(clientServices, 'maxReports'),
+            maxGOOSE: attr(clientServices, 'maxGOOSE'),
+            maxSMV: attr(clientServices, 'maxSMV'),
             timeSyncProt: csTimeSyncProt
                 ? {
-                    yes: csTimeSyncProt.getAttribute('yes') ?? null,
-                    sntp: csTimeSyncProt.getAttribute('sntp') ?? null,
-                    iec61850_9_3: csTimeSyncProt.getAttribute('iec61850_9_3') ?? null,
-                    c37_238: csTimeSyncProt.getAttribute('c37_238') ?? null,
-                    other: csTimeSyncProt.getAttribute('other') ?? null,
+                    yes: attr(csTimeSyncProt, 'yes'),
+                    sntp: attr(csTimeSyncProt, 'sntp'),
+                    iec61850_9_3: attr(csTimeSyncProt, 'iec61850_9_3'),
+                    c37_238: attr(csTimeSyncProt, 'c37_238'),
+                    other: attr(csTimeSyncProt, 'other'),
                 }
                 : null,
             mcSecurity: csMcSecurity
                 ? {
-                    signature: csMcSecurity.getAttribute('signature') ?? null,
-                    encryption: csMcSecurity.getAttribute('encryption') ?? null,
+                    signature: attr(csMcSecurity, 'signature'),
+                    encryption: attr(csMcSecurity, 'encryption'),
                 }
                 : null,
         },
         dataSet: {
-            max: services.querySelector('ConfDataSet')?.getAttribute('max') ??
+            max: attr(services.querySelector('ConfDataSet'), 'max') ??
                 String(services.parentElement?.querySelectorAll('DataSet').length ?? 0),
-            maxAttributes: services.querySelector('ConfDataSet')?.getAttribute('maxAttributes') ??
-                null,
-            modify: services.querySelector('ConfDataSet')?.getAttribute('modify') ?? 'true',
+            maxAttributes: attr(services.querySelector('ConfDataSet'), 'maxAttributes'),
+            modify: attr(services.querySelector('ConfDataSet'), 'modify') ?? 'true',
         },
         settingGroups: {
-            sgEdit: services
-                .querySelector('SettingGroups > SGEdit')
-                ?.getAttribute('resvTms') ?? null,
-            confSG: services
-                .querySelector('SettingGroups > ConfSG')
-                ?.getAttribute('resvTms') ?? null,
+            sgEdit: attr(services.querySelector('SettingGroups > SGEdit'), 'resvTms'),
+            confSG: attr(services.querySelector('SettingGroups > ConfSG'), 'resvTms'),
         },
         reportSettings: {
-            cbName: reportSettings?.getAttribute('cbName') ?? null,
-            datSet: reportSettings?.getAttribute('datSet') ?? null,
-            rptID: reportSettings?.getAttribute('rptID') ?? null,
-            optFields: reportSettings?.getAttribute('optFields') ?? null,
-            bufTime: reportSettings?.getAttribute('bufTime') ?? null,
-            trgOps: reportSettings?.getAttribute('trgOps') ?? null,
-            intgPd: reportSettings?.getAttribute('intgPd') ?? null,
-            resvTms: reportSettings?.getAttribute('resvTms') ?? null,
-            owner: reportSettings?.getAttribute('owner') ?? null,
+            cbName: attr(reportSettings, 'cbName'),
+            datSet: attr(reportSettings, 'datSet'),
+            rptID: attr(reportSettings, 'rptID'),
+            optFields: attr(reportSettings, 'optFields'),
+            bufTime: attr(reportSettings, 'bufTime'),
+            trgOps: attr(reportSettings, 'trgOps'),
+            intgPd: attr(reportSettings, 'intgPd'),
+            resvTms: attr(reportSettings, 'resvTms'),
+            owner: attr(reportSettings, 'owner'),
         },
         confReportControl: {
-            max: confReportControl?.getAttribute('max') ?? null,
-            bufMode: confReportControl?.getAttribute('bufMode') ?? null,
-            maxBuf: confReportControl?.getAttribute('maxBuf') ?? null,
-            bufConf: confReportControl?.getAttribute('bufConf') ?? null,
+            max: attr(confReportControl, 'max'),
+            bufMode: attr(confReportControl, 'bufMode'),
+            maxBuf: attr(confReportControl, 'maxBuf'),
+            bufConf: attr(confReportControl, 'bufConf'),
         },
         dynDataSet: {
-            max: dynDataSet?.getAttribute('max') ?? null,
-            maxAttributes: dynDataSet?.getAttribute('maxAttributes') ?? null,
+            max: attr(dynDataSet, 'max'),
+            maxAttributes: attr(dynDataSet, 'maxAttributes'),
         },
         gseSettings: {
-            cbName: gseSettings?.getAttribute('cbName') ?? null,
-            datSet: gseSettings?.getAttribute('datSet') ?? null,
-            appID: gseSettings?.getAttribute('appID') ?? null,
-            dataLabel: gseSettings?.getAttribute('dataLabel') ?? null,
-            kdaParticipant: gseSettings?.getAttribute('kdaParticipant') ?? null,
-            signature: gseSettingsMcSecurity?.getAttribute('signature') ?? null,
-            encryption: gseSettingsMcSecurity?.getAttribute('encryption') ?? null,
+            cbName: attr(gseSettings, 'cbName'),
+            datSet: attr(gseSettings, 'datSet'),
+            appID: attr(gseSettings, 'appID'),
+            dataLabel: attr(gseSettings, 'dataLabel'),
+            kdaParticipant: attr(gseSettings, 'kdaParticipant'),
+            signature: attr(gseSettingsMcSecurity, 'signature'),
+            encryption: attr(gseSettingsMcSecurity, 'encryption'),
         },
         goose: {
-            max: goose?.getAttribute('max') ?? null,
-            fixedOffs: goose?.getAttribute('fixedOffs') ?? null,
-            goose: goose?.getAttribute('goose') ?? null,
-            rGOOSE: goose?.getAttribute('rGOOSE') ?? null,
+            max: attr(goose, 'max'),
+            fixedOffs: attr(goose, 'fixedOffs'),
+            goose: attr(goose, 'goose'),
+            rGOOSE: attr(goose, 'rGOOSE'),
         },
         supSubscription: {
-            maxGo: supSubscription?.getAttribute('maxGo') ?? null,
-            maxSv: supSubscription?.getAttribute('maxSv') ?? null,
+            maxGo: attr(supSubscription, 'maxGo'),
+            maxSv: attr(supSubscription, 'maxSv'),
         },
         gsse: {
-            max: gsse?.getAttribute('max') ?? null,
+            max: attr(gsse, 'max'),
         },
         fileHandling: {
-            mms: fileHandling?.getAttribute('mms') ?? null,
-            ftp: fileHandling?.getAttribute('ftp') ?? null,
-            ftps: fileHandling?.getAttribute('ftps') ?? null,
+            mms: attr(fileHandling, 'mms'),
+            ftp: attr(fileHandling, 'ftp'),
+            ftps: attr(fileHandling, 'ftps'),
         },
         timeSyncProt: timeSyncProt
             ? {
-                yes: timeSyncProt.getAttribute('yes') ?? null,
-                sntp: timeSyncProt.getAttribute('sntp') ?? null,
-                iec61850_9_3: timeSyncProt.getAttribute('iec61850_9_3') ?? null,
-                c37_238: timeSyncProt.getAttribute('c37_238') ?? null,
-                other: timeSyncProt.getAttribute('other') ?? null,
+                yes: attr(timeSyncProt, 'yes'),
+                sntp: attr(timeSyncProt, 'sntp'),
+                iec61850_9_3: attr(timeSyncProt, 'iec61850_9_3'),
+                c37_238: attr(timeSyncProt, 'c37_238'),
+                other: attr(timeSyncProt, 'other'),
             }
             : null,
         redProt: {
-            hsr: redProt?.getAttribute('hsr') ?? null,
-            prp: redProt?.getAttribute('prp') ?? null,
-            rstp: redProt?.getAttribute('rstp') ?? null,
+            hsr: attr(redProt, 'hsr'),
+            prp: attr(redProt, 'prp'),
+            rstp: attr(redProt, 'rstp'),
         },
         commProt: {
-            ipv6: commProt?.getAttribute('ipv6') ?? null,
+            ipv6: attr(commProt, 'ipv6'),
         },
         smvSettings: {
-            cbName: smvSettings?.getAttribute('cbName') ?? null,
-            datSet: smvSettings?.getAttribute('datSet') ?? null,
-            svID: smvSettings?.getAttribute('svID') ?? null,
-            optFields: smvSettings?.getAttribute('optFields') ?? null,
-            smpRate: smvSettings?.getAttribute('smpRate') ?? null,
-            nofASDU: smvSettings?.getAttribute('nofASDU') ?? null,
-            samplesPerSec: smvSettings?.getAttribute('samplesPerSec') ?? null,
-            synchSrcId: smvSettings?.getAttribute('synchSrcId') ?? null,
-            pdcTimeStamp: smvSettings?.getAttribute('pdcTimeStamp') ?? null,
-            kdaParticipant: smvSettings?.getAttribute('kdaParticipant') ?? null,
+            cbName: attr(smvSettings, 'cbName'),
+            datSet: attr(smvSettings, 'datSet'),
+            svID: attr(smvSettings, 'svID'),
+            optFields: attr(smvSettings, 'optFields'),
+            smpRate: attr(smvSettings, 'smpRate'),
+            nofASDU: attr(smvSettings, 'nofASDU'),
+            samplesPerSec: attr(smvSettings, 'samplesPerSec'),
+            synchSrcId: attr(smvSettings, 'synchSrcId'),
+            pdcTimeStamp: attr(smvSettings, 'pdcTimeStamp'),
+            kdaParticipant: attr(smvSettings, 'kdaParticipant'),
             mcSecurity: smvMcSecurity
                 ? {
-                    signature: smvMcSecurity.getAttribute('signature') ?? null,
-                    encryption: smvMcSecurity.getAttribute('encryption') ?? null,
+                    signature: attr(smvMcSecurity, 'signature'),
+                    encryption: attr(smvMcSecurity, 'encryption'),
                 }
                 : null,
             smpRateVal: smvSettings?.querySelector('SmpRate')?.textContent ?? null,
@@ -103428,52 +103429,39 @@ function extractServicesData(ied) {
             secPerSamplesVal: smvSettings?.querySelector('SecPerSamples')?.textContent ?? null,
         },
         smvPublisher: {
-            max: smvPublisher?.getAttribute('max') ?? null,
-            delivery: smvPublisher?.getAttribute('delivery') ?? null,
-            deliveryConf: smvPublisher?.getAttribute('deliveryConf') ?? null,
-            sv: smvPublisher?.getAttribute('sv') ?? null,
-            rSV: smvPublisher?.getAttribute('rSV') ?? null,
+            max: attr(smvPublisher, 'max'),
+            delivery: attr(smvPublisher, 'delivery'),
+            deliveryConf: attr(smvPublisher, 'deliveryConf'),
+            sv: attr(smvPublisher, 'sv'),
+            rSV: attr(smvPublisher, 'rSV'),
         },
         dynamicAssociations: {
-            max: dynAssociation?.getAttribute('max') ?? null,
+            max: attr(dynAssociation, 'max'),
         },
         discoverCapabilities: {
-            getDirectory: services.querySelector('GetDirectory') ? 'true' : null,
-            getDataObjectDefinition: services.querySelector('GetDataObjectDefinition')
-                ? 'true'
-                : null,
-            dataObjectDirectory: services.querySelector('DataObjectDirectory')
-                ? 'true'
-                : null,
-            getDataSetValue: services.querySelector('GetDataSetValue')
-                ? 'true'
-                : null,
-            setDataSetValue: services.querySelector('SetDataSetValue')
-                ? 'true'
-                : null,
-            setDataSetDirectory: services.querySelector('DataSetDirectory')
-                ? 'true'
-                : null,
-            readWrite: services.querySelector('ReadWrite') ? 'true' : null,
+            getDirectory: hasChild(services, 'GetDirectory'),
+            getDataObjectDefinition: hasChild(services, 'GetDataObjectDefinition'),
+            dataObjectDirectory: hasChild(services, 'DataObjectDirectory'),
+            getDataSetValue: hasChild(services, 'GetDataSetValue'),
+            setDataSetValue: hasChild(services, 'SetDataSetValue'),
+            setDataSetDirectory: hasChild(services, 'DataSetDirectory'),
+            readWrite: hasChild(services, 'ReadWrite'),
         },
         functionalNaming: {
-            confLdName: services.querySelector('ConfLdName') ? 'true' : null,
-            supportsLdName: clientServices?.getAttribute('supportsLdName') ?? null,
+            confLdName: hasChild(services, 'ConfLdName'),
+            supportsLdName: attr(clientServices, 'supportsLdName'),
         },
         clientCapabilities: {
-            maxAttributes: clientServices?.getAttribute('maxAttributes') ?? null,
-            timerActivatedControl: services.querySelector('TimerActivatedControl')
-                ? 'true'
-                : null,
-            getCBValues: services.querySelector('GetCBValues') ? 'true' : null,
-            GSEDir: services.querySelector('GSEDir') ? 'true' : null,
+            maxAttributes: attr(clientServices, 'maxAttributes'),
+            timerActivatedControl: hasChild(services, 'TimerActivatedControl'),
+            getCBValues: hasChild(services, 'GetCBValues'),
+            GSEDir: hasChild(services, 'GSEDir'),
         },
         valKindManipulationConfig: {
-            setToRO: services.querySelector('ValueHandling')?.getAttribute('setToRO') ??
-                null,
+            setToRO: attr(services.querySelector('ValueHandling'), 'setToRO'),
         },
         signalReferenceConfig: {
-            max: services.querySelector('ConfSigRef')?.getAttribute('max') ?? null,
+            max: attr(services.querySelector('ConfSigRef'), 'max'),
         },
     };
 }
@@ -104932,7 +104920,7 @@ class IedServicesAction extends ScopedElementsMixin(i$3) {
                 renderer: renderSampledValuesServices,
             },
             {
-                title: msg('Edit Client Server Services'),
+                title: msg('Client Server Services'),
                 renderer: renderClientServerServices,
             },
         ];
@@ -104952,9 +104940,6 @@ class IedServicesAction extends ScopedElementsMixin(i$3) {
         this._ied = value;
         this.services = extractServicesData(this._ied);
     }
-    get ied() {
-        return this._ied;
-    }
     show() {
         this.activeIndex = 0;
         if (!this.pages || this.pages.length === 0) {
@@ -104964,16 +104949,6 @@ class IedServicesAction extends ScopedElementsMixin(i$3) {
     }
     close() {
         this.dialog.close();
-    }
-    goNext() {
-        if (this.activeIndex < this.pages.length - 1) {
-            this.activeIndex++;
-        }
-    }
-    goBack() {
-        if (this.activeIndex > 0) {
-            this.activeIndex--;
-        }
     }
     selectIndex(e, index) {
         e.preventDefault();
@@ -105008,20 +104983,8 @@ class IedServicesAction extends ScopedElementsMixin(i$3) {
           </section>
         </div>
         <div slot="actions">
-          <oscd-outlined-button slot="secondaryAction" @click=${this.close}
-            >Cancel</oscd-outlined-button
-          >
-          <oscd-outlined-button
-            slot="secondaryAction"
-            @click=${this.goBack}
-            ?disabled=${this.activeIndex === 0}
-            >Back</oscd-outlined-button
-          >
-          <oscd-filled-button
-            slot="primaryAction"
-            @click=${this.goNext}
-            ?disabled=${this.activeIndex === this.pages.length - 1}
-            >Next</oscd-filled-button
+          <oscd-filled-button slot="primaryAction" @click=${this.close}
+            >${msg('Close')}</oscd-filled-button
           >
         </div>
       </oscd-dialog>
@@ -105080,7 +105043,7 @@ class IedServicesAction extends ScopedElementsMixin(i$3) {
   `; }
 }
 __decorate$1([
-    n$3({ type: Element })
+    n$3({ attribute: false })
 ], IedServicesAction.prototype, "ied", null);
 __decorate$1([
     r$1()
