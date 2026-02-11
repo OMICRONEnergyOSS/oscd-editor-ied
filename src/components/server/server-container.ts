@@ -31,7 +31,7 @@ export class ServerContainer extends ScopedElementsMixin(BaseContainer) {
     'oscd-scl-dialogs': OscdSclDialogs,
   };
 
-  @property()
+  @property({ type: Array })
   selectedLNClasses: string[] = [];
 
   @query('oscd-scl-dialogs')

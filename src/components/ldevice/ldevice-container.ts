@@ -17,7 +17,6 @@ import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
 import OscdSclDialogs from '@omicronenergy/oscd-scl-dialogs/OscdSclDialogs.js';
 import { EditV2 } from '@openscd/oscd-api';
 
-/** [[`IED`]] plugin subeditor for editing `LDevice` element. */
 export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
   static scopedElements = {
     'oscd-action-pane': OscdActionPane,
@@ -28,7 +27,7 @@ export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
     'oscd-scl-dialogs': OscdSclDialogs,
   };
 
-  @property()
+  @property({ type: Array })
   selectedLNClasses: string[] = [];
 
   @property({ type: Boolean })
