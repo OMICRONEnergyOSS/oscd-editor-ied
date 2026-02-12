@@ -16,6 +16,7 @@ import { msg } from '@lit/localize';
 import { DaiValueCreateDialog } from './dai-value-create-dialog.js';
 import { DaiValueEditDialog } from './dai-value-edit-dialog.js';
 import { DaInfoDialog } from './da-info-dialog.js';
+import { daSupportsMultipleValues, getNumOfSGs } from '../../foundation/dai.js';
 
 function getValueDisplayString(val: Element): string {
   const sGroup = val.getAttribute('sGroup');
@@ -195,7 +196,9 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
     const element = this.instanceElement ?? this.element;
     const hasInstantiatedVal = !!this.instanceElement?.querySelector('Val');
 
-    const settingGroupCount = this.getMultipleSettingGroupCount();
+    const settingGroupCount = daSupportsMultipleValues(this.element)
+      ? getNumOfSGs(this.ancestors)
+      : null;
     if (
       settingGroupCount !== null &&
       settingGroupCount > 1 &&
@@ -225,40 +228,6 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
           ),
         )
       : [renderValueRow('\u00A0', bType, 'add', this.openCreateDialog)];
-  }
-
-  private getMultipleSettingGroupCount(): number | null {
-    let daElement;
-    if (this.element.tagName === 'BDA') {
-      const daTypeId = this.element.parentElement?.getAttribute('id');
-      const root = this.element.getRootNode() as Document | Element;
-      const referencedDa = root.querySelector(
-        `DOType > DA[type="${daTypeId}"]`,
-      );
-      if (referencedDa) {
-        daElement = referencedDa;
-      }
-    } else {
-      daElement = this.element;
-    }
-
-    const fc = daElement?.getAttribute('fc') ?? '';
-    const iedElement = this.ancestors.find(
-      element => element.tagName === 'IED',
-    );
-    const settingControl = iedElement?.querySelector('SettingControl');
-    const numOfSGs = settingControl?.getAttribute('numOfSGs') ?? '';
-    const count = parseInt(numOfSGs);
-
-    if (
-      (fc === 'SG' || fc === 'SE') &&
-      numOfSGs !== '' &&
-      !Number.isNaN(count)
-    ) {
-      return count;
-    }
-
-    return null;
   }
 
   render(): TemplateResult {
