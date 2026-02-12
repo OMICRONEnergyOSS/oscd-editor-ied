@@ -233,6 +233,7 @@ export const testDocs = {
 		</LNodeType>
 		<LNodeType lnClass="TCTR" id="TCTR_Test">
 			<DO name="Beh" type="Beh_Test"/>
+			<DO name="NestedBeh" type="NestedBeh_Test"/>
 			<DO name="HzRtg" type="HzRtg_Test"/>
 			<DO name="ARtg" type="ARtg_Test"/>
 		</LNodeType>
@@ -240,6 +241,9 @@ export const testDocs = {
 			<DA name="stVal" fc="ST" dchg="true" dupd="true" bType="Enum" type="stVal_enums"/>
 			<DA name="q" fc="ST" qchg="true" bType="Quality"/>
 			<DA name="t" fc="ST" bType="Timestamp"/>
+		</DOType>
+		<DOType cdc="ENS" id="NestedBeh_Test">
+			<SDO name="subBeh" type="Beh_Test"/>
 		</DOType>
 		<DOType cdc="ASG" id="ARtg_Test">
 			<DA name="setVal" desc="fc=SG" fc="SG" bType="INT32"/>
@@ -257,6 +261,11 @@ export const testDocs = {
 		</DOType>
 		<DAType id="AnalogueValueCtl">
 			<BDA name="i" bType="INT32"/>
+			<BDA name="range" bType="Struct" type="RangeStruct"/>
+		</DAType>
+		<DAType id="RangeStruct">
+			<BDA name="min" bType="INT32"/>
+			<BDA name="max" bType="INT32"/>
 		</DAType>
 		<DAType id="AnalogueValue">
 			<BDA name="i" bType="INT32"/>

@@ -185,12 +185,6 @@ describe('dai-value-create-dialog', () => {
   });
 
   it('displays correct number of fields when numOfSGs is set and DA supports multiple values', async () => {
-    /* There is no guarantee that a DAI will have a Val element for every sGroup.
-     * If the DA supports multiple values and some are missing, the default DA value (if any)
-     * is applied.
-     * This test ensures that if some of the sGroups are missing, the dialog still displays all
-     */
-
     const { daiValueCreateDialog, ancestors, openDialog, clickSave } =
       await testSetup({
         docContents: testDocs.withIED_instanciated,

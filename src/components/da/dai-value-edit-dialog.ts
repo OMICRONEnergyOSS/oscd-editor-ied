@@ -113,7 +113,6 @@ export class DaiValueEditDialog extends ScopedElementsMixin(LitElement) {
   private editedValue: string | null = null;
 
   private buildValElement(value: string, sGroup?: number): Element {
-
     const val = createElement(this.templateElement.ownerDocument, 'Val', {
       ...(sGroup ? { sGroup: `${sGroup}` } : {}),
     });

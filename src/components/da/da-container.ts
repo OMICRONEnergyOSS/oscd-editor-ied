@@ -326,9 +326,5 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
       display: flex;
       align-items: center;
     }
-
-    oscd-icon-button {
-      color: var(--md-sys-color-on-surface);
-    }
   `;
 }

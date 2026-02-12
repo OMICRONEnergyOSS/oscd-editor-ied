@@ -10,7 +10,6 @@ import { OscdFilledTextField } from '@omicronenergy/oscd-ui/textfield/OscdFilled
 import {
   daSupportsMultipleValues,
   getNumOfSGs,
-  getTemplatePath,
   planDaiCreation,
 } from '../../foundation/dai.js';
 import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
@@ -24,6 +23,7 @@ import {
 } from './fields/dai-timestamp-field.js';
 import { EditV2 } from '@openscd/oscd-api';
 import { createElement } from '@openscd/scl-lib/dist/foundation/utils.js';
+import { getTemplatePath } from '../../foundation/ln-initialization.js';
 
 export class DaiValueCreateDialog extends ScopedElementsMixin(LitElement) {
   static scopedElements = {
@@ -132,7 +132,7 @@ export class DaiValueCreateDialog extends ScopedElementsMixin(LitElement) {
 
     for (const { value, sGroup } of values) {
       edits.push({
-        parent: plan.dai,
+        parent: plan.instanceElement,
         node: this.buildValElement(value, sGroup),
         reference: null,
       });

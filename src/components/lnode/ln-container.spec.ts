@@ -93,7 +93,7 @@ describe('ln-container', () => {
       const doContainers =
         testHarness.lnContainer.shadowRoot?.querySelectorAll('do-container') ??
         [];
-      expect(doContainers.length).to.equal(3);
+      expect(doContainers.length).to.equal(4);
     });
 
     it('passes instance elements to DO containers when present', async () => {

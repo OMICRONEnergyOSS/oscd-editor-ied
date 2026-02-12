@@ -2,15 +2,15 @@ import { expect } from '@open-wc/testing';
 import { getFirstAndAssertBySelector } from '../test-utils/queries.js';
 import { parseDoc, testDocs } from '../test-utils/test-files.js';
 import {
-  DaiCreationInsertStructurePlan,
   daSupportsMultipleValues,
-  determineUninitializedStructure,
   getNumOfSGs,
-  getTemplatePath,
-  initializeElements,
   planDaiCreation,
   resolveDaFromBDA,
 } from './dai.js';
+import {
+  getTemplatePath,
+  InstanceCreationInsertStructurePlan,
+} from './ln-initialization.js';
 
 const HZRTG_STRUCTURED_ANCESTORS = [
   'LNodeType[id="TCTR_Test"] > DO[name="HzRtg"]',
@@ -173,209 +173,6 @@ describe('getTemplateStructure tests', () => {
   });
 });
 
-/*
- * Tip: The Case ID's (in test labels below) match the LN elements in test-files.ts
- * e.g. it('Case 1:... matches the LN (in LD3) with the comment <!-- Case 1... -->
- */
-describe('determineUninitializedStructure tests', () => {
-  it('Case 1: LN has nothing → missing DOI, SDI, DAI', () => {
-    const { lnElement, templateElement, ancestors } = setupTestHarness({
-      docContents: testDocs.withIED_instanciated,
-      templateSelector: 'DAType[id="AnalogueValueCtl"] > BDA[name="i"]',
-      lnSelector: 'LDevice[inst="LD3"] LN[inst="1"]',
-      templatePathSelectors: HZRTG_STRUCTURED_ANCESTORS,
-    });
-
-    const templatePath = getTemplatePath(templateElement, ancestors);
-
-    const [parent, missing] = determineUninitializedStructure(
-      lnElement,
-      templatePath,
-    );
-
-    expect(parent).to.equal(lnElement);
-    expect(missing.map(e => e.tagName)).to.deep.equal(['DO', 'DA', 'BDA']);
-  });
-
-  it('Case 2: detects missing SDI and DAI when DOI exists', () => {
-    const { lnElement, templateElement, ancestors } = setupTestHarness({
-      docContents: testDocs.withIED_instanciated,
-      templateSelector: 'DAType[id="AnalogueValueCtl"] > BDA[name="i"]',
-      lnSelector: 'LDevice[inst="LD3"] LN[inst="2"]',
-      templatePathSelectors: HZRTG_STRUCTURED_ANCESTORS,
-    });
-
-    const templateStructure = getTemplatePath(templateElement, ancestors);
-
-    const [parent, missing] = determineUninitializedStructure(
-      lnElement,
-      templateStructure,
-    );
-
-    expect(parent.tagName).to.equal('DOI');
-    expect(parent.getAttribute('name')).to.equal('HzRtg');
-    expect(missing.map(e => e.tagName)).to.deep.equal(['DA', 'BDA']);
-  });
-
-  it('Case 3: DOI exists with unrelated DAI → missing SDI and DAI', () => {
-    const { lnElement, templateElement, ancestors } = setupTestHarness({
-      docContents: testDocs.withIED_instanciated,
-      templateSelector: 'DAType[id="AnalogueValueCtl"] > BDA[name="i"]',
-      lnSelector: 'LDevice[inst="LD3"] LN[inst="3"]',
-      templatePathSelectors: HZRTG_STRUCTURED_ANCESTORS,
-    });
-
-    const templatePath = getTemplatePath(templateElement, ancestors);
-
-    const [parent, missing] = determineUninitializedStructure(
-      lnElement,
-      templatePath,
-    );
-
-    expect(parent.tagName).to.equal('DOI');
-    expect(parent.getAttribute('name')).to.equal('HzRtg');
-    expect(missing.map(e => e.tagName)).to.deep.equal(['DA', 'BDA']);
-  });
-
-  it('Case 4: SDI exists, missing DAI → missing BDA only', () => {
-    const { lnElement, templateElement, ancestors } = setupTestHarness({
-      docContents: testDocs.withIED_instanciated,
-      templateSelector: 'DAType[id="AnalogueValueCtl"] > BDA[name="i"]',
-      lnSelector: 'LDevice[inst="LD3"] LN[inst="4"]',
-      templatePathSelectors: HZRTG_STRUCTURED_ANCESTORS,
-    });
-
-    const templatePath = getTemplatePath(templateElement, ancestors);
-
-    const [parent, missing] = determineUninitializedStructure(
-      lnElement,
-      templatePath,
-    );
-
-    expect(parent.tagName).to.equal('SDI');
-    expect(parent.getAttribute('name')).to.equal('setMag');
-    expect(missing.map(e => e.tagName)).to.deep.equal(['BDA']);
-  });
-
-  it('Case 5: DAI exists (no Val) → fully initialized', () => {
-    const { lnElement, templateElement, ancestors } = setupTestHarness({
-      docContents: testDocs.withIED_instanciated,
-      templateSelector: 'DAType[id="AnalogueValueCtl"] > BDA[name="i"]',
-      lnSelector: 'LDevice[inst="LD3"] LN[inst="5"]',
-      templatePathSelectors: HZRTG_STRUCTURED_ANCESTORS,
-    });
-
-    const templatePath = getTemplatePath(templateElement, ancestors);
-
-    const [parent, missing] = determineUninitializedStructure(
-      lnElement,
-      templatePath,
-    );
-
-    expect(parent.tagName).to.equal('DAI');
-    expect(parent.getAttribute('name')).to.equal('i');
-    expect(missing).to.deep.equal([]);
-  });
-
-  it('Case 6: DAI and Val exist → fully initialized', () => {
-    const { lnElement, templateElement, ancestors } = setupTestHarness({
-      docContents: testDocs.withIED_instanciated,
-      templateSelector: 'DAType[id="AnalogueValueCtl"] > BDA[name="i"]',
-      lnSelector: 'LDevice[inst="LD3"] LN[inst="6"]',
-      templatePathSelectors: HZRTG_STRUCTURED_ANCESTORS,
-    });
-
-    const templatePath = getTemplatePath(templateElement, ancestors);
-
-    const [parent, missing] = determineUninitializedStructure(
-      lnElement,
-      templatePath,
-    );
-
-    expect(parent.tagName).to.equal('DAI');
-    expect(parent.getAttribute('name')).to.equal('i');
-    expect(missing).to.deep.equal([]);
-  });
-
-  it('Case 7: Simple DA, DOI exists but wrong DAI → missing DA', () => {
-    const { lnElement, templateElement, ancestors } = setupTestHarness({
-      docContents: testDocs.withIED_instanciated,
-      templateSelector: 'DOType[id="ARtg_Test"] > DA[name="setMag"]',
-      lnSelector: 'LDevice[inst="LD3"] LN[inst="7"]',
-      templatePathSelectors: ['LNodeType[id="TCTR_Test"] > DO[name="ARtg"]'],
-    });
-
-    const templatePath = getTemplatePath(templateElement, ancestors);
-
-    const [parent, missing] = determineUninitializedStructure(
-      lnElement,
-      templatePath,
-    );
-
-    expect(parent.tagName).to.equal('DOI');
-    expect(parent.getAttribute('name')).to.equal('ARtg');
-    expect(missing.map(e => e.tagName)).to.deep.equal(['DA']);
-    expect(missing[0].getAttribute('name')).to.equal('setMag');
-  });
-
-  it('does not mutate inputs - safe to call multiple times', () => {
-    /* Added this test as a regression test for input mutation */
-    const { lnElement, templateElement, ancestors } = setupTestHarness({
-      docContents: testDocs.withIED_instanciated,
-      templateSelector: 'DOType[id="ARtg_Test"] > DA[name="setMag"]',
-      lnSelector: 'LDevice[inst="LD3"] LN[inst="7"]',
-      templatePathSelectors: ['LNodeType[id="TCTR_Test"] > DO[name="ARtg"]'],
-    });
-
-    const templatePath = getTemplatePath(templateElement, ancestors);
-
-    const r1 = determineUninitializedStructure(lnElement, templatePath);
-    const r2 = determineUninitializedStructure(lnElement, templatePath);
-
-    expect(r1).to.deep.equal(r2);
-  });
-});
-
-describe('initializeElements tests', () => {
-  it('creates full DOI → SDI → DAI → Val structure', () => {
-    const { templateElement, ancestors } = setupTestHarness({
-      docContents: testDocs.withIED_instanciated,
-      templateSelector: 'DAType[id="AnalogueValueCtl"] > BDA[name="i"]',
-      lnSelector: 'LDevice[inst="LD3"] LN[inst="1"]',
-      templatePathSelectors: HZRTG_STRUCTURED_ANCESTORS,
-    });
-
-    const structure = getTemplatePath(templateElement, ancestors);
-    const insertElement = initializeElements(structure);
-
-    expectStructure(insertElement, [
-      { tag: 'DOI', attrs: { name: 'HzRtg' } },
-      { tag: 'SDI', attrs: { name: 'setMag' } },
-      { tag: 'DAI', attrs: { name: 'i' } },
-    ]);
-
-    expect(
-      Array.from(insertElement.querySelectorAll('DAI > Val')).length,
-      'Inserted DAI should not contain Val elements',
-    ).to.equal(0);
-  });
-
-  it('creates only DAI when template path contains only DA', () => {
-    const { templateElement, lnElement, ancestors } = setupTestHarness({
-      docContents: testDocs.withIED_instanciated,
-      templateSelector: 'DOType[id="ARtg_Test"] > DA[name="setMag"]',
-      lnSelector: 'LDevice[inst="LD3"] LN[inst="7"]',
-      templatePathSelectors: ['LNodeType[id="TCTR_Test"] > DO[name="ARtg"]'],
-    });
-
-    const structure = getTemplatePath(templateElement, ancestors);
-    const [, missing] = determineUninitializedStructure(lnElement, structure);
-    const insertElement = initializeElements(missing);
-
-    expectStructure(insertElement, [{ tag: 'DAI', attrs: { name: 'setMag' } }]);
-  });
-});
-
 describe('planDaiCreation', () => {
   describe('structured DA (HzRtg.setMag.i)', () => {
     it('Case 1: LN has nothing → insert DOI/SDI/DAI', () => {
@@ -390,7 +187,7 @@ describe('planDaiCreation', () => {
       const plan = planDaiCreation(
         lnElement,
         templatePath,
-      ) as DaiCreationInsertStructurePlan;
+      ) as InstanceCreationInsertStructurePlan;
 
       expect(plan.kind).to.equal('insert-structure');
 
@@ -402,7 +199,7 @@ describe('planDaiCreation', () => {
         { tag: 'DAI', attrs: { name: 'i' } },
       ]);
 
-      expect(plan.dai.getAttribute('name')).to.equal('i');
+      expect(plan.instanceElement.getAttribute('name')).to.equal('i');
     });
 
     it('Case 2: DOI exists, empty → insert SDI/DAI', () => {
@@ -417,7 +214,7 @@ describe('planDaiCreation', () => {
       const plan = planDaiCreation(
         lnElement,
         templatePath,
-      ) as DaiCreationInsertStructurePlan;
+      ) as InstanceCreationInsertStructurePlan;
 
       expect(plan.kind).to.equal('insert-structure');
       expect(plan.parent.tagName).to.equal('DOI');
@@ -441,7 +238,7 @@ describe('planDaiCreation', () => {
       const plan = planDaiCreation(
         lnElement,
         templatePath,
-      ) as DaiCreationInsertStructurePlan;
+      ) as InstanceCreationInsertStructurePlan;
 
       expect(plan.kind).to.equal('insert-structure');
       expect(plan.parent.tagName).to.equal('DOI');
@@ -465,7 +262,7 @@ describe('planDaiCreation', () => {
       const plan = planDaiCreation(
         lnElement,
         templatePath,
-      ) as DaiCreationInsertStructurePlan;
+      ) as InstanceCreationInsertStructurePlan;
 
       expect(plan.kind).to.equal('insert-structure');
       expect(plan.parent.tagName).to.equal('SDI');
@@ -474,7 +271,7 @@ describe('planDaiCreation', () => {
       expectStructure(plan.node, [{ tag: 'DAI', attrs: { name: 'i' } }]);
     });
 
-    it('Case 5: DAI exists, no Val → append-val', () => {
+    it('Case 5: DAI exists, no Val → noop', () => {
       const { templateElement, lnElement, ancestors } = setupTestHarness({
         docContents: testDocs.withIED_instanciated,
         templateSelector: 'DAType[id="AnalogueValueCtl"] > BDA[name="i"]',
@@ -485,12 +282,12 @@ describe('planDaiCreation', () => {
       const templatePath = getTemplatePath(templateElement, ancestors);
       const plan = planDaiCreation(lnElement, templatePath);
 
-      expect(plan.kind).to.equal('append-val');
-      expect(plan.dai.tagName).to.equal('DAI');
-      expect(plan.dai.getAttribute('name')).to.equal('i');
+      expect(plan.kind).to.equal('noop');
+      expect(plan.instanceElement.tagName).to.equal('DAI');
+      expect(plan.instanceElement.getAttribute('name')).to.equal('i');
     });
 
-    it('Case 6: DAI and Val exist → append-val (no mutation planning)', () => {
+    it('Case 6: DAI and Val exist → noop (no mutation planning)', () => {
       const { templateElement, lnElement, ancestors } = setupTestHarness({
         docContents: testDocs.withIED_instanciated,
         templateSelector: 'DAType[id="AnalogueValueCtl"] > BDA[name="i"]',
@@ -501,8 +298,8 @@ describe('planDaiCreation', () => {
       const templatePath = getTemplatePath(templateElement, ancestors);
       const plan = planDaiCreation(lnElement, templatePath);
 
-      expect(plan.kind).to.equal('append-val');
-      expect(plan.dai.getAttribute('name')).to.equal('i');
+      expect(plan.kind).to.equal('noop');
+      expect(plan.instanceElement.getAttribute('name')).to.equal('i');
     });
 
     it('Case 7: DOI exists, wrong DAI → insert DAI', () => {
@@ -517,7 +314,7 @@ describe('planDaiCreation', () => {
       const plan = planDaiCreation(
         lnElement,
         templatePath,
-      ) as DaiCreationInsertStructurePlan;
+      ) as InstanceCreationInsertStructurePlan;
 
       expect(plan.kind).to.equal('insert-structure');
       expect(plan.parent.tagName).to.equal('DOI');

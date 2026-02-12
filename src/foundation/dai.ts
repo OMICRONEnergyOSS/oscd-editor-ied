@@ -1,45 +1,30 @@
-import { createElement } from '@openscd/scl-lib/dist/foundation/utils.js';
+import {
+  InstanceCreationPlan,
+  planInstanceInitialization,
+} from './ln-initialization.js';
 
-const SCL_NAMESPACE = 'http://www.iec.ch/61850/2003/SCL';
-
-export type DaiCreationInsertStructurePlan = {
-  kind: 'insert-structure';
-  parent: Element;
-  node: Element;
-  dai: Element;
-};
-
-export type DaiCreationAppendValPlan = {
-  kind: 'append-val';
-  dai: Element;
-};
-export type DaiCreationPlan =
-  | DaiCreationInsertStructurePlan
-  | DaiCreationAppendValPlan;
-
-export function getTemplatePath(
-  templateElement: Element,
-  ancestors: Element[],
-): Element[] {
-  const doElement = ancestors.find(element => element.tagName === 'DO');
-  if (!doElement) {
-    return [templateElement];
-  }
-
-  const dataStructure = ancestors.slice(ancestors.indexOf(doElement));
-  dataStructure.push(templateElement);
-  return dataStructure;
-}
-//TODO:
-// This function is using root.querySelector('DOType > DA[type="..."]'). If multiple DOType contain a DA
-// referencing the same DAType id, this could resolve the “wrong” DA and thus the wrong fc for daSupportsMultipleValues(). If that
-// scenario is possible in SCL, consider scoping resolution via the actual template path context instead of a global query.
+/**
+ * Small helper function to resolve the DA element corresponding to a BDA element, by looking up the DAType
+ * referenced by the BDA's parent DO and finding the DA with the matching type attribute. This is needed
+ * because in SCL, BDA elements don't have an fc attribute themselves, but their corresponding DA does,
+ * and we need to check that to determine if the BDA supports multiple values.
+ * @param BDAElement - The BDA element to resolve the corresponding DA for.
+ * @returns The corresponding DA element, or null if not found.
+ */
 export function resolveDaFromBDA(BDAElement: Element): Element | null {
+  // TODO: This function is using root.querySelector('DOType > DA[type="..."]'). If multiple DOType contain a DA
+  // referencing the same DAType id, this could resolve the “wrong” DA and thus the wrong fc for daSupportsMultipleValues(). If that
+  // scenario is possible in SCL, consider scoping resolution via the actual template path context instead of a global query.
   const daTypeId = BDAElement.parentElement?.getAttribute('id');
   const root = BDAElement.getRootNode() as Document | Element;
   return root.querySelector(`DOType > DA[type="${daTypeId}"]`);
 }
 
+/**
+ * Get the number of SGs from the ancestors of a given element. This is used to determine how many Val elements to create when initializing a DAI that supports multiple values.
+ * @param ancestors - The list of ancestor elements of the element.
+ * @returns The number of SGs, or null if not found.
+ */
 export function getNumOfSGs(ancestors: Element[]): number | null {
   const ldevice = ancestors.find(el => el.tagName === 'LDevice');
   const settingControl = ldevice?.querySelector('LN0 > SettingControl');
@@ -49,6 +34,11 @@ export function getNumOfSGs(ancestors: Element[]): number | null {
   return Number.isFinite(num) ? num : null;
 }
 
+/**
+ * Determines if a given template element supports multiple values. This is true if the element is a BDA whose corresponding DA has an fc of SG or SE.
+ * @param templateElement - The template element to check.
+ * @returns True if the template element supports multiple values, false otherwise.
+ */
 export function daSupportsMultipleValues(templateElement: Element): boolean {
   const da =
     templateElement.tagName === 'BDA'
@@ -64,120 +54,32 @@ export function daSupportsMultipleValues(templateElement: Element): boolean {
 }
 
 /**
- * Determine which part of the template structure still needs to be initialized.
- * @param parentElement - The instance element to search from for DOI/SDI
- * @param templateStructure - The templates structure with DO/DA/BDA Elements.
- * @returns The last initialized element or LN(0) if nothing is initialized, and the list of remaining template elements.
+ * Works out the initialization steps needed to create a DAI instance from a template, given the current state of the
+ * instance structure. It does not perform any mutations itself, but returns a plan describing the necessary steps
+ * to get from the current state to a valid DAI instance.
+ * @param lnElement - The LN element to be initialized.
+ * @param templatePath - Template elements to initialize within the lnElement above.
+ * @returns The plan describing the necessary steps to get from the current state to a valid DAI instance. This will
+ * either be an appendVal plan (if the structure is already initialized and we just need to add a Val), or an
+ * insertStructure plan (if part or all of the structure needs to be initialized first).
  */
-export function determineUninitializedStructure(
-  parentElement: Element,
-  templateStructure: Element[],
-): [Element, Element[]] {
-  // TODO - handle empty templateStructure (fail early)
-  // function relies on templateElement! and assumes templateStructure is non-empty. If an upstream caller ever passes [],
-  // we’ll get a runtime error; a defensive early-throw would make failures clearer.
-  const [templateElement, ...templateRest] = templateStructure;
-
-  let instanceElement: Element | null;
-  if (templateRest.length > 0) {
-    if (templateElement!.tagName === 'DO') {
-      instanceElement = parentElement.querySelector(
-        `DOI[name="${templateElement!.getAttribute('name')}"]`,
-      );
-    } else {
-      instanceElement = parentElement.querySelector(
-        `SDI[name="${templateElement!.getAttribute('name')}"]`,
-      );
-    }
-
-    if (instanceElement) {
-      return determineUninitializedStructure(instanceElement, templateRest);
-    }
-
-    return [parentElement, [templateElement, ...templateRest]];
-  }
-
-  instanceElement = parentElement.querySelector(
-    `DAI[name="${templateElement!.getAttribute('name')}"]`,
-  );
-  if (instanceElement) {
-    return [instanceElement, []];
-  }
-
-  return [parentElement, [templateElement!]];
-}
-
-/**
- * Create a new instance structure defined by the array of template elements passed.
- * @param uninitializedTemplateStructure - Template elements to initialize.
- * @returns The Element created from the last Template Element in the Array.
- */
-export function initializeElements(
-  uninitializedTemplateStructure: Element[],
-): Element {
-  // TODO - this function mutates its input array via .shift(). That’s OK given current usage (the arrays passed in are freshly constructed),
-  // but it’s a “footgun” API; Switch to an index-based || functional implementation to keep it pure like the other primitives.
-  const element = uninitializedTemplateStructure.shift();
-  if (uninitializedTemplateStructure.length > 0) {
-    let newElement: Element;
-    if (element!.tagName === 'DO') {
-      newElement = element!.ownerDocument.createElementNS(SCL_NAMESPACE, 'DOI');
-    } else {
-      newElement = element!.ownerDocument.createElementNS(SCL_NAMESPACE, 'SDI');
-    }
-    newElement.setAttribute('name', element?.getAttribute('name') ?? '');
-
-    const childElement = initializeElements(uninitializedTemplateStructure);
-    newElement.append(childElement);
-
-    return newElement;
-  }
-
-  const daiElement = createElement(element!.ownerDocument, 'DAI', {
-    name: element?.getAttribute('name') ?? '',
-  });
-  return daiElement;
-}
-
 export function planDaiCreation(
   lnElement: Element,
   templatePath: Element[],
-): DaiCreationPlan {
-  // 1. Walk the instance using the trusted primitive
-  const [lastInitialized, uninitializedTemplatePath] =
-    determineUninitializedStructure(lnElement, templatePath);
+): InstanceCreationPlan {
+  const plan = planInstanceInitialization(lnElement, templatePath);
 
-  // 2. If something is missing → insert-structure
-  if (uninitializedTemplatePath.length > 0) {
-    const subtree = initializeElements(uninitializedTemplatePath);
-
-    // subtree is DAI | DOI | SDI
-    const dai =
-      subtree.tagName === 'DAI' ? subtree : subtree.querySelector('DAI');
-    if (!dai) {
-      throw new Error('Invariant violation: initialized subtree has no DAI');
-    }
-
+  if (plan.kind === 'insert-structure') {
     return {
       kind: 'insert-structure',
-      parent: lastInitialized,
-      node: subtree,
-      dai,
+      parent: plan.parent,
+      node: plan.node,
+      instanceElement: plan.instanceElement,
     };
   }
 
-  // 3. Otherwise → append-val
-  const dai =
-    lastInitialized.tagName === 'DAI'
-      ? lastInitialized
-      : lastInitialized.querySelector('DAI');
-
-  if (!dai) {
-    throw new Error('Invariant violation: structure exists but no DAI found');
-  }
-
   return {
-    kind: 'append-val',
-    dai,
+    kind: 'noop',
+    instanceElement: plan.instanceElement,
   };
 }

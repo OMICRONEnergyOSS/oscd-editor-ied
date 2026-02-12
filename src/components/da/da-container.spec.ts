@@ -401,7 +401,7 @@ describe('da-container', () => {
           testHarness.daContainer.shadowRoot?.querySelectorAll(
             'da-container',
           ) ?? [];
-        expect(bdaContainers.length).to.equal(1);
+        expect(bdaContainers.length).to.equal(2);
       });
     });
 

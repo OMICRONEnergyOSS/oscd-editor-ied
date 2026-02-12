@@ -14,15 +14,15 @@
 				<Services>
 					<DynAssociation />
 					<SettingGroups>
-						<SGEdit resvTms="true"/>
-						<ConfSG resvTms="true"/>
+						<SGEdit resvTms="true" />
+						<ConfSG resvTms="true" />
 					</SettingGroups>
 					<GetDirectory />
 					<GetDataObjectDefinition />
 					<GetDataSetValue />
 					<DataSetDirectory />
 					<ReadWrite />
-					<ConfDataSet max="16" maxAttributes="256" modify="true"/>
+					<ConfDataSet max="16" maxAttributes="256" modify="true" />
 					<LogSettings
 						cbName="Fix"
 						datSet="Conf"
@@ -30,7 +30,7 @@
 						trgOps="Conf"
 						intgPd="Conf"
 					/>
-					<ConfLogControl max="8"/>
+					<ConfLogControl max="8" />
 					<ReportSettings
 						cbName="Fix"
 						datSet="Conf"
@@ -40,12 +40,32 @@
 						trgOps="Conf"
 						intgPd="Conf"
 					/>
-					<ConfReportControl max="8" buffered="true"/>
-					<GSESettings cbName="Fix" datSet="Conf"/>
-					<ConfGSEControl max="8"/>
-					<SMVSettings cbName="Fix" datSet="Conf"/>
-					<ConfSMVControl max="4"/>
-					<ClientServices readLog="true"/>
+					<ConfReportControl max="8" buffered="true" />
+					<GSESettings cbName="Fix" datSet="Conf" />
+					<ConfGSEControl max="8" />
+					<SMVSettings cbName="Fix" datSet="Conf">
+						<McSecurity signature="true" encryption="true" />
+						<SamplesPerSec>4000</SamplesPerSec>
+						<SecPerSamples>80</SecPerSamples>
+					</SMVSettings>
+					<ConfSMVControl max="4" />
+					<ClientServices readLog="true">
+						<TimeSyncProt
+						yes="true"
+						sntp="true"
+						iec61850_9_3="true"
+						c37_238="false"
+						other="false"
+						/>
+						<McSecurity signature="true" encryption="false" />
+					</ClientServices>
+					<TimeSyncProt
+						yes="true"
+						sntp="true"
+						iec61850_9_3="false"
+						c37_238="false"
+						other="false"
+					/>
 				</Services>
 				<LDevice inst="LD1">
 					<LN0 lnClass="LLN0" inst="" lnType="LLN0_Test">
@@ -132,6 +152,7 @@
 		</LNodeType>
 		<LNodeType lnClass="TCTR" id="TCTR_Test">
 			<DO name="Beh" type="Beh_Test"/>
+			<DO name="NestedBeh" type="NestedBeh_Test"/>
 			<DO name="HzRtg" type="HzRtg_Test"/>
 			<DO name="ARtg" type="ARtg_Test"/>
 		</LNodeType>
@@ -139,6 +160,9 @@
 			<DA name="stVal" fc="ST" dchg="true" dupd="true" bType="Enum" type="stVal_enums"/>
 			<DA name="q" fc="ST" qchg="true" bType="Quality"/>
 			<DA name="t" fc="ST" bType="Timestamp"/>
+		</DOType>
+		<DOType cdc="ENS" id="NestedBeh_Test">
+			<SDO name="subBeh" type="Beh_Test"/>
 		</DOType>
 		<DOType cdc="ASG" id="ARtg_Test">
 			<DA name="setVal" desc="fc=SG" fc="SG" bType="INT32"/>
@@ -156,6 +180,11 @@
 		</DOType>
 		<DAType id="AnalogueValueCtl">
 			<BDA name="i" bType="INT32"/>
+			<BDA name="range" bType="Struct" type="RangeStruct"/>
+		</DAType>
+		<DAType id="RangeStruct">
+			<BDA name="min" bType="INT32"/>
+			<BDA name="max" bType="INT32"/>
 		</DAType>
 		<DAType id="AnalogueValue">
 			<BDA name="i" bType="INT32"/>
