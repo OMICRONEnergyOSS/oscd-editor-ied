@@ -1,32 +1,34 @@
 import { expect, fixture } from '@open-wc/testing';
 import { renderLogSettingsServices } from './service-log-settings.js';
 import { html } from 'lit';
-import { IedServicesAction } from './ied-services-action.js';
-import { parseDoc, testDocs } from '../../../test-utils/test-files.js';
-import { extractServicesData } from '../../../foundation/services.js';
+import { ServicesAction } from './services-action.js';
+import { parseDoc, testDocs } from '../../test-utils/test-files.js';
+import { extractServicesData } from '../../foundation/services.js';
 import { renderClientServerServices } from './service-client-server.js';
 import { renderReportConfigurationsServices } from './service-report-configurations.js';
 import { renderGseControlServices } from './service-GSE-Control.js';
 import { renderNetworkingServices } from './service-networking.js';
 import { renderSampledValuesServices } from './service-sampled-values.js';
 
-customElements.define('ied-services-action', IedServicesAction);
+customElements.define('services-action', ServicesAction);
 
 const testDoc = parseDoc(testDocs.withIED_instanciated);
 const ied = testDoc.querySelector('IED')!;
 
-describe('ied-services-action', () => {
-  let iedServicesAction: IedServicesAction;
+describe('services-action', () => {
+  let iedServicesAction: ServicesAction;
 
   beforeEach(async () => {
-    iedServicesAction = await fixture<IedServicesAction>(
-      html`<ied-services-action></ied-services-action>`,
+    iedServicesAction = await fixture<ServicesAction>(
+      html`<services-action></services-action>`,
     );
   });
 
   describe('with no services', () => {
     beforeEach(async () => {
-      iedServicesAction.ied = parseDoc(testDocs.withIED).querySelector('IED')!;
+      iedServicesAction.element = parseDoc(testDocs.withIED).querySelector(
+        'IED',
+      )!;
       await iedServicesAction.updateComplete;
     });
     it('disables icon button', async () => {
@@ -38,14 +40,14 @@ describe('ied-services-action', () => {
 
   describe('with services', () => {
     beforeEach(async () => {
-      iedServicesAction.ied = parseDoc(
+      iedServicesAction.element = parseDoc(
         testDocs.withIED_instanciated,
       ).querySelector('IED')!;
       await iedServicesAction.updateComplete;
     });
 
     it('enables icon button', async () => {
-      iedServicesAction.ied = parseDoc(
+      iedServicesAction.element = parseDoc(
         testDocs.withIED_instanciated,
       ).querySelector('IED')!;
       await iedServicesAction.updateComplete;

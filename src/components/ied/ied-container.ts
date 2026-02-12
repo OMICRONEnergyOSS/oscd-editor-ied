@@ -25,7 +25,7 @@ import {
 } from '../../foundation.js';
 import { Insert } from '@openscd/oscd-api';
 import { removeIED } from '@openscd/scl-lib';
-import { IedServicesAction } from './services/ied-services-action.js';
+import { ServicesAction } from '../services/services-action.js';
 
 /** [[`IED`]] plugin subeditor for editing `IED` element. */
 export class IedContainer extends ScopedElementsMixin(BaseContainer) {
@@ -35,7 +35,7 @@ export class IedContainer extends ScopedElementsMixin(BaseContainer) {
     'oscd-action-pane': OscdActionPane,
     'access-point-container': AccessPointContainer,
     'access-point-create-dialog': AccessPointCreateDialog,
-    'ied-services-action': IedServicesAction,
+    'services-action': ServicesAction,
   };
 
   @property({ type: Array })
@@ -106,7 +106,7 @@ export class IedContainer extends ScopedElementsMixin(BaseContainer) {
   render() {
     return html` <oscd-action-pane .label="${this.header()}">
       <oscd-icon slot="icon">developer_board</oscd-icon>
-      <abbr slot="action" title="${msg('remove')}">
+      <abbr slot="action" title="${msg('Delete IED and all its content')}">
         <oscd-icon-button
           data-testid="delete-ied-button"
           @click=${() => this.removeIED()}
@@ -114,7 +114,7 @@ export class IedContainer extends ScopedElementsMixin(BaseContainer) {
           <oscd-icon>delete</oscd-icon></oscd-icon-button
         >
       </abbr>
-      <abbr slot="action" title="${msg('edit')}">
+      <abbr slot="action" title="${msg('Edit IED')}">
         <oscd-icon-button
           data-testid="edit-ied-button"
           @click=${(event: Event) => {
@@ -125,11 +125,8 @@ export class IedContainer extends ScopedElementsMixin(BaseContainer) {
           <oscd-icon>edit</oscd-icon></oscd-icon-button
         >
       </abbr>
-      <abbr
-        slot="action"
-        title="${msg('Show Services the IED/AccessPoint provides')}"
-      >
-        <ied-services-action .ied=${this.element}></ied-services-action>
+      <abbr slot="action" title="${msg('Show Services the IED provides')}">
+        <services-action .element=${this.element}></services-action>
       </abbr>
       <abbr slot="action" title="${msg('Add AccessPoint')}">
         <oscd-icon-button

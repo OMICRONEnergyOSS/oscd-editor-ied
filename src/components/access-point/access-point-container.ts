@@ -19,6 +19,7 @@ import {
   AccessPointEditData,
   AccessPointEditDialog,
 } from './access-point-edit-dialog.js';
+import { ServicesAction } from '../services/services-action.js';
 
 export class AccessPointContainer extends ScopedElementsMixin(BaseContainer) {
   static scopedElements = {
@@ -29,9 +30,10 @@ export class AccessPointContainer extends ScopedElementsMixin(BaseContainer) {
     'server-container': ServerContainer,
     'ln-container': LNContainer,
     'access-point-edit-dialog': AccessPointEditDialog,
+    'services-action': ServicesAction,
   };
 
-  @property()
+  @property({ type: Array })
   selectedLNClasses: string[] = [];
 
   @query('access-point-edit-dialog')
@@ -85,22 +87,31 @@ export class AccessPointContainer extends ScopedElementsMixin(BaseContainer) {
 
     return html`<oscd-action-pane .label="${this.header()}">
         <oscd-scl-icon slot="icon">accessPointIcon</oscd-scl-icon>
-        <oscd-icon-button
+        <abbr
           slot="action"
-          title="${msg('remove')}"
-          data-testid="delete-access-point-button"
-          @click=${() => this.removeAccessPoint()}
+          title="${msg('Delete AccessPoint and all its content')}"
         >
-          <oscd-icon>delete</oscd-icon>
-        </oscd-icon-button>
-        <oscd-icon-button
+          <oscd-icon-button
+            data-testid="delete-access-point-button"
+            @click=${() => this.removeAccessPoint()}
+          >
+            <oscd-icon>delete</oscd-icon>
+          </oscd-icon-button>
+        </abbr>
+        <abbr slot="action" title="${msg('Edit AccessPoint')}">
+          <oscd-icon-button
+            data-testid="edit-access-point-button"
+            @click=${() => this.accessPointDialog.show()}
+          >
+            <oscd-icon>edit</oscd-icon>
+          </oscd-icon-button>
+        </abbr>
+        <abbr
           slot="action"
-          title="${msg('edit')}"
-          data-testid="edit-access-point-button"
-          @click=${() => this.accessPointDialog.show()}
+          title="${msg('Show Services the AccessPoint provides')}"
         >
-          <oscd-icon>edit</oscd-icon>
-        </oscd-icon-button>
+          <services-action .element=${this.element}></services-action>
+        </abbr>
         ${Array.from(this.element.querySelectorAll(':scope > Server')).map(
           server =>
             html`<server-container
@@ -150,6 +161,11 @@ export class AccessPointContainer extends ScopedElementsMixin(BaseContainer) {
       grid-gap: 12px;
       box-sizing: border-box;
       grid-template-columns: repeat(auto-fit, minmax(316px, auto));
+    }
+
+    abbr {
+      text-decoration: none;
+      border-bottom: none;
     }
 
     @media (max-width: 387px) {

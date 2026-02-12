@@ -7,14 +7,11 @@ import { OscdDialog } from '@omicronenergy/oscd-ui/dialog/OscdDialog.js';
 import { OscdFilledButton } from '@omicronenergy/oscd-ui/button/OscdFilledButton.js';
 import { OscdOutlinedButton } from '@omicronenergy/oscd-ui/button/OscdOutlinedButton.js';
 import { renderLogSettingsServices } from './service-log-settings.js';
-import { OscdFormGroup } from '../../form/oscd-form-group.js';
-import { OscdFormDivider } from '../../form/oscd-form-divider.js';
-import { OscdForm } from '../../form/oscd-form.js';
-import {
-  extractServicesData,
-  IEDServices,
-} from '../../../foundation/services.js';
-import { OscdFormField } from '../../form/oscd-form-field.js';
+import { OscdFormGroup } from '../form/oscd-form-group.js';
+import { OscdFormDivider } from '../form/oscd-form-divider.js';
+import { OscdForm } from '../form/oscd-form.js';
+import { extractServicesData, Services } from '../../foundation/services.js';
+import { OscdFormField } from '../form/oscd-form-field.js';
 import { renderReportConfigurationsServices } from './service-report-configurations.js';
 import { msg } from '@lit/localize';
 import { renderGseControlServices } from './service-GSE-Control.js';
@@ -27,7 +24,7 @@ export type ServicePage = {
   renderer: () => TemplateResult;
 };
 
-export class IedServicesAction extends ScopedElementsMixin(LitElement) {
+export class ServicesAction extends ScopedElementsMixin(LitElement) {
   static scopedElements = {
     'oscd-icon': OscdIcon,
     'oscd-icon-button': OscdIconButton,
@@ -40,15 +37,19 @@ export class IedServicesAction extends ScopedElementsMixin(LitElement) {
     'oscd-form-group': OscdFormGroup,
   };
 
-  private _ied!: Element;
+  private _element!: Element;
   @property({ attribute: false })
-  set ied(value: Element) {
-    this._ied = value;
-    this.services = extractServicesData(this._ied);
+  set element(value: Element) {
+    this._element = value;
+    this.services = extractServicesData(this._element);
+  }
+
+  get element(): Element {
+    return this._element;
   }
 
   @state()
-  private services: IEDServices | null = null;
+  private services: Services | null = null;
 
   @state()
   activeIndex = 0;
@@ -107,7 +108,7 @@ export class IedServicesAction extends ScopedElementsMixin(LitElement) {
       <oscd-icon-button ?disabled=${!this.services} @click=${() => this.show()}
         ><oscd-icon>settings</oscd-icon></oscd-icon-button
       >
-      <oscd-dialog @closed=${this.close}>
+      <oscd-dialog @closed=${this.close} scrollable="false">
         <div slot="headline">${this.headline}</div>
         <div slot="content" class="dialog-content">
           <aside class="nav">

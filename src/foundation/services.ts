@@ -6,7 +6,7 @@ export interface TimeSyncProt {
   other: string | null;
 }
 
-export interface IEDServices {
+export interface Services {
   logSettings: {
     cbName: string | null;
     datSet: string | null;
@@ -196,8 +196,8 @@ function hasChild(parent: Element, childSelector: string): 'true' | null {
   return parent.querySelector(childSelector) ? 'true' : null;
 }
 
-export function extractServicesData(ied: Element): IEDServices | null {
-  const services = ied.querySelector('Services');
+export function extractServicesData(element: Element): Services | null {
+  const services = element.querySelector(':scope > Services');
   if (!services) {
     return null;
   }
