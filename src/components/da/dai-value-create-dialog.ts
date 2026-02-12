@@ -259,15 +259,6 @@ export class DaiValueCreateDialog extends ScopedElementsMixin(LitElement) {
   }
 
   static styles = css`
-    :host {
-      --md-filled-text-field-disabled-input-text-opacity: 0.8;
-      --md-filled-text-field-disabled-label-text-opacity: 0.8;
-      --md-filled-text-field-disabled-container-color: transparent;
-
-      --md-filled-text-field-disabled-active-indicator-color: transparent;
-      --md-filled-text-field-active-indicator-height: 0px;
-    }
-
     [slot='content'] {
       width: 320px;
       max-width: 100vw;

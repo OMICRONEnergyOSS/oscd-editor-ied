@@ -415,7 +415,7 @@ export class OscdEditorIED extends ScopedElementsMixin(LitElement) {
   private renderSelectedIED(): TemplateResult {
     if (this.iedList.length === 0) {
       return html`<h1>
-        <span style="color: var(--base1)">${msg('No IED')}</span>
+        <span style="color: var(--oscd-base1)">${msg('No IED')}</span>
       </h1>`;
     }
     return html`<section>
@@ -468,7 +468,7 @@ export class OscdEditorIED extends ScopedElementsMixin(LitElement) {
     }
 
     h1 {
-      color: var(--md-theme-on-surface);
+      color: var(--md-sys-color-on-surface);
       font-family: var(--oscd-text-font, 'Roboto', sans-serif);
       font-weight: 300;
       margin: 0px;

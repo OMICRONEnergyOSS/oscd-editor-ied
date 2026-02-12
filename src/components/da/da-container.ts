@@ -333,8 +333,8 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
 
   static styles = css`
     h4 {
-      color: var(--mdc-theme-on-surface);
-      font-family: 'Roboto', sans-serif;
+      color: var(--md-sys-color-on-surface);
+      font-family: var(--oscd-text-font);
       font-weight: 300;
       margin: 0px;
       padding-left: 0.3em;
@@ -359,7 +359,7 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
     }
 
     oscd-icon-button {
-      color: var(--mdc-theme-on-surface);
+      color: var(--md-sys-color-on-surface);
     }
   `;
 }

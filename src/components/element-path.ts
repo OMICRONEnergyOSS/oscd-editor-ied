@@ -17,8 +17,8 @@ export class ElementPath extends ScopedElementsMixin(LitElement) {
     }
 
     h3 {
-      color: var(--mdc-theme-on-surface);
-      font-family: 'Roboto', sans-serif;
+      color: var(--md-sys-color-on-surface);
+      font-family: var(--oscd-text-font);
       font-weight: 300;
       overflow: hidden;
       white-space: nowrap;
