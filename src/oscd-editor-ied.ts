@@ -19,7 +19,6 @@ import { OscdIcon } from '@omicronenergy/oscd-ui/icon/OscdIcon.js';
 
 import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
 import { initializeNsdoc, Nsdoc } from './foundation/nsdoc.js';
-import { OpenscdApi } from './foundation/types.js';
 import { SelectItem } from '@omicronenergy/oscd-ui/selection-list/OscdSelectionList.js';
 import { IedContainer } from './components/ied/ied-container.js';
 import { ElementPath } from './components/element-path.js';
@@ -105,9 +104,6 @@ export class OscdEditorIED extends ScopedElementsMixin(LitElement) {
   @property({ type: Object })
   nsdoc: Nsdoc = initializeNsdoc();
 
-  @property({ type: Object })
-  oscdApi?: OpenscdApi | null = null;
-
   @state()
   selectedIEDs: Element[] = [];
 
@@ -154,11 +150,6 @@ export class OscdEditorIED extends ScopedElementsMixin(LitElement) {
 
           return aLnClass.localeCompare(bLnClass);
         });
-      // .map(element => {
-      //   const lnClass = element.getAttribute('lnClass');
-      //   const label = this.nsdoc.getDataDescription(element).label;
-      //   return [lnClass, label];
-      // }) as string[][];
     }
     return [];
   }
@@ -236,33 +227,6 @@ export class OscdEditorIED extends ScopedElementsMixin(LitElement) {
     this.removeEventListener(EVENTS.EDIT_ELEMENT, this.handleEditElement);
     this.removeEventListener(EVENTS.CONFIRM_DELETE, this.handleConfirmDelete);
   }
-
-  // private handleCreateVirtualIED(iedName: string): void {
-  //   const inserts: Insert[] = [];
-
-  //   const existingLLN0 = findLLN0LNodeType(this.doc);
-  //   const lnTypeId = existingLLN0?.getAttribute('id') || 'PlaceholderLLN0';
-
-  //   const ied = createIEDStructure(this.doc, iedName, lnTypeId);
-
-  //   const dataTypeTemplates = this.doc.querySelector('DataTypeTemplates');
-  //   inserts.push({
-  //     parent: this.doc.querySelector('SCL')!,
-  //     node: ied,
-  //     reference: dataTypeTemplates,
-  //   });
-
-  //   if (!existingLLN0) {
-  //     const lnodeTypeInserts = createLLN0LNodeType(this.doc, lnTypeId);
-  //     inserts.push(...lnodeTypeInserts);
-  //   }
-
-  //   this.dispatchEvent(newEditEventV2(inserts));
-
-  //   this.selectedIEDs = [ied];
-  //   this.selectedLNClasses = [];
-  //   this.requestUpdate('selectedIed');
-  // }
 
   protected willUpdate(_changedProperties: PropertyValues): void {
     // When the document is updated, we reset the selected IED if it no longer exists

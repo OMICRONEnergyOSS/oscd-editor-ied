@@ -95,7 +95,7 @@ describe('getTemplateStructure tests', () => {
     const { templateElement, ancestors } = setupTestHarness({
       docContents: testDocs.withIED_instanciated,
       templateSelector: 'DAType[id="AnalogueValue"] > BDA[name="i"]',
-      lnSelector: 'IED[name="IED1"] LN0', // unused, but required by harness
+      lnSelector: 'IED[name="IED1"] LN0',
     });
 
     const path = getTemplatePath(templateElement, ancestors);
@@ -152,7 +152,6 @@ describe('getTemplateStructure tests', () => {
       templateSelector: 'DAType[id="AnalogueValueCtl"] > BDA[name="i"]',
       lnSelector: 'IED[name="IED1"] LN0',
       templatePathSelectors: [
-        // Rubish prefix ancestors
         'LNodeType[id="TCTR_Test"]',
         ...HZRTG_STRUCTURED_ANCESTORS,
       ],
@@ -335,7 +334,6 @@ describe('resolveDaFromBDA tests', () => {
 
     const da = resolveDaFromBDA(templateElement);
 
-    // Assert via primitives only
     expect(da?.tagName).to.equal('DA');
     expect(da?.getAttribute('name')).to.equal('setMag');
   });

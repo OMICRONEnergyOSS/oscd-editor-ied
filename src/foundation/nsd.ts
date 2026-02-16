@@ -6,8 +6,6 @@ import {
   nsd81 as nsd81Str,
 } from '@openscd/scl-lib/dist/foundation/codecomponents/nsds.js';
 
-//TODO [stee-re]: Move this to @openscd/scl-lib
-
 const [nsd72, nsd73, nsd74, nsd7420, nsd81] = [
   nsd72Str,
   nsd73Str,

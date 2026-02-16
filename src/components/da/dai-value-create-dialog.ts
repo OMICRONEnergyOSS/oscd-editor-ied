@@ -78,11 +78,9 @@ export class DaiValueCreateDialog extends ScopedElementsMixin(LitElement) {
       return;
     }
 
-    // Reset UI-only state
     this.editedValues.clear();
     this.multipleSettings = this.getMultipleSettingGroupCount();
 
-    // Read-only hint for the user
     this.templateValue =
       this.templateElement.querySelector('Val')?.textContent?.trim() ?? null;
 
@@ -103,7 +101,6 @@ export class DaiValueCreateDialog extends ScopedElementsMixin(LitElement) {
       return;
     }
 
-    // Collect user intent (values to create)
     const values = Array.from(this.editedValues.entries())
       .filter(([_, value]) => value)
       .map(([index, value]) => ({
@@ -112,7 +109,6 @@ export class DaiValueCreateDialog extends ScopedElementsMixin(LitElement) {
       }));
 
     if (values.length === 0) {
-      // Contract: create-dialog must create at least one Val
       return;
     }
 

@@ -29,8 +29,8 @@
     "lint": "eslint .",
     "format": "eslint . --fix",
     "analyze": "cem analyze --litelement --exclude demo/* --exclude dist/* --exclude *.spec.ts --exclude *.test.ts --exclude coverage/*",
-    "start": "wds --node-resolve",
-    "start:bundle": "npm run bundle && concurrently -k -r \"rollup -c rollup.config.js --watch\" \"wds --hmr \"",
+    "start": "rimraf dist && tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds --watch --node-resolve\"",
+    "start:bundle": "npm run bundle && concurrently -k -r \"rollup -c rollup.config.js --watch\" \"wds --watch --root-dir ./dist\"",
     "build": "rimraf dist && mkdir dist && tsc ",
     "bundle": "rimraf dist && rollup -c rollup.config.js",
     "test": "npm run build && wtr --coverage --group unit",
@@ -46,7 +46,7 @@
     "@omicronenergy/oscd-editor-source": "^0.0.1",
     "@omicronenergy/oscd-menu-open": "^0.0.6",
     "@omicronenergy/oscd-menu-save": "^0.0.2",
-    "@omicronenergy/oscd-scl-dialogs": "^0.0.8",
+    "@omicronenergy/oscd-scl-dialogs": "^0.0.10",
     "@omicronenergy/oscd-shell": "^0.0.10",
     "@omicronenergy/oscd-ui": "^0.0.11",
     "@open-wc/scoped-elements": "^3.0.5",
@@ -107,9 +107,7 @@
     "typescript": "^5.9.3"
   },
   "overrides": {
-    "@web/test-runner-playwright": {
-      "playwright": "1.54.1"
-    }
+    "playwright": "1.54.1"
   },
   "customElements": "custom-elements.json",
   "prettier": {

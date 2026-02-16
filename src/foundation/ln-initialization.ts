@@ -48,9 +48,6 @@ export function determineUninitializedStructure(
   parentElement: Element,
   templateStructure: Element[],
 ): [Element, Element[]] {
-  // TODO - handle empty templateStructure (fail early)
-  // function relies on templateElement! and assumes templateStructure is non-empty. If an upstream caller ever passes [],
-  // we’ll get a runtime error; a defensive early-throw would make failures clearer.
   const [templateElement, ...templateRest] = templateStructure;
 
   let instanceElement: Element | null;
@@ -90,30 +87,31 @@ export function determineUninitializedStructure(
 export function initializeElements(
   uninitializedTemplateStructure: Element[],
 ): Element {
-  // TODO - this function mutates its input array via .shift(). That’s OK given current usage (the arrays passed in are freshly constructed),
-  // but it’s a “footgun” API; Switch to an index-based || functional implementation to keep it pure like the other primitives.
-  const element = uninitializedTemplateStructure.shift();
-  if (uninitializedTemplateStructure.length > 0) {
+  const [tipElement, ...restOfUninitializedTemplateStructure] =
+    uninitializedTemplateStructure;
+  if (restOfUninitializedTemplateStructure.length > 0) {
     let newElement: Element;
-    const name = element?.getAttribute('name') ?? '';
-    if (element!.tagName === 'DO') {
-      newElement = createElement(element!.ownerDocument, 'DOI', {
+    const name = tipElement?.getAttribute('name') ?? '';
+    if (tipElement!.tagName === 'DO') {
+      newElement = createElement(tipElement!.ownerDocument, 'DOI', {
         name,
       });
     } else {
-      newElement = createElement(element!.ownerDocument, 'SDI', {
+      newElement = createElement(tipElement!.ownerDocument, 'SDI', {
         name,
       });
     }
 
-    const childElement = initializeElements(uninitializedTemplateStructure);
+    const childElement = initializeElements(
+      restOfUninitializedTemplateStructure,
+    );
     newElement.append(childElement);
 
     return newElement;
   }
 
-  const daiElement = createElement(element!.ownerDocument, 'DAI', {
-    name: element?.getAttribute('name') ?? '',
+  const daiElement = createElement(tipElement!.ownerDocument, 'DAI', {
+    name: tipElement?.getAttribute('name') ?? '',
   });
   return daiElement;
 }
