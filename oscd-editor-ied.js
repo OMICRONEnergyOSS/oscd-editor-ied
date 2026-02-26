@@ -38528,6 +38528,10 @@ function buildDoInfoGroups({ ancestors, nsdoc, templateElement, instanceElement,
                 label: 'Data object common data class',
                 value: doTypeElement?.getAttribute('cdc') ?? MISSING_VALUE,
             },
+            {
+                label: 'Data object Type',
+                value: templateElement?.getAttribute('type') ?? MISSING_VALUE,
+            },
         ],
         [
             {
@@ -38647,8 +38651,12 @@ function buildDaInfoGroups({ ancestors, nsdoc, templateElement, instanceElement,
                 value: templateElement?.getAttribute('fc') ?? MISSING_VALUE,
             },
             {
-                label: 'Data attribute type',
+                label: 'Data attribute base type',
                 value: templateElement?.getAttribute('bType') ?? MISSING_VALUE,
+            },
+            {
+                label: 'Data attribute type',
+                value: templateElement?.getAttribute('type') ?? MISSING_VALUE,
             },
             {
                 label: 'Data attribute value',
