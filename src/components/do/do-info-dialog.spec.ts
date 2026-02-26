@@ -43,6 +43,7 @@ describe('do-info-dialog', () => {
       'Data object name',
       'Data object description',
       'Data object common data class',
+      'Data object Type',
     ]);
     expect(groups[0][0].value).to.equal('DO-label');
     expect(groups[0][1].value).to.equal('ARtg');
@@ -74,6 +75,7 @@ describe('do-info-dialog', () => {
     expect(groups[0].map(field => field.label)).to.deep.equal([
       'Data object name',
       'Data object common data class',
+      'Data object Type',
     ]);
     expect(groups[1][0].value).to.equal(MISSING_VALUE);
   });
@@ -124,6 +126,7 @@ describe('do-info-dialog', () => {
       'ARtg',
       MISSING_VALUE,
       'ASG',
+      'ARtg_Test',
       MISSING_VALUE,
       'LN-label',
       '1',

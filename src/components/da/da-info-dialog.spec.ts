@@ -40,6 +40,7 @@ describe('da-info-dialog', () => {
       'Data attribute name',
       'Data attribute description',
       'Data attribute functional constraint',
+      'Data attribute base type',
       'Data attribute type',
       'Data attribute value',
     ]);
@@ -48,7 +49,8 @@ describe('da-info-dialog', () => {
     expect(groups[0][2].value).to.equal(MISSING_VALUE);
     expect(groups[0][3].value).to.equal('SG');
     expect(groups[0][4].value).to.equal('INT32');
-    expect(groups[0][5].value).to.equal('10, 12, 13, 14, 15');
+    expect(groups[0][5].value).to.equal(MISSING_VALUE);
+    expect(groups[0][6].value).to.equal('10, 12, 13, 14, 15');
     expect(groups[1][0].value).to.equal('ARtg');
     expect(groups[1][1].value).to.equal('ASG');
     expect(groups[2][0].value).to.equal(MISSING_VALUE);

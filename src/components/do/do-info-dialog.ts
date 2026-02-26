@@ -61,6 +61,10 @@ export function buildDoInfoGroups({
         label: 'Data object common data class',
         value: doTypeElement?.getAttribute('cdc') ?? MISSING_VALUE,
       },
+      {
+        label: 'Data object Type',
+        value: templateElement?.getAttribute('type') ?? MISSING_VALUE,
+      },
     ],
     [
       {

@@ -55,8 +55,12 @@ export function buildDaInfoGroups({
         value: templateElement?.getAttribute('fc') ?? MISSING_VALUE,
       },
       {
-        label: 'Data attribute type',
+        label: 'Data attribute base type',
         value: templateElement?.getAttribute('bType') ?? MISSING_VALUE,
+      },
+      {
+        label: 'Data attribute type',
+        value: templateElement?.getAttribute('type') ?? MISSING_VALUE,
       },
       {
         label: 'Data attribute value',
