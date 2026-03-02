@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<SCL xmlns="http://www.iec.ch/61850/2003/SCL" version="2007" revision="B" release="5">
+<SCL xmlns="http://www.iec.ch/61850/2003/SCL"
+     version="2007"
+     revision="B"
+     release="1">
 	<Header id="development sample"/>
 	<Substation name="S1">
 		<VoltageLevel name="V1">
@@ -7,7 +10,7 @@
 			<Bay name="B1"/>
 		</VoltageLevel>
 	</Substation>
-	<IED name="IED1" manufacturer="OpenSCD">
+	<IED name="IED2" manufacturer="OpenSCD">
 		<Services>
 			<DynAssociation />
 			<SettingGroups>
@@ -37,29 +40,21 @@
 						trgOps="Conf"
 						intgPd="Conf"
 					/>
-			<ConfReportControl max="8" buffered="true" />
+			<ConfReportControl max="8" />
 			<GSESettings cbName="Fix" datSet="Conf" />
-			<ConfGSEControl max="8" />
 			<SMVSettings cbName="Fix" datSet="Conf">
-				<McSecurity signature="true" encryption="true" />
 				<SamplesPerSec>4000</SamplesPerSec>
 				<SecPerSamples>80</SecPerSamples>
 			</SMVSettings>
-			<ConfSMVControl max="4" />
 			<ClientServices readLog="true">
 				<TimeSyncProt
-						yes="true"
 						sntp="true"
-						iec61850_9_3="true"
 						c37_238="false"
 						other="false"
 						/>
-				<McSecurity signature="true" encryption="false" />
 			</ClientServices>
 			<TimeSyncProt
-						yes="true"
 						sntp="true"
-						iec61850_9_3="false"
 						c37_238="false"
 						other="false"
 					/>
@@ -148,6 +143,12 @@
 	</IED>
 	<IED name="IED1" manufacturer="OpenSCD">
 		<AccessPoint name="AP2">
+			<Server>
+				<Authentication/>
+				<LDevice inst="LD2">
+					<LN0 lnClass="LLN0" inst="" lnType="LLN0_Test"/>
+				</LDevice>
+			</Server>
 			<Services>
 				<DynAssociation />
 				<SettingGroups>
@@ -177,39 +178,13 @@
 						trgOps="Conf"
 						intgPd="Conf"
 					/>
-				<ConfReportControl max="8" buffered="true" />
+				<ConfReportControl max="8" />
 				<GSESettings cbName="Fix" datSet="Conf" />
-				<ConfGSEControl max="8" />
 				<SMVSettings cbName="Fix" datSet="Conf">
-					<McSecurity signature="true" encryption="true" />
 					<SamplesPerSec>4000</SamplesPerSec>
 					<SecPerSamples>80</SecPerSamples>
 				</SMVSettings>
-				<ConfSMVControl max="4" />
-				<ClientServices readLog="true">
-					<TimeSyncProt
-						yes="true"
-						sntp="true"
-						iec61850_9_3="true"
-						c37_238="false"
-						other="false"
-						/>
-					<McSecurity signature="true" encryption="false" />
-				</ClientServices>
-				<TimeSyncProt
-						yes="true"
-						sntp="true"
-						iec61850_9_3="false"
-						c37_238="false"
-						other="false"
-					/>
 			</Services>
-			<Server>
-				<Authentication/>
-				<LDevice inst="LD2">
-					<LN0 lnClass="LLN0" inst="" lnType="LLN0_Test"/>
-				</LDevice>
-			</Server>
 		</AccessPoint>
 	</IED>
 	<DataTypeTemplates>
