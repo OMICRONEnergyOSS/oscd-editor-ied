@@ -7,8 +7,4 @@ export interface Nsdoc {
         label: string;
     };
 }
-/**
- * Initialize the full Nsdoc object.
- * @returns A fully initialized Nsdoc object for wizards/editors to use.
- */
 export declare function initializeNsdoc(): Nsdoc;
