@@ -1801,6 +1801,180 @@ function ariaAttributeToDataProperty$2(ariaAttribute) {
 
 /**
  * @license
+ * Copyright 2022 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+/**
+ * Returns `true` if the given element is in a right-to-left direction.
+ *
+ * @param el Element to determine direction from
+ * @param shouldCheck Optional. If `false`, return `false` without checking
+ *     direction. Determining the direction of `el` is somewhat expensive, so
+ *     this parameter can be used as a conditional guard. Defaults to `true`.
+ */
+function isRtl$2(el, shouldCheck = true) {
+    return (shouldCheck &&
+        getComputedStyle(el).getPropertyValue('direction').trim() === 'rtl');
+}
+
+/**
+ * @license
+ * Copyright 2023 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+/**
+ * A symbol used to access dispatch hooks on an event.
+ */
+const dispatchHooks$2 = Symbol('dispatchHooks');
+/**
+ * Add a hook for an event that is called after the event is dispatched and
+ * propagates to other event listeners.
+ *
+ * This is useful for behaviors that need to check if an event is canceled.
+ *
+ * The callback is invoked synchronously, which allows for better integration
+ * with synchronous platform APIs (like `<form>` or `<label>` clicking).
+ *
+ * Note: `setupDispatchHooks()` must be called on the element before adding any
+ * other event listeners. Call it in the constructor of an element or
+ * controller.
+ *
+ * @example
+ * ```ts
+ * class MyControl extends LitElement {
+ *   constructor() {
+ *     super();
+ *     setupDispatchHooks(this, 'click');
+ *     this.addEventListener('click', event => {
+ *       afterDispatch(event, () => {
+ *         if (event.defaultPrevented) {
+ *           return
+ *         }
+ *
+ *         // ... perform logic
+ *       });
+ *     });
+ *   }
+ * }
+ * ```
+ *
+ * @example
+ * ```ts
+ * class MyController implements ReactiveController {
+ *   constructor(host: ReactiveElement) {
+ *     // setupDispatchHooks() may be called multiple times for the same
+ *     // element and events, making it safe for multiple controllers to use it.
+ *     setupDispatchHooks(host, 'click');
+ *     host.addEventListener('click', event => {
+ *       afterDispatch(event, () => {
+ *         if (event.defaultPrevented) {
+ *           return;
+ *         }
+ *
+ *         // ... perform logic
+ *       });
+ *     });
+ *   }
+ * }
+ * ```
+ *
+ * @param event The event to add a hook to.
+ * @param callback A hook that is called after the event finishes dispatching.
+ */
+function afterDispatch$2(event, callback) {
+    const hooks = event[dispatchHooks$2];
+    if (!hooks) {
+        throw new Error(`'${event.type}' event needs setupDispatchHooks().`);
+    }
+    hooks.addEventListener('after', callback, { once: true });
+}
+/**
+ * A lookup map of elements and event types that have a dispatch hook listener
+ * set up. Used to ensure we don't set up multiple hook listeners on the same
+ * element for the same event.
+ */
+const ELEMENT_DISPATCH_HOOK_TYPES$2 = new WeakMap();
+/**
+ * Sets up an element to add dispatch hooks to given event types. This must be
+ * called before adding any event listeners that need to use dispatch hooks
+ * like `afterDispatch()`.
+ *
+ * This function is safe to call multiple times with the same element or event
+ * types. Call it in the constructor of elements, mixins, and controllers to
+ * ensure it is set up before external listeners.
+ *
+ * @example
+ * ```ts
+ * class MyControl extends LitElement {
+ *   constructor() {
+ *     super();
+ *     setupDispatchHooks(this, 'click');
+ *     this.addEventListener('click', this.listenerUsingAfterDispatch);
+ *   }
+ * }
+ * ```
+ *
+ * @param element The element to set up event dispatch hooks for.
+ * @param eventTypes The event types to add dispatch hooks to.
+ */
+function setupDispatchHooks$2(element, ...eventTypes) {
+    let typesAlreadySetUp = ELEMENT_DISPATCH_HOOK_TYPES$2.get(element);
+    if (!typesAlreadySetUp) {
+        typesAlreadySetUp = new Set();
+        ELEMENT_DISPATCH_HOOK_TYPES$2.set(element, typesAlreadySetUp);
+    }
+    for (const eventType of eventTypes) {
+        // Don't register multiple dispatch hook listeners. A second registration
+        // would lead to the second listener calling `afterDispatch()` hooks twice.
+        if (typesAlreadySetUp.has(eventType)) {
+            continue;
+        }
+        element.addEventListener(eventType, (event) => {
+            // Add hooks onto the event.
+            const hooks = new EventTarget();
+            event[dispatchHooks$2] = hooks;
+            const cleanupLastNodeListener = new AbortController();
+            const callAfterDispatch = () => {
+                cleanupLastNodeListener.abort();
+                hooks.dispatchEvent(new Event('after'));
+            };
+            const patchStopPropagation = (superMethod) => {
+                return function () {
+                    superMethod.call(this);
+                    // Synchronously call afterDispatch() hooks when interrupted.
+                    callAfterDispatch();
+                };
+            };
+            event.stopPropagation = patchStopPropagation(event.stopPropagation);
+            event.stopImmediatePropagation = patchStopPropagation(event.stopImmediatePropagation);
+            // Add an event listener to detect the end of the event's propagation.
+            const composedPath = event.composedPath();
+            let lastNodeForEvent;
+            if (event.composed && event.bubbles) {
+                lastNodeForEvent = composedPath[composedPath.length - 1];
+            }
+            else if (!event.bubbles) {
+                lastNodeForEvent = composedPath[0];
+            }
+            else {
+                lastNodeForEvent = composedPath[0].getRootNode();
+            }
+            lastNodeForEvent.addEventListener(eventType, () => {
+                // Synchronously call afterDispatch() hooks.
+                callAfterDispatch();
+            }, { once: true, signal: cleanupLastNodeListener.signal });
+        }, {
+            // Ensure this listener runs before other listeners.
+            // `setupDispatchHooks()` should be called in constructors to also
+            // ensure they run before any other externally-added capture listeners.
+            capture: true,
+        });
+        typesAlreadySetUp.add(eventType);
+    }
+}
+
+/**
+ * @license
  * Copyright 2023 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -1851,80 +2025,239 @@ function mixinElementInternals$2(base) {
  * SPDX-License-Identifier: Apache-2.0
  */
 /**
- * Sets up an element's constructor to enable form submission. The element
- * instance should be form associated and have a `type` property.
+ * A symbol property to retrieve the form value for an element.
+ */
+const getFormValue$2 = Symbol('getFormValue');
+/**
+ * A symbol property to retrieve the form state for an element.
+ */
+const getFormState$2 = Symbol('getFormState');
+/**
+ * Mixes in form-associated behavior for a class. This allows an element to add
+ * values to `<form>` elements.
+ *
+ * Implementing classes should provide a `[formValue]` to return the current
+ * value of the element, as well as reset and restore callbacks.
+ *
+ * @example
+ * ```ts
+ * const base = mixinFormAssociated(mixinElementInternals(LitElement));
+ *
+ * class MyControl extends base {
+ *   \@property()
+ *   value = '';
+ *
+ *   override [getFormValue]() {
+ *     return this.value;
+ *   }
+ *
+ *   override formResetCallback() {
+ *     const defaultValue = this.getAttribute('value');
+ *     this.value = defaultValue;
+ *   }
+ *
+ *   override formStateRestoreCallback(state: string) {
+ *     this.value = state;
+ *   }
+ * }
+ * ```
+ *
+ * Elements may optionally provide a `[formState]` if their values do not
+ * represent the state of the component.
+ *
+ * @example
+ * ```ts
+ * const base = mixinFormAssociated(mixinElementInternals(LitElement));
+ *
+ * class MyCheckbox extends base {
+ *   \@property()
+ *   value = 'on';
+ *
+ *   \@property({type: Boolean})
+ *   checked = false;
+ *
+ *   override [getFormValue]() {
+ *     return this.checked ? this.value : null;
+ *   }
+ *
+ *   override [getFormState]() {
+ *     return String(this.checked);
+ *   }
+ *
+ *   override formResetCallback() {
+ *     const defaultValue = this.hasAttribute('checked');
+ *     this.checked = defaultValue;
+ *   }
+ *
+ *   override formStateRestoreCallback(state: string) {
+ *     this.checked = Boolean(state);
+ *   }
+ * }
+ * ```
+ *
+ * @param base The class to mix functionality into. The base class must use
+ *     `mixinElementInternals()`.
+ * @return The provided class with `FormAssociated` mixed in.
+ */
+function mixinFormAssociated$2(base) {
+    class FormAssociatedElement extends base {
+        get form() {
+            return this[internals$2].form;
+        }
+        get labels() {
+            return this[internals$2].labels;
+        }
+        // Use @property for the `name` and `disabled` properties to add them to the
+        // `observedAttributes` array and trigger `attributeChangedCallback()`.
+        //
+        // We don't use Lit's default getter/setter (`noAccessor: true`) because
+        // the attributes need to be updated synchronously to work with synchronous
+        // form APIs, and Lit updates attributes async by default.
+        get name() {
+            return this.getAttribute('name') ?? '';
+        }
+        set name(name) {
+            // Note: setting name to null or empty does not remove the attribute.
+            this.setAttribute('name', name);
+            // We don't need to call `requestUpdate()` since it's called synchronously
+            // in `attributeChangedCallback()`.
+        }
+        get disabled() {
+            return this.hasAttribute('disabled');
+        }
+        set disabled(disabled) {
+            // Coerce `disabled` in `Boolean()` to ensure that setting to `null` or
+            // `undefined` sets the attribute to `false`.
+            this.toggleAttribute('disabled', Boolean(disabled));
+            // We don't need to call `requestUpdate()` since it's called synchronously
+            // in `attributeChangedCallback()`.
+        }
+        attributeChangedCallback(name, old, value) {
+            // Manually `requestUpdate()` for `name` and `disabled` when their
+            // attribute or property changes.
+            // The properties update their attributes, so this callback is invoked
+            // immediately when the properties are set. We call `requestUpdate()` here
+            // instead of letting Lit set the properties from the attribute change.
+            // That would cause the properties to re-set the attribute and invoke this
+            // callback again in a loop. This leads to stale state when Lit tries to
+            // determine if a property changed or not.
+            if (name === 'name' || name === 'disabled') {
+                // Disabled's value is only false if the attribute is missing and null.
+                const oldValue = name === 'disabled' ? old !== null : old;
+                // Trigger a lit update when the attribute changes.
+                this.requestUpdate(name, oldValue);
+                return;
+            }
+            super.attributeChangedCallback(name, old, value);
+        }
+        requestUpdate(name, oldValue, options) {
+            super.requestUpdate(name, oldValue, options);
+            // If any properties change, update the form value, which may have changed
+            // as well.
+            // Update the form value synchronously in `requestUpdate()` rather than
+            // `update()` or `updated()`, which are async. This is necessary to ensure
+            // that form data is updated in time for synchronous event listeners.
+            this[internals$2].setFormValue(this[getFormValue$2](), this[getFormState$2]());
+        }
+        [getFormValue$2]() {
+            return this.getAttribute('value');
+        }
+        [getFormState$2]() {
+            return this[getFormValue$2]();
+        }
+        formDisabledCallback(disabled) {
+            this.disabled = disabled;
+        }
+    }
+    /** @nocollapse */
+    FormAssociatedElement.formAssociated = true;
+    __decorate$2([
+        n$a({ noAccessor: true })
+    ], FormAssociatedElement.prototype, "name", null);
+    __decorate$2([
+        n$a({ type: Boolean, noAccessor: true })
+    ], FormAssociatedElement.prototype, "disabled", null);
+    return FormAssociatedElement;
+}
+
+/**
+ * @license
+ * Copyright 2023 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+/**
+ * Mixes in form submitter behavior for a class.
  *
  * A click listener is added to each element instance. If the click is not
  * default prevented, it will submit the element's form, if any.
  *
  * @example
  * ```ts
- * class MyElement extends mixinElementInternals(LitElement) {
- *   static {
- *     setupFormSubmitter(MyElement);
- *   }
- *
+ * const base = mixinFormSubmitter(mixinElementInternals(LitElement));
+ * class MyButton extends base {
  *   static formAssociated = true;
- *
- *   type: FormSubmitterType = 'submit';
  * }
  * ```
  *
- * @param ctor The form submitter element's constructor.
+ * @param base The class to mix functionality into.
+ * @return The provided class with `FormSubmitter` mixed in.
  */
-function setupFormSubmitter$2(ctor) {
-    ctor.addInitializer((instance) => {
-        const submitter = instance;
-        submitter.addEventListener('click', async (event) => {
-            const { type, [internals$2]: elementInternals } = submitter;
-            const { form } = elementInternals;
-            if (!form || type === 'button') {
-                return;
-            }
-            // Wait a full task for event bubbling to complete.
-            await new Promise((resolve) => {
-                setTimeout(resolve);
-            });
-            if (event.defaultPrevented) {
-                return;
-            }
-            if (type === 'reset') {
-                form.reset();
-                return;
-            }
-            // form.requestSubmit(submitter) does not work with form associated custom
-            // elements. This patches the dispatched submit event to add the correct
-            // `submitter`.
-            // See https://github.com/WICG/webcomponents/issues/814
-            form.addEventListener('submit', (submitEvent) => {
-                Object.defineProperty(submitEvent, 'submitter', {
-                    configurable: true,
-                    enumerable: true,
-                    get: () => submitter,
+function mixinFormSubmitter$1(base) {
+    class FormSubmitterElement extends base {
+        // Name attribute must reflect synchronously for form integration.
+        get name() {
+            return this.getAttribute('name') ?? '';
+        }
+        set name(name) {
+            this.setAttribute('name', name);
+        }
+        // Mixins must have a constructor with `...args: any[]`
+        // tslint:disable-next-line:no-any
+        constructor(...args) {
+            super(...args);
+            this.type = 'submit';
+            this.value = '';
+            setupDispatchHooks$2(this, 'click');
+            this.addEventListener('click', async (event) => {
+                const isReset = this.type === 'reset';
+                const isSubmit = this.type === 'submit';
+                const elementInternals = this[internals$2];
+                const { form } = elementInternals;
+                if (!form || !(isSubmit || isReset)) {
+                    return;
+                }
+                afterDispatch$2(event, () => {
+                    if (event.defaultPrevented) {
+                        return;
+                    }
+                    if (isReset) {
+                        form.reset();
+                        return;
+                    }
+                    // form.requestSubmit(submitter) does not work with form associated custom
+                    // elements. This patches the dispatched submit event to add the correct
+                    // `submitter`.
+                    // See https://github.com/WICG/webcomponents/issues/814
+                    form.addEventListener('submit', (submitEvent) => {
+                        Object.defineProperty(submitEvent, 'submitter', {
+                            configurable: true,
+                            enumerable: true,
+                            get: () => this,
+                        });
+                    }, { capture: true, once: true });
+                    elementInternals.setFormValue(this.value);
+                    form.requestSubmit();
                 });
-            }, { capture: true, once: true });
-            elementInternals.setFormValue(submitter.value);
-            form.requestSubmit();
-        });
-    });
-}
-
-/**
- * @license
- * Copyright 2022 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-/**
- * Returns `true` if the given element is in a right-to-left direction.
- *
- * @param el Element to determine direction from
- * @param shouldCheck Optional. If `false`, return `false` without checking
- *     direction. Determining the direction of `el` is somewhat expensive, so
- *     this parameter can be used as a conditional guard. Defaults to `true`.
- */
-function isRtl$2(el, shouldCheck = true) {
-    return (shouldCheck &&
-        getComputedStyle(el).getPropertyValue('direction').trim() === 'rtl');
+            });
+        }
+    }
+    __decorate$2([
+        n$a()
+    ], FormSubmitterElement.prototype, "type", void 0);
+    __decorate$2([
+        n$a({ reflect: true })
+    ], FormSubmitterElement.prototype, "value", void 0);
+    return FormSubmitterElement;
 }
 
 /**
@@ -1933,7 +2266,7 @@ function isRtl$2(el, shouldCheck = true) {
  * SPDX-License-Identifier: Apache-2.0
  */
 // Separate variable needed for closure.
-const iconButtonBaseClass$2 = mixinDelegatesAria$2(mixinElementInternals$2(i$a));
+const iconButtonBaseClass$2 = mixinDelegatesAria$2(mixinFormSubmitter$1(mixinFormAssociated$2(mixinElementInternals$2(i$a))));
 /**
  * A button for rendering icons.
  *
@@ -1942,30 +2275,8 @@ const iconButtonBaseClass$2 = mixinDelegatesAria$2(mixinElementInternals$2(i$a))
  * @fires change {Event} Dispatched when a toggle button toggles --bubbles
  */
 let IconButton$2 = class IconButton extends iconButtonBaseClass$2 {
-    get name() {
-        return this.getAttribute('name') ?? '';
-    }
-    set name(name) {
-        this.setAttribute('name', name);
-    }
-    /**
-     * The associated form element with which this element's value will submit.
-     */
-    get form() {
-        return this[internals$2].form;
-    }
-    /**
-     * The labels this element is associated with.
-     */
-    get labels() {
-        return this[internals$2].labels;
-    }
     constructor() {
         super();
-        /**
-         * Disables the icon button and makes it non-interactive.
-         */
-        this.disabled = false;
         /**
          * "Soft-disables" the icon button (disabled but still focusable).
          *
@@ -2007,20 +2318,32 @@ let IconButton$2 = class IconButton extends iconButtonBaseClass$2 {
          * icon is provided.
          */
         this.selected = false;
-        /**
-         * The default behavior of the button. May be "button", "reset", or "submit"
-         * (default).
-         */
-        this.type = 'submit';
-        /**
-         * The value added to a form with the button's name when the button submits a
-         * form.
-         */
-        this.value = '';
         this.flipIcon = isRtl$2(this, this.flipIconInRtl);
-        {
-            this.addEventListener('click', this.handleClick.bind(this));
-        }
+        setupDispatchHooks$2(this, 'click');
+        this.addEventListener('click', (event) => {
+            // If the button is soft-disabled or a disabled link, we need to
+            // explicitly prevent the click from propagating to other event listeners
+            // as well as prevent the default action. This is because the underlying
+            // `<button>` or `<a>` element is not actually `:disabled`.
+            if (this.softDisabled || (this.disabled && this.href)) {
+                event.stopImmediatePropagation();
+                event.preventDefault();
+                return;
+            }
+            // Save current selected state to toggle, since an external event listener
+            // may also change the selected state on click.
+            const wasSelected = this.selected;
+            afterDispatch$2(event, () => {
+                if (!this.toggle || this.disabled || event.defaultPrevented) {
+                    return;
+                }
+                this.selected = !wasSelected;
+                this.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }));
+                // Bubbles but does not compose to mimic native browser <input> & <select>
+                // Additionally, native change event is not an InputEvent.
+                this.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+        });
     }
     willUpdate() {
         // Link buttons cannot be disabled or soft-disabled.
@@ -2050,8 +2373,7 @@ let IconButton$2 = class IconButton extends iconButtonBaseClass$2 {
         aria-expanded="${(!this.href && ariaExpanded) || E$1}"
         aria-pressed="${ariaPressedValue}"
         aria-disabled=${(!this.href && this.softDisabled) || E$1}
-        ?disabled="${!this.href && this.disabled}"
-        @click="${this.handleClickOnChild}">
+        ?disabled="${!this.href && this.disabled}">
         ${this.renderFocusRing()}
         ${this.renderRipple()}
         ${!this.selected ? this.renderIcon() : E$1}
@@ -2109,50 +2431,12 @@ let IconButton$2 = class IconButton extends iconButtonBaseClass$2 {
         this.flipIcon = isRtl$2(this, this.flipIconInRtl);
         super.connectedCallback();
     }
-    /** Handles a click on this element. */
-    handleClick(event) {
-        // If the icon button is soft-disabled, we need to explicitly prevent the
-        // click from propagating to other event listeners as well as prevent the
-        // default action.
-        if (!this.href && this.softDisabled) {
-            event.stopImmediatePropagation();
-            event.preventDefault();
-            return;
-        }
-    }
-    /**
-     * Handles a click on the child <div> or <button> element within this
-     * element's shadow DOM.
-     */
-    async handleClickOnChild(event) {
-        // Allow the event to propagate
-        await 0;
-        if (!this.toggle ||
-            this.disabled ||
-            this.softDisabled ||
-            event.defaultPrevented) {
-            return;
-        }
-        this.selected = !this.selected;
-        this.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }));
-        // Bubbles but does not compose to mimic native browser <input> & <select>
-        // Additionally, native change event is not an InputEvent.
-        this.dispatchEvent(new Event('change', { bubbles: true }));
-    }
 };
-(() => {
-    setupFormSubmitter$2(IconButton$2);
-})();
-/** @nocollapse */
-IconButton$2.formAssociated = true;
 /** @nocollapse */
 IconButton$2.shadowRootOptions = {
     mode: 'open',
     delegatesFocus: true,
 };
-__decorate$2([
-    n$a({ type: Boolean, reflect: true })
-], IconButton$2.prototype, "disabled", void 0);
 __decorate$2([
     n$a({ type: Boolean, attribute: 'soft-disabled', reflect: true })
 ], IconButton$2.prototype, "softDisabled", void 0);
@@ -2177,12 +2461,6 @@ __decorate$2([
 __decorate$2([
     n$a({ type: Boolean, reflect: true })
 ], IconButton$2.prototype, "selected", void 0);
-__decorate$2([
-    n$a()
-], IconButton$2.prototype, "type", void 0);
-__decorate$2([
-    n$a({ reflect: true })
-], IconButton$2.prototype, "value", void 0);
 __decorate$2([
     r$7()
 ], IconButton$2.prototype, "flipIcon", void 0);
@@ -2841,9 +3119,9 @@ OscdIconButton$1.styles = [styles$15, styles$14];
  * SPDX-License-Identifier: Apache-2.0
  */
 /**
- * TODO(b/265336902): add docs
+ * An icon element.
  */
-let Icon$2 = class Icon extends i$a {
+let Icon$3 = class Icon extends i$a {
     render() {
         return x$1 `<slot></slot>`;
     }
@@ -2881,7 +3159,7 @@ const styles$13 = i$d `:host{font-size:var(--md-icon-size, 24px);width:var(--md-
  * @final
  * @suppress {visibility}
  */
-let OscdIcon$2 = class OscdIcon extends Icon$2 {
+let OscdIcon$2 = class OscdIcon extends Icon$3 {
 };
 /** @nocollapse */
 OscdIcon$2.styles = [styles$13];
@@ -3534,7 +3812,10 @@ MdItem$1.styles = [styles$11];
 const listItemBaseClass$2 = mixinDelegatesAria$2(i$a);
 /**
  * @fires request-activation {Event} Requests the list to set `tabindex=0` on
- * the item and focus it. --bubbles --composed
+ * the item and focus it. Used internally for list keyboard navigation; most
+ * applications do not need to listen for this event. It is exposed for
+ * authors building their own list-item replacements or wrapping items in a
+ * custom controller. --bubbles --composed
  */
 let ListItemEl$2 = class ListItemEl extends listItemBaseClass$2 {
     constructor() {
@@ -6303,29 +6584,13 @@ async function squelchEventsForMicrotask$2() {
  * SPDX-License-Identifier: Apache-2.0
  */
 // Separate variable needed for closure.
-const buttonBaseClass$2 = mixinDelegatesAria$2(mixinElementInternals$2(i$a));
+const buttonBaseClass$2 = mixinDelegatesAria$2(mixinFormSubmitter$1(mixinFormAssociated$2(mixinElementInternals$2(i$a))));
 /**
  * A button component.
  */
 let Button$2 = class Button extends buttonBaseClass$2 {
-    get name() {
-        return this.getAttribute('name') ?? '';
-    }
-    set name(name) {
-        this.setAttribute('name', name);
-    }
-    /**
-     * The associated form element with which this element's value will submit.
-     */
-    get form() {
-        return this[internals$2].form;
-    }
     constructor() {
         super();
-        /**
-         * Whether or not the button is disabled.
-         */
-        this.disabled = false;
         /**
          * Whether or not the button is "soft-disabled" (disabled but still
          * focusable).
@@ -6361,16 +6626,6 @@ let Button$2 = class Button extends buttonBaseClass$2 {
          * Whether to display the icon or not.
          */
         this.hasIcon = false;
-        /**
-         * The default behavior of the button. May be "button", "reset", or "submit"
-         * (default).
-         */
-        this.type = 'submit';
-        /**
-         * The value added to a form with the button's name when the button submits a
-         * form.
-         */
-        this.value = '';
         {
             this.addEventListener('click', this.handleClick.bind(this));
         }
@@ -6459,19 +6714,11 @@ let Button$2 = class Button extends buttonBaseClass$2 {
         this.hasIcon = this.assignedIcons.length > 0;
     }
 };
-(() => {
-    setupFormSubmitter$2(Button$2);
-})();
-/** @nocollapse */
-Button$2.formAssociated = true;
 /** @nocollapse */
 Button$2.shadowRootOptions = {
     mode: 'open',
     delegatesFocus: true,
 };
-__decorate$2([
-    n$a({ type: Boolean, reflect: true })
-], Button$2.prototype, "disabled", void 0);
 __decorate$2([
     n$a({ type: Boolean, attribute: 'soft-disabled', reflect: true })
 ], Button$2.prototype, "softDisabled", void 0);
@@ -6490,12 +6737,6 @@ __decorate$2([
 __decorate$2([
     n$a({ type: Boolean, attribute: 'has-icon', reflect: true })
 ], Button$2.prototype, "hasIcon", void 0);
-__decorate$2([
-    n$a()
-], Button$2.prototype, "type", void 0);
-__decorate$2([
-    n$a({ reflect: true })
-], Button$2.prototype, "value", void 0);
 __decorate$2([
     e$b('.button')
 ], Button$2.prototype, "buttonElement", void 0);
@@ -51586,7 +51827,7 @@ OscdFilledButton$1.styles = [
  * @final
  * @suppress {visibility}
  */
-let OscdIcon$1 = class OscdIcon extends Icon$2 {
+let OscdIcon$1 = class OscdIcon extends Icon$3 {
 };
 /** @nocollapse */
 OscdIcon$1.styles = [styles$13];
@@ -53579,7 +53820,10 @@ function isItemNotDisabled$1(item) {
 const listItemBaseClass$1 = mixinDelegatesAria$1(i$3);
 /**
  * @fires request-activation {Event} Requests the list to set `tabindex=0` on
- * the item and focus it. --bubbles --composed
+ * the item and focus it. Used internally for list keyboard navigation; most
+ * applications do not need to listen for this event. It is exposed for
+ * authors building their own list-item replacements or wrapping items in a
+ * custom controller. --bubbles --composed
  */
 let ListItemEl$1 = class ListItemEl extends listItemBaseClass$1 {
     constructor() {
@@ -53778,7 +54022,7 @@ const styles$P = i$6 `:host{display:flex;-webkit-tap-highlight-color:rgba(0,0,0,
  */
 /**
  * @license
- * Copyright 2025 Omicron Energy GmbH
+ * Copyright 2026 OMICRON electronics GmbH
  * SPDX-License-Identifier: Apache-2.0
  */
 /**
@@ -53827,116 +54071,6 @@ OscdListItem.scopedElements = {
     'md-focus-ring': OscdFocusRing,
 };
 OscdListItem.styles = [styles$P];
-
-/**
- * @license
- * Copyright 2023 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-/**
- * A unique symbol used for protected access to an instance's
- * `ElementInternals`.
- *
- * @example
- * ```ts
- * class MyElement extends mixinElementInternals(LitElement) {
- *   constructor() {
- *     super();
- *     this[internals].role = 'button';
- *   }
- * }
- * ```
- */
-const internals$1 = Symbol('internals');
-// Private symbols
-const privateInternals$1 = Symbol('privateInternals');
-/**
- * Mixes in an attached `ElementInternals` instance.
- *
- * This mixin is only needed when other shared code needs access to a
- * component's `ElementInternals`, such as form-associated mixins.
- *
- * @param base The class to mix functionality into.
- * @return The provided class with `WithElementInternals` mixed in.
- */
-function mixinElementInternals$1(base) {
-    class WithElementInternalsElement extends base {
-        get [internals$1]() {
-            // Create internals in getter so that it can be used in methods called on
-            // construction in `ReactiveElement`, such as `requestUpdate()`.
-            if (!this[privateInternals$1]) {
-                // Cast needed for closure
-                this[privateInternals$1] = this.attachInternals();
-            }
-            return this[privateInternals$1];
-        }
-    }
-    return WithElementInternalsElement;
-}
-
-/**
- * @license
- * Copyright 2023 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-/**
- * Sets up an element's constructor to enable form submission. The element
- * instance should be form associated and have a `type` property.
- *
- * A click listener is added to each element instance. If the click is not
- * default prevented, it will submit the element's form, if any.
- *
- * @example
- * ```ts
- * class MyElement extends mixinElementInternals(LitElement) {
- *   static {
- *     setupFormSubmitter(MyElement);
- *   }
- *
- *   static formAssociated = true;
- *
- *   type: FormSubmitterType = 'submit';
- * }
- * ```
- *
- * @param ctor The form submitter element's constructor.
- */
-function setupFormSubmitter$1(ctor) {
-    ctor.addInitializer((instance) => {
-        const submitter = instance;
-        submitter.addEventListener('click', async (event) => {
-            const { type, [internals$1]: elementInternals } = submitter;
-            const { form } = elementInternals;
-            if (!form || type === 'button') {
-                return;
-            }
-            // Wait a full task for event bubbling to complete.
-            await new Promise((resolve) => {
-                setTimeout(resolve);
-            });
-            if (event.defaultPrevented) {
-                return;
-            }
-            if (type === 'reset') {
-                form.reset();
-                return;
-            }
-            // form.requestSubmit(submitter) does not work with form associated custom
-            // elements. This patches the dispatched submit event to add the correct
-            // `submitter`.
-            // See https://github.com/WICG/webcomponents/issues/814
-            form.addEventListener('submit', (submitEvent) => {
-                Object.defineProperty(submitEvent, 'submitter', {
-                    configurable: true,
-                    enumerable: true,
-                    get: () => submitter,
-                });
-            }, { capture: true, once: true });
-            elementInternals.setFormValue(submitter.value);
-            form.requestSubmit();
-        });
-    });
-}
 
 /**
  * @license
@@ -54036,33 +54170,460 @@ async function squelchEventsForMicrotask$1() {
 
 /**
  * @license
+ * Copyright 2023 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+/**
+ * A unique symbol used for protected access to an instance's
+ * `ElementInternals`.
+ *
+ * @example
+ * ```ts
+ * class MyElement extends mixinElementInternals(LitElement) {
+ *   constructor() {
+ *     super();
+ *     this[internals].role = 'button';
+ *   }
+ * }
+ * ```
+ */
+const internals$1 = Symbol('internals');
+// Private symbols
+const privateInternals$1 = Symbol('privateInternals');
+/**
+ * Mixes in an attached `ElementInternals` instance.
+ *
+ * This mixin is only needed when other shared code needs access to a
+ * component's `ElementInternals`, such as form-associated mixins.
+ *
+ * @param base The class to mix functionality into.
+ * @return The provided class with `WithElementInternals` mixed in.
+ */
+function mixinElementInternals$1(base) {
+    class WithElementInternalsElement extends base {
+        get [internals$1]() {
+            // Create internals in getter so that it can be used in methods called on
+            // construction in `ReactiveElement`, such as `requestUpdate()`.
+            if (!this[privateInternals$1]) {
+                // Cast needed for closure
+                this[privateInternals$1] = this.attachInternals();
+            }
+            return this[privateInternals$1];
+        }
+    }
+    return WithElementInternalsElement;
+}
+
+/**
+ * @license
+ * Copyright 2023 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+/**
+ * A symbol property to retrieve the form value for an element.
+ */
+const getFormValue$1 = Symbol('getFormValue');
+/**
+ * A symbol property to retrieve the form state for an element.
+ */
+const getFormState$1 = Symbol('getFormState');
+/**
+ * Mixes in form-associated behavior for a class. This allows an element to add
+ * values to `<form>` elements.
+ *
+ * Implementing classes should provide a `[formValue]` to return the current
+ * value of the element, as well as reset and restore callbacks.
+ *
+ * @example
+ * ```ts
+ * const base = mixinFormAssociated(mixinElementInternals(LitElement));
+ *
+ * class MyControl extends base {
+ *   \@property()
+ *   value = '';
+ *
+ *   override [getFormValue]() {
+ *     return this.value;
+ *   }
+ *
+ *   override formResetCallback() {
+ *     const defaultValue = this.getAttribute('value');
+ *     this.value = defaultValue;
+ *   }
+ *
+ *   override formStateRestoreCallback(state: string) {
+ *     this.value = state;
+ *   }
+ * }
+ * ```
+ *
+ * Elements may optionally provide a `[formState]` if their values do not
+ * represent the state of the component.
+ *
+ * @example
+ * ```ts
+ * const base = mixinFormAssociated(mixinElementInternals(LitElement));
+ *
+ * class MyCheckbox extends base {
+ *   \@property()
+ *   value = 'on';
+ *
+ *   \@property({type: Boolean})
+ *   checked = false;
+ *
+ *   override [getFormValue]() {
+ *     return this.checked ? this.value : null;
+ *   }
+ *
+ *   override [getFormState]() {
+ *     return String(this.checked);
+ *   }
+ *
+ *   override formResetCallback() {
+ *     const defaultValue = this.hasAttribute('checked');
+ *     this.checked = defaultValue;
+ *   }
+ *
+ *   override formStateRestoreCallback(state: string) {
+ *     this.checked = Boolean(state);
+ *   }
+ * }
+ * ```
+ *
+ * @param base The class to mix functionality into. The base class must use
+ *     `mixinElementInternals()`.
+ * @return The provided class with `FormAssociated` mixed in.
+ */
+function mixinFormAssociated$1(base) {
+    class FormAssociatedElement extends base {
+        get form() {
+            return this[internals$1].form;
+        }
+        get labels() {
+            return this[internals$1].labels;
+        }
+        // Use @property for the `name` and `disabled` properties to add them to the
+        // `observedAttributes` array and trigger `attributeChangedCallback()`.
+        //
+        // We don't use Lit's default getter/setter (`noAccessor: true`) because
+        // the attributes need to be updated synchronously to work with synchronous
+        // form APIs, and Lit updates attributes async by default.
+        get name() {
+            return this.getAttribute('name') ?? '';
+        }
+        set name(name) {
+            // Note: setting name to null or empty does not remove the attribute.
+            this.setAttribute('name', name);
+            // We don't need to call `requestUpdate()` since it's called synchronously
+            // in `attributeChangedCallback()`.
+        }
+        get disabled() {
+            return this.hasAttribute('disabled');
+        }
+        set disabled(disabled) {
+            // Coerce `disabled` in `Boolean()` to ensure that setting to `null` or
+            // `undefined` sets the attribute to `false`.
+            this.toggleAttribute('disabled', Boolean(disabled));
+            // We don't need to call `requestUpdate()` since it's called synchronously
+            // in `attributeChangedCallback()`.
+        }
+        attributeChangedCallback(name, old, value) {
+            // Manually `requestUpdate()` for `name` and `disabled` when their
+            // attribute or property changes.
+            // The properties update their attributes, so this callback is invoked
+            // immediately when the properties are set. We call `requestUpdate()` here
+            // instead of letting Lit set the properties from the attribute change.
+            // That would cause the properties to re-set the attribute and invoke this
+            // callback again in a loop. This leads to stale state when Lit tries to
+            // determine if a property changed or not.
+            if (name === 'name' || name === 'disabled') {
+                // Disabled's value is only false if the attribute is missing and null.
+                const oldValue = name === 'disabled' ? old !== null : old;
+                // Trigger a lit update when the attribute changes.
+                this.requestUpdate(name, oldValue);
+                return;
+            }
+            super.attributeChangedCallback(name, old, value);
+        }
+        requestUpdate(name, oldValue, options) {
+            super.requestUpdate(name, oldValue, options);
+            // If any properties change, update the form value, which may have changed
+            // as well.
+            // Update the form value synchronously in `requestUpdate()` rather than
+            // `update()` or `updated()`, which are async. This is necessary to ensure
+            // that form data is updated in time for synchronous event listeners.
+            this[internals$1].setFormValue(this[getFormValue$1](), this[getFormState$1]());
+        }
+        [getFormValue$1]() {
+            return this.getAttribute('value');
+        }
+        [getFormState$1]() {
+            return this[getFormValue$1]();
+        }
+        formDisabledCallback(disabled) {
+            this.disabled = disabled;
+        }
+    }
+    /** @nocollapse */
+    FormAssociatedElement.formAssociated = true;
+    __decorate([
+        n$3({ noAccessor: true })
+    ], FormAssociatedElement.prototype, "name", null);
+    __decorate([
+        n$3({ type: Boolean, noAccessor: true })
+    ], FormAssociatedElement.prototype, "disabled", null);
+    return FormAssociatedElement;
+}
+
+/**
+ * @license
+ * Copyright 2023 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+/**
+ * A symbol used to access dispatch hooks on an event.
+ */
+const dispatchHooks$1 = Symbol('dispatchHooks');
+/**
+ * Add a hook for an event that is called after the event is dispatched and
+ * propagates to other event listeners.
+ *
+ * This is useful for behaviors that need to check if an event is canceled.
+ *
+ * The callback is invoked synchronously, which allows for better integration
+ * with synchronous platform APIs (like `<form>` or `<label>` clicking).
+ *
+ * Note: `setupDispatchHooks()` must be called on the element before adding any
+ * other event listeners. Call it in the constructor of an element or
+ * controller.
+ *
+ * @example
+ * ```ts
+ * class MyControl extends LitElement {
+ *   constructor() {
+ *     super();
+ *     setupDispatchHooks(this, 'click');
+ *     this.addEventListener('click', event => {
+ *       afterDispatch(event, () => {
+ *         if (event.defaultPrevented) {
+ *           return
+ *         }
+ *
+ *         // ... perform logic
+ *       });
+ *     });
+ *   }
+ * }
+ * ```
+ *
+ * @example
+ * ```ts
+ * class MyController implements ReactiveController {
+ *   constructor(host: ReactiveElement) {
+ *     // setupDispatchHooks() may be called multiple times for the same
+ *     // element and events, making it safe for multiple controllers to use it.
+ *     setupDispatchHooks(host, 'click');
+ *     host.addEventListener('click', event => {
+ *       afterDispatch(event, () => {
+ *         if (event.defaultPrevented) {
+ *           return;
+ *         }
+ *
+ *         // ... perform logic
+ *       });
+ *     });
+ *   }
+ * }
+ * ```
+ *
+ * @param event The event to add a hook to.
+ * @param callback A hook that is called after the event finishes dispatching.
+ */
+function afterDispatch$1(event, callback) {
+    const hooks = event[dispatchHooks$1];
+    if (!hooks) {
+        throw new Error(`'${event.type}' event needs setupDispatchHooks().`);
+    }
+    hooks.addEventListener('after', callback, { once: true });
+}
+/**
+ * A lookup map of elements and event types that have a dispatch hook listener
+ * set up. Used to ensure we don't set up multiple hook listeners on the same
+ * element for the same event.
+ */
+const ELEMENT_DISPATCH_HOOK_TYPES$1 = new WeakMap();
+/**
+ * Sets up an element to add dispatch hooks to given event types. This must be
+ * called before adding any event listeners that need to use dispatch hooks
+ * like `afterDispatch()`.
+ *
+ * This function is safe to call multiple times with the same element or event
+ * types. Call it in the constructor of elements, mixins, and controllers to
+ * ensure it is set up before external listeners.
+ *
+ * @example
+ * ```ts
+ * class MyControl extends LitElement {
+ *   constructor() {
+ *     super();
+ *     setupDispatchHooks(this, 'click');
+ *     this.addEventListener('click', this.listenerUsingAfterDispatch);
+ *   }
+ * }
+ * ```
+ *
+ * @param element The element to set up event dispatch hooks for.
+ * @param eventTypes The event types to add dispatch hooks to.
+ */
+function setupDispatchHooks$1(element, ...eventTypes) {
+    let typesAlreadySetUp = ELEMENT_DISPATCH_HOOK_TYPES$1.get(element);
+    if (!typesAlreadySetUp) {
+        typesAlreadySetUp = new Set();
+        ELEMENT_DISPATCH_HOOK_TYPES$1.set(element, typesAlreadySetUp);
+    }
+    for (const eventType of eventTypes) {
+        // Don't register multiple dispatch hook listeners. A second registration
+        // would lead to the second listener calling `afterDispatch()` hooks twice.
+        if (typesAlreadySetUp.has(eventType)) {
+            continue;
+        }
+        element.addEventListener(eventType, (event) => {
+            // Add hooks onto the event.
+            const hooks = new EventTarget();
+            event[dispatchHooks$1] = hooks;
+            const cleanupLastNodeListener = new AbortController();
+            const callAfterDispatch = () => {
+                cleanupLastNodeListener.abort();
+                hooks.dispatchEvent(new Event('after'));
+            };
+            const patchStopPropagation = (superMethod) => {
+                return function () {
+                    superMethod.call(this);
+                    // Synchronously call afterDispatch() hooks when interrupted.
+                    callAfterDispatch();
+                };
+            };
+            event.stopPropagation = patchStopPropagation(event.stopPropagation);
+            event.stopImmediatePropagation = patchStopPropagation(event.stopImmediatePropagation);
+            // Add an event listener to detect the end of the event's propagation.
+            const composedPath = event.composedPath();
+            let lastNodeForEvent;
+            if (event.composed && event.bubbles) {
+                lastNodeForEvent = composedPath[composedPath.length - 1];
+            }
+            else if (!event.bubbles) {
+                lastNodeForEvent = composedPath[0];
+            }
+            else {
+                lastNodeForEvent = composedPath[0].getRootNode();
+            }
+            lastNodeForEvent.addEventListener(eventType, () => {
+                // Synchronously call afterDispatch() hooks.
+                callAfterDispatch();
+            }, { once: true, signal: cleanupLastNodeListener.signal });
+        }, {
+            // Ensure this listener runs before other listeners.
+            // `setupDispatchHooks()` should be called in constructors to also
+            // ensure they run before any other externally-added capture listeners.
+            capture: true,
+        });
+        typesAlreadySetUp.add(eventType);
+    }
+}
+
+/**
+ * @license
+ * Copyright 2023 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+/**
+ * Mixes in form submitter behavior for a class.
+ *
+ * A click listener is added to each element instance. If the click is not
+ * default prevented, it will submit the element's form, if any.
+ *
+ * @example
+ * ```ts
+ * const base = mixinFormSubmitter(mixinElementInternals(LitElement));
+ * class MyButton extends base {
+ *   static formAssociated = true;
+ * }
+ * ```
+ *
+ * @param base The class to mix functionality into.
+ * @return The provided class with `FormSubmitter` mixed in.
+ */
+function mixinFormSubmitter(base) {
+    class FormSubmitterElement extends base {
+        // Name attribute must reflect synchronously for form integration.
+        get name() {
+            return this.getAttribute('name') ?? '';
+        }
+        set name(name) {
+            this.setAttribute('name', name);
+        }
+        // Mixins must have a constructor with `...args: any[]`
+        // tslint:disable-next-line:no-any
+        constructor(...args) {
+            super(...args);
+            this.type = 'submit';
+            this.value = '';
+            setupDispatchHooks$1(this, 'click');
+            this.addEventListener('click', async (event) => {
+                const isReset = this.type === 'reset';
+                const isSubmit = this.type === 'submit';
+                const elementInternals = this[internals$1];
+                const { form } = elementInternals;
+                if (!form || !(isSubmit || isReset)) {
+                    return;
+                }
+                afterDispatch$1(event, () => {
+                    if (event.defaultPrevented) {
+                        return;
+                    }
+                    if (isReset) {
+                        form.reset();
+                        return;
+                    }
+                    // form.requestSubmit(submitter) does not work with form associated custom
+                    // elements. This patches the dispatched submit event to add the correct
+                    // `submitter`.
+                    // See https://github.com/WICG/webcomponents/issues/814
+                    form.addEventListener('submit', (submitEvent) => {
+                        Object.defineProperty(submitEvent, 'submitter', {
+                            configurable: true,
+                            enumerable: true,
+                            get: () => this,
+                        });
+                    }, { capture: true, once: true });
+                    elementInternals.setFormValue(this.value);
+                    form.requestSubmit();
+                });
+            });
+        }
+    }
+    __decorate([
+        n$3()
+    ], FormSubmitterElement.prototype, "type", void 0);
+    __decorate([
+        n$3({ reflect: true })
+    ], FormSubmitterElement.prototype, "value", void 0);
+    return FormSubmitterElement;
+}
+
+/**
+ * @license
  * Copyright 2019 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 // Separate variable needed for closure.
-const buttonBaseClass$1 = mixinDelegatesAria$1(mixinElementInternals$1(i$3));
+const buttonBaseClass$1 = mixinDelegatesAria$1(mixinFormSubmitter(mixinFormAssociated$1(mixinElementInternals$1(i$3))));
 /**
  * A button component.
  */
 let Button$1 = class Button extends buttonBaseClass$1 {
-    get name() {
-        return this.getAttribute('name') ?? '';
-    }
-    set name(name) {
-        this.setAttribute('name', name);
-    }
-    /**
-     * The associated form element with which this element's value will submit.
-     */
-    get form() {
-        return this[internals$1].form;
-    }
     constructor() {
         super();
-        /**
-         * Whether or not the button is disabled.
-         */
-        this.disabled = false;
         /**
          * Whether or not the button is "soft-disabled" (disabled but still
          * focusable).
@@ -54098,16 +54659,6 @@ let Button$1 = class Button extends buttonBaseClass$1 {
          * Whether to display the icon or not.
          */
         this.hasIcon = false;
-        /**
-         * The default behavior of the button. May be "button", "reset", or "submit"
-         * (default).
-         */
-        this.type = 'submit';
-        /**
-         * The value added to a form with the button's name when the button submits a
-         * form.
-         */
-        this.value = '';
         {
             this.addEventListener('click', this.handleClick.bind(this));
         }
@@ -54196,19 +54747,11 @@ let Button$1 = class Button extends buttonBaseClass$1 {
         this.hasIcon = this.assignedIcons.length > 0;
     }
 };
-(() => {
-    setupFormSubmitter$1(Button$1);
-})();
-/** @nocollapse */
-Button$1.formAssociated = true;
 /** @nocollapse */
 Button$1.shadowRootOptions = {
     mode: 'open',
     delegatesFocus: true,
 };
-__decorate([
-    n$3({ type: Boolean, reflect: true })
-], Button$1.prototype, "disabled", void 0);
 __decorate([
     n$3({ type: Boolean, attribute: 'soft-disabled', reflect: true })
 ], Button$1.prototype, "softDisabled", void 0);
@@ -54227,12 +54770,6 @@ __decorate([
 __decorate([
     n$3({ type: Boolean, attribute: 'has-icon', reflect: true })
 ], Button$1.prototype, "hasIcon", void 0);
-__decorate([
-    n$3()
-], Button$1.prototype, "type", void 0);
-__decorate([
-    n$3({ reflect: true })
-], Button$1.prototype, "value", void 0);
 __decorate([
     e$3('.button')
 ], Button$1.prototype, "buttonElement", void 0);
@@ -54279,7 +54816,7 @@ const styles$N = i$6 `:host{border-start-start-radius:var(--_container-shape-sta
  */
 /**
  * @license
- * Copyright 2025 Omicron Energy GmbH
+ * Copyright 2026 OMICRON electronics GmbH
  * SPDX-License-Identifier: Apache-2.0
  */
 /**
@@ -54476,178 +55013,6 @@ function mixinConstraintValidation$1(base) {
         }
     }
     return ConstraintValidationElement;
-}
-
-/**
- * @license
- * Copyright 2023 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-/**
- * A symbol property to retrieve the form value for an element.
- */
-const getFormValue$1 = Symbol('getFormValue');
-/**
- * A symbol property to retrieve the form state for an element.
- */
-const getFormState$1 = Symbol('getFormState');
-/**
- * Mixes in form-associated behavior for a class. This allows an element to add
- * values to `<form>` elements.
- *
- * Implementing classes should provide a `[formValue]` to return the current
- * value of the element, as well as reset and restore callbacks.
- *
- * @example
- * ```ts
- * const base = mixinFormAssociated(mixinElementInternals(LitElement));
- *
- * class MyControl extends base {
- *   \@property()
- *   value = '';
- *
- *   override [getFormValue]() {
- *     return this.value;
- *   }
- *
- *   override formResetCallback() {
- *     const defaultValue = this.getAttribute('value');
- *     this.value = defaultValue;
- *   }
- *
- *   override formStateRestoreCallback(state: string) {
- *     this.value = state;
- *   }
- * }
- * ```
- *
- * Elements may optionally provide a `[formState]` if their values do not
- * represent the state of the component.
- *
- * @example
- * ```ts
- * const base = mixinFormAssociated(mixinElementInternals(LitElement));
- *
- * class MyCheckbox extends base {
- *   \@property()
- *   value = 'on';
- *
- *   \@property({type: Boolean})
- *   checked = false;
- *
- *   override [getFormValue]() {
- *     return this.checked ? this.value : null;
- *   }
- *
- *   override [getFormState]() {
- *     return String(this.checked);
- *   }
- *
- *   override formResetCallback() {
- *     const defaultValue = this.hasAttribute('checked');
- *     this.checked = defaultValue;
- *   }
- *
- *   override formStateRestoreCallback(state: string) {
- *     this.checked = Boolean(state);
- *   }
- * }
- * ```
- *
- * IMPORTANT: Requires declares for lit-analyzer
- * @example
- * ```ts
- * const base = mixinFormAssociated(mixinElementInternals(LitElement));
- * class MyControl extends base {
- *   // Writable mixin properties for lit-html binding, needed for lit-analyzer
- *   declare disabled: boolean;
- *   declare name: string;
- * }
- * ```
- *
- * @param base The class to mix functionality into. The base class must use
- *     `mixinElementInternals()`.
- * @return The provided class with `FormAssociated` mixed in.
- */
-function mixinFormAssociated$1(base) {
-    class FormAssociatedElement extends base {
-        get form() {
-            return this[internals$1].form;
-        }
-        get labels() {
-            return this[internals$1].labels;
-        }
-        // Use @property for the `name` and `disabled` properties to add them to the
-        // `observedAttributes` array and trigger `attributeChangedCallback()`.
-        //
-        // We don't use Lit's default getter/setter (`noAccessor: true`) because
-        // the attributes need to be updated synchronously to work with synchronous
-        // form APIs, and Lit updates attributes async by default.
-        get name() {
-            return this.getAttribute('name') ?? '';
-        }
-        set name(name) {
-            // Note: setting name to null or empty does not remove the attribute.
-            this.setAttribute('name', name);
-            // We don't need to call `requestUpdate()` since it's called synchronously
-            // in `attributeChangedCallback()`.
-        }
-        get disabled() {
-            return this.hasAttribute('disabled');
-        }
-        set disabled(disabled) {
-            this.toggleAttribute('disabled', disabled);
-            // We don't need to call `requestUpdate()` since it's called synchronously
-            // in `attributeChangedCallback()`.
-        }
-        attributeChangedCallback(name, old, value) {
-            // Manually `requestUpdate()` for `name` and `disabled` when their
-            // attribute or property changes.
-            // The properties update their attributes, so this callback is invoked
-            // immediately when the properties are set. We call `requestUpdate()` here
-            // instead of letting Lit set the properties from the attribute change.
-            // That would cause the properties to re-set the attribute and invoke this
-            // callback again in a loop. This leads to stale state when Lit tries to
-            // determine if a property changed or not.
-            if (name === 'name' || name === 'disabled') {
-                // Disabled's value is only false if the attribute is missing and null.
-                const oldValue = name === 'disabled' ? old !== null : old;
-                // Trigger a lit update when the attribute changes.
-                this.requestUpdate(name, oldValue);
-                return;
-            }
-            super.attributeChangedCallback(name, old, value);
-        }
-        requestUpdate(name, oldValue, options) {
-            super.requestUpdate(name, oldValue, options);
-            // If any properties change, update the form value, which may have changed
-            // as well.
-            // Update the form value synchronously in `requestUpdate()` rather than
-            // `update()` or `updated()`, which are async. This is necessary to ensure
-            // that form data is updated in time for synchronous event listeners.
-            this[internals$1].setFormValue(this[getFormValue$1](), this[getFormState$1]());
-        }
-        [getFormValue$1]() {
-            // Closure does not allow abstract symbol members, so a default
-            // implementation is needed.
-            throw new Error('Implement [getFormValue]');
-        }
-        [getFormState$1]() {
-            return this[getFormValue$1]();
-        }
-        formDisabledCallback(disabled) {
-            this.disabled = disabled;
-        }
-    }
-    /** @nocollapse */
-    FormAssociatedElement.formAssociated = true;
-    __decorate([
-        n$3({ noAccessor: true })
-    ], FormAssociatedElement.prototype, "name", null);
-    __decorate([
-        n$3({ type: Boolean, noAccessor: true })
-    ], FormAssociatedElement.prototype, "disabled", null);
-    return FormAssociatedElement;
 }
 
 /**
@@ -54949,7 +55314,7 @@ const styles$M = i$6 `:host{border-start-start-radius:var(--md-checkbox-containe
  */
 /**
  * @license
- * Copyright 2025 Omicron Energy GmbH
+ * Copyright 2026 OMICRON electronics GmbH
  * SPDX-License-Identifier: Apache-2.0
  */
 /**
@@ -55502,7 +55867,7 @@ const styles$L = i$6 `@layer{:host{display:inline-flex;height:var(--md-radio-ico
  */
 /**
  * @license
- * Copyright 2025 Omicron Energy GmbH
+ * Copyright 2026 OMICRON electronics GmbH
  * SPDX-License-Identifier: Apache-2.0
  */
 /**
@@ -55535,9 +55900,9 @@ OscdRadio.styles = [styles$L];
  * SPDX-License-Identifier: Apache-2.0
  */
 /**
- * TODO(b/265336902): add docs
+ * An icon element.
  */
-let Icon$1 = class Icon extends i$3 {
+let Icon$2 = class Icon extends i$3 {
     render() {
         return x `<slot></slot>`;
     }
@@ -55556,6 +55921,757 @@ let Icon$1 = class Icon extends i$3 {
     }
 };
 
+const elementIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">
+<path fill="currentColor" d="M9,7H15V9H11V11H15V13H11V15H15V17H9V7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+</svg>`;
+const attributeIcon = b `<svg viewBox="0 0 24 24">
+<path fill="currentColor" d="M11,7H13A2,2 0 0,1 15,9V17H13V13H11V17H9V9A2,2 0 0,1 11,7M11,9V11H13V9H11M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2Z" />
+</svg>`;
+const contentIcon = b `<svg viewBox="0 0 24 24">
+<path fill="currentColor" d="M11,7H13A2,2 0 0,1 15,9V10H13V9H11V15H13V14H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+</svg>`;
+
+const editIcon = b `<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 25 25"
+>
+  <path
+    d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z"
+    stroke="currentColor"
+    fill="transparent"
+    stroke-width="1.5"
+    stroke-linecap="round"
+  />
+</svg>`;
+const pathsSVG = {
+    action: b `<path d="M0 0h24v24H0z" fill="none"></path><path d="M13 3c-4.97 0-9
+  4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7
+  7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0
+  9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z" fill="currentColor"></path>`,
+    dAIcon: b `<path fill="currentColor" d="m4.2 0c-2.31 0-4.2 1.89-4.2 4.2v11.6c0 2.31 1.89 4.2 4.2 4.2h18.1c2.31 0 4.2-1.89 4.2-4.2v-11.6c0-2.31-1.89-4.2-4.2-4.2zm0 1.89h18.1c1.29 0 2.3 1.01 2.3 2.3v11.6c0 1.29-1.01 2.31-2.3 2.31h-18.1c-1.29 0-2.3-1.01-2.3-2.31v-11.6c0-1.29 1.01-2.3 2.3-2.3z"/><path stroke="none" fill="currentColor" d="m12.5 9.94q0 1.55-0.509 2.71-0.503 1.15-1.43 1.76-0.923 0.611-2.12 0.611h-3.37v-10h3.02q2.11 0 3.26 1.28 1.15 1.27 1.15 3.65zm-1.76 0q0-1.61-0.698-2.46-0.698-0.852-1.99-0.852h-1.24v6.77h1.48q1.12 0 1.79-0.931 0.663-0.931 0.663-2.53z"/><path stroke="none" fill="currentColor" d="m19.7 15-0.74-2.56h-3.18l-0.74 2.56h-1.75l3.04-10h2.06l3.03 10zm-1.13-4.13-0.823-2.88-0.379-1.46q-0.0947 0.412-0.178 0.739-0.0829 0.327-1.02 3.59z"/>`,
+    dOIcon: b `<path fill="none" stroke="currentColor" stroke-width="1.89" d="m4.2 0.945h18.1c1.8 0 3.25 1.45 3.25 3.25v11.6c0 1.8-1.45 3.25-3.25 3.25h-18.1c-1.8 0-3.25-1.45-3.25-3.25v-11.6c0-1.8 1.45-3.25 3.25-3.25z"/><path stroke="none" fill="currentColor" d="m12.1 9.94q0 1.55-0.509 2.71-0.503 1.15-1.43 1.76-0.923 0.611-2.12 0.611h-3.37v-10h3.02q2.11 0 3.26 1.28 1.15 1.27 1.15 3.65zm-1.76 0q0-1.61-0.698-2.46-0.698-0.852-1.99-0.852h-1.24v6.77h1.48q1.12 0 1.79-0.931 0.663-0.931 0.663-2.53z"/><path stroke="none" fill="currentColor" d="m21.6 9.97q0 1.56-0.515 2.75-0.515 1.19-1.47 1.82-0.959 0.625-2.24 0.625-1.97 0-3.08-1.39-1.11-1.39-1.11-3.81 0-2.41 1.11-3.76t3.1-1.35 3.1 1.36q1.12 1.36 1.12 3.74zm-1.78 0q0-1.62-0.639-2.54-0.639-0.923-1.79-0.923-1.17 0-1.81 0.916-0.639 0.909-0.639 2.54 0 1.65 0.651 2.6 0.657 0.945 1.79 0.945 1.17 0 1.81-0.923 0.639-0.923 0.639-2.62z"/>`,
+    enumIcon: b `<path fill="none" stroke="currentColor" stroke-width="1.89" d="m4.2 0.945h18.1c1.8 0 3.25 1.45 3.25 3.25v11.6c0 1.8-1.45 3.25-3.25 3.25h-18.1c-1.8 0-3.25-1.45-3.25-3.25v-11.6c0-1.8 1.45-3.25 3.25-3.25z"/><path d="m5.37 15v-10h6.56v1.62h-4.81v2.51h4.45v1.62h-4.45v2.64h5.06v1.62z"/><path d="m18.5 15-3.63-7.71q0.107 1.12 0.107 1.8v5.9h-1.55v-10h1.99l3.69 7.77q-0.107-1.07-0.107-1.95v-5.82h1.55v10z"/>`,
+    info: b `<path d="M0 0h24v24H0z" fill="none"></path><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor"></path>`,
+    warning: b `<path d="M0 0h24v24H0z" fill="none"></path><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" fill="currentColor"></path>`,
+    error: b `<path d="M0 0h24v24H0V0z" fill="none"></path><path d="M15.73 3H8.27L3 8.27v7.46L8.27 21h7.46L21 15.73V8.27L15.73 3zM19 14.9L14.9 19H9.1L5 14.9V9.1L9.1 5h5.8L19 9.1v5.8z" fill="currentColor"></path><path d="M11 7h2v7h-2z" fill="currentColor"></path><circle cx="12" cy="16" r="1" fill="currentColor"></circle>`,
+    gooseIcon: b `<path fill="currentColor" d="M11,7H15V9H11V15H13V11H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />`,
+    lNIcon: b `<path stroke="currentColor" stroke-width="1.89" fill="none" d="m4.2 0.945h18.1c1.8 0 3.25 1.45 3.25 3.25v11.6c0 1.8-1.45 3.25-3.25 3.25h-18.1c-1.8 0-3.25-1.45-3.25-3.25v-11.6c0-1.8 1.45-3.25 3.25-3.25z"/><path fill="currentColor" d="m5.71 15v-10h1.75v8.39h4.47v1.62z"/><path fill="currentColor" d="m18.2 15-3.63-7.71q0.107 1.12 0.107 1.8v5.9h-1.55v-10h1.99l3.69 7.77q-0.107-1.07-0.107-1.95v-5.82h1.55v10z"/>`,
+    logIcon: b `<path fill="currentColor" d="M9,7H11V15H15V17H9V7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />`,
+    reportIcon: b `<path fill="currentColor" d="M9,7H13A2,2 0 0,1 15,9V11C15,11.84 14.5,12.55 13.76,12.85L15,17H13L11.8,13H11V17H9V7M11,9V11H13V9H11M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12C4,16.41 7.58,20 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />`,
+    dataSetIcon: b `<path fill="currentColor" d="M9,7H12.5A3.5,3.5 0 0,1 16,10.5V13.5A3.5,3.5 0 0,1 12.5,17H9V7M11,9V15H12.5A1.5,1.5 0 0,0 14,13.5V10.5A1.5,1.5 0 0,0 12.5,9H11M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12C4,16.41 7.58,20 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />`,
+    smvIcon: b `<path fill="currentColor" d="M11,7H15V9H11V11H13A2,2 0 0,1 15,13V15A2,2 0 0,1 13,17H9V15H13V13H11A2,2 0 0,1 9,11V9A2,2 0 0,1 11,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />`,
+    reset: b ``,
+};
+const gooseIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">${pathsSVG['gooseIcon']}</svg>`;
+const reportIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">${pathsSVG['reportIcon']}</svg>`;
+const smvIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">${pathsSVG['smvIcon']}</svg>`;
+const dataSetIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">${pathsSVG['dataSetIcon']}</svg>`;
+const logIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">${pathsSVG['logIcon']}</svg>`;
+const inputIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">
+<path fill="currentColor" d="M14,12L10,8V11H2V13H10V16M20,18V6C20,4.89 19.1,4 18,4H6A2,2 0 0,0 4,6V9H6V6H18V18H6V15H4V18A2,2 0 0,0 6,20H18A2,2 0 0,0 20,18Z" />
+</svg>`;
+const clientIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">
+<path fill="currentColor" d="M21,14V4H3V14H21M21,2A2,2 0 0,1 23,4V16A2,2 0 0,1 21,18H14L16,21V22H8V21L10,18H3C1.89,18 1,17.1 1,16V4C1,2.89 1.89,2 3,2H21M4,5H15V10H4V5M16,5H20V7H16V5M20,8V13H16V8H20M4,11H9V13H4V11M10,11H15V13H10V11Z" />
+</svg>`;
+const disconnect = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">
+<path fill="currentColor" d="M4,1C2.89,1 2,1.89 2,3V7C2,8.11 2.89,9 4,9H1V11H13V9H10C11.11,9 12,8.11 12,7V3C12,1.89 11.11,1 10,1H4M4,3H10V7H4V3M14,13C12.89,13 12,13.89 12,15V19C12,20.11 12.89,21 14,21H11V23H23V21H20C21.11,21 22,20.11 22,19V15C22,13.89 21.11,13 20,13H14M3.88,13.46L2.46,14.88L4.59,17L2.46,19.12L3.88,20.54L6,18.41L8.12,20.54L9.54,19.12L7.41,17L9.54,14.88L8.12,13.46L6,15.59L3.88,13.46M14,15H20V19H14V15Z" />
+</svg>`;
+const networkConfigIcon = b `<svg
+  xmlns="http://www.w3.org/2000/svg"
+  slot="icon"
+  width="25px"
+  height="25px"
+  style="margin-bottom:0px;"
+>
+  <rect
+    width="8"
+    height="8"
+    x="8.5"
+    y="2"
+    rx="1"
+    ry="1"
+    fill="transparent"
+    stroke="currentColor"
+    stroke-width="1.5"
+  />
+  <rect
+    width="8"
+    height="8"
+    x="2.5"
+    y="15"
+    rx="1"
+    ry="1"
+    fill="transparent"
+    stroke="currentColor"
+    stroke-width="1.5"
+  />
+  <rect
+    width="8"
+    height="8"
+    x="15"
+    y="15"
+    rx="1"
+    ry="1"
+    fill="transparent"
+    stroke="currentColor"
+    stroke-width="1.5"
+  />
+
+  <line
+    x1="2"
+    y1="12.5"
+    x2="23"
+    y2="12.5"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-width="1.5"
+  />
+  <line
+    x1="12.5"
+    y1="10"
+    x2="12.5"
+    y2="12.5"
+    stroke="currentColor"
+    stroke-width="1.5"
+  />
+  <line
+    x1="6.5"
+    y1="12.5"
+    x2="6.5"
+    y2="15"
+    stroke="currentColor"
+    stroke-width="1.5"
+  />
+  <line
+    x1="19"
+    y1="12.5"
+    x2="19"
+    y2="15"
+    stroke="currentColor"
+    stroke-width="1.5"
+  />
+</svg>`;
+const zeroLineIcon = b `<svg
+  xmlns="http://www.w3.org/2000/svg"
+  slot="icon"
+  viewBox="0 0 25 25"
+>
+  <path
+    d="M 2 9 L 12.5 2 L 23 9 L 21 9 L 21 21 L 4 21 L 4 9 Z"
+    fill="transparent"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M 11 7 L 17.5 7 L 13.5 11 L 16.5 11 L 10 19 L 11.5 13 L 8.5 13 Z "
+    fill="currentColor"
+  />
+</svg>`;
+const voltageLevelIcon = b `<svg
+  id="Laag_1"
+  data-name="Laag 1"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+>
+  <defs>
+    <style>
+      .cls-1 {
+        fill: currentColor;
+      }
+
+      .cls-1,
+      .cls-2 {
+        stroke-width: 0px;
+      }
+
+      .cls-2 {
+        fill: currentColor;
+        opacity: 0;
+      }
+    </style>
+  </defs>
+  <path
+    class="cls-1"
+    d="M11.13,20.06L3.63,6.93c-.27-.48-.11-1.09.37-1.36h0c.48-.27,1.09-.11,1.36.37l6.64,11.61,6.64-11.61c.27-.48.88-.65,1.36-.37h0c.48.27.65.88.37,1.36l-7.5,13.13c-.38.67-1.35.67-1.74,0Z"
+  />
+  <rect class="cls-2" width="24" height="24" />
+</svg>`;
+const bayIcon = b `<svg
+  id="Laag_1"
+  data-name="Laag 1"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+>
+  <defs>
+    <style>
+      .cls-1 {
+        fill: currentColor;
+        stroke-width: 0px;
+      }
+    </style>
+  </defs>
+  <path
+    class="cls-1"
+    d="M7.75,8c0-.41-.34-.75-.75-.75s-.75.34-.75.75v1.5h-1.25c0,.84.52,1.55,1.25,1.85v8.65h1.5v-8.65c.73-.3,1.25-1.01,1.25-1.85h-1.25v-1.5Z"
+  />
+  <path
+    class="cls-1"
+    d="M12.75,8c0-.41-.34-.75-.75-.75s-.75.34-.75.75v1.5h-1.25c0,.84.52,1.55,1.25,1.85v8.65h1.5v-8.65c.73-.3,1.25-1.01,1.25-1.85h-1.25v-1.5Z"
+  />
+  <path
+    class="cls-1"
+    d="M17.75,8c0-.41-.34-.75-.75-.75s-.75.34-.75.75v1.5h-1.25c0,.84.52,1.55,1.25,1.85v8.65h1.5v-8.65c.73-.3,1.25-1.01,1.25-1.85h-1.25v-1.5Z"
+  />
+  <path
+    class="cls-1"
+    d="M20,4H4c-1.1,0-2,.9-2,2v4c0,1.1.9,2,2,2v-6h16v6c1.1,0,2-.9,2-2v-4c0-1.1-.9-2-2-2Z"
+  />
+</svg>`;
+const disconnectorIcon = b `<svg
+  id="Laag_1"
+  data-name="Laag 1"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+>
+  <defs>
+    <style>
+      .cls-1 {
+        fill: currentColor;
+      }
+
+      .cls-1,
+      .cls-2 {
+        stroke-width: 0px;
+      }
+
+      .cls-2 {
+        fill: #fff;
+        opacity: 0;
+      }
+    </style>
+  </defs>
+  <g>
+    <path
+      class="cls-1"
+      d="M12.71,15.29l-6.79-6.79c-.39-.39-1.02-.39-1.41,0-.39.39-.39,1.02,0,1.41l6.5,6.5v4.59c0,.55.45,1,1,1s1-.45,1-1v-5c0-.13-.03-.26-.08-.38-.05-.12-.12-.23-.22-.33Z"
+    />
+    <path
+      class="cls-1"
+      d="M14,6h-1v-3c0-.55-.45-1-1-1s-1,.45-1,1v3h-1c-.55,0-1,.45-1,1s.45,1,1,1h4c.55,0,1-.45,1-1s-.45-1-1-1Z"
+    />
+  </g>
+  <rect class="cls-2" width="24" height="24" />
+</svg>`;
+const circuitBreakerIcon = b `<svg
+  id="Laag_1"
+  data-name="Laag 1"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+>
+  <defs>
+    <style>
+      .cls-1 {
+        fill: currentColor;
+      }
+
+      .cls-1,
+      .cls-2 {
+        stroke-width: 0px;
+      }
+
+      .cls-2 {
+        fill: #fff;
+        opacity: 0;
+      }
+    </style>
+  </defs>
+  <g>
+    <path
+      class="cls-1"
+      d="M12.71,15.29l-6.79-6.79c-.39-.39-1.02-.39-1.41,0-.39.39-.39,1.02,0,1.41l6.5,6.5v4.59c0,.55.45,1,1,1s1-.45,1-1v-5c0-.13-.03-.26-.08-.38-.05-.12-.12-.23-.22-.33Z"
+    />
+    <path
+      class="cls-1"
+      d="M13.41,7l1.29-1.29c.39-.39.39-1.02,0-1.41s-1.02-.39-1.41,0l-1.29,1.29-1.29-1.29c-.39-.39-1.02-.39-1.41,0s-.39,1.02,0,1.41l1.29,1.29-1.29,1.29c-.39.39-.39,1.02,0,1.41.2.2.45.29.71.29s.51-.1.71-.29l1.29-1.29,1.29,1.29c.2.2.45.29.71.29s.51-.1.71-.29c.39-.39.39-1.02,0-1.41l-1.29-1.29Z"
+    />
+  </g>
+  <rect class="cls-2" width="24" height="24" />
+</svg>`;
+const currentTransformerIcon = b `<svg
+  id="Laag_1"
+  data-name="Laag 1"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+>
+  <defs>
+    <style>
+      .cls-1 {
+        fill: currentColor;
+      }
+
+      .cls-1,
+      .cls-2 {
+        stroke-width: 0px;
+      }
+
+      .cls-2 {
+        fill: #fff;
+        opacity: 0;
+      }
+    </style>
+  </defs>
+  <path
+    class="cls-1"
+    d="M19,12c0-3.53-2.61-6.43-6-6.92v-2.08c0-.55-.45-1-1-1s-1,.45-1,1v2.08c-3.39.49-6,3.39-6,6.92s2.61,6.43,6,6.92v2.08c0,.55.45,1,1,1s1-.45,1-1v-2.08c3.39-.49,6-3.39,6-6.92ZM7,12c0-2.42,1.72-4.44,4-4.9v9.8c-2.28-.46-4-2.48-4-4.9ZM13,16.9V7.1c2.28.46,4,2.48,4,4.9s-1.72,4.44-4,4.9Z"
+  />
+  <rect class="cls-2" width="24" height="24" />
+</svg>`;
+const voltageTransformerIcon = b `<svg
+  id="Laag_1"
+  data-name="Laag 1"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+>
+  <defs>
+    <style>
+      .cls-1 {
+        fill: currentColor;
+      }
+
+      .cls-1,
+      .cls-2 {
+        stroke-width: 0px;
+      }
+
+      .cls-2 {
+        fill: #fff;
+        opacity: 0;
+      }
+    </style>
+  </defs>
+  <path
+    class="cls-1"
+    d="M17,10c0-2.42-1.72-4.44-4-4.9v-2.1s0-1-1-1-1,1-1,1v2.1c-2.28.46-4,2.48-4,4.9,0,.71.15,1.39.42,2-.27.61-.42,1.29-.42,2,0,2.42,1.72,4.44,4,4.9v1.1h-1c-.55,0-1,.45-1,1s.45,1,1,1h4c.55,0,1-.45,1-1s-.45-1-1-1h-1v-1.1c2.28-.46,4-2.48,4-4.9,0-.71-.15-1.39-.42-2,.27-.61.42-1.29.42-2ZM12,7c1.66,0,3,1.34,3,3,0,0,0,.01,0,.02-.84-.63-1.87-1.02-3-1.02s-2.16.39-3,1.02c0,0,0-.01,0-.02,0-1.66,1.34-3,3-3ZM14.22,12c-.55.61-1.34,1-2.22,1s-1.67-.39-2.22-1c.55-.61,1.34-1,2.22-1s1.67.39,2.22,1ZM12,17c-1.66,0-3-1.34-3-3,0,0,0-.01,0-.02.84.63,1.87,1.02,3,1.02s2.16-.39,3-1.02c0,0,0,.01,0,.02,0,1.66-1.34,3-3,3Z"
+  />
+  <rect class="cls-2" width="24" height="24" />
+</svg>`;
+const earthSwitchIcon = b `<svg
+  id="Laag_1"
+  data-name="Laag 1"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+>
+  <defs>
+    <style>
+      .cls-1 {
+        fill: currentColor;
+      }
+
+      .cls-1,
+      .cls-2 {
+        stroke-width: 0px;
+      }
+
+      .cls-2 {
+        fill: #fff;
+        opacity: 0;
+      }
+    </style>
+  </defs>
+  <g>
+    <path
+      class="cls-1"
+      d="M13,20h-2c-.55,0-1,.45-1,1s.45,1,1,1h2c.55,0,1-.45,1-1s-.45-1-1-1Z"
+    />
+    <path
+      class="cls-1"
+      d="M15,16h-2v-5c0-.13-.03-.26-.08-.38-.05-.12-.12-.23-.22-.33L5.91,3.5c-.39-.39-1.02-.39-1.41,0-.39.39-.39,1.02,0,1.41l6.5,6.5v4.59h-2c-.55,0-1,.45-1,1s.45,1,1,1h6c.55,0,1-.45,1-1s-.45-1-1-1Z"
+    />
+    <path
+      class="cls-1"
+      d="M10,4h4c.55,0,1-.45,1-1s-.45-1-1-1h-4c-.55,0-1,.45-1,1s.45,1,1,1Z"
+    />
+  </g>
+  <rect class="cls-2" width="24" height="24" />
+</svg>`;
+const generalConductingEquipmentIcon = b `<svg
+  id="Laag_1"
+  data-name="Laag 1"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+>
+  <defs>
+    <style>
+      .cls-1 {
+        fill: currentColor;
+        stroke-width: 0px;
+      }
+    </style>
+  </defs>
+  <path
+    class="cls-1"
+    d="M20.41,3.59c-.78-.78-2.05-.78-2.83,0-.59.59-.73,1.47-.43,2.19l-1.49,1.49c-1.02-.79-2.29-1.27-3.67-1.27-3.31,0-6,2.69-6,6,0,1.38.48,2.66,1.27,3.67l-1.49,1.49c-.73-.31-1.6-.17-2.19.43-.78.78-.78,2.05,0,2.83.78.78,2.05.78,2.83,0,.59-.59.73-1.47.43-2.19l1.49-1.49c1.02.79,2.29,1.27,3.67,1.27,3.31,0,6-2.69,6-6,0-1.38-.48-2.66-1.27-3.67l1.49-1.49c.73.31,1.6.17,2.19-.43.78-.78.78-2.05,0-2.83ZM12,16c-2.21,0-4-1.79-4-4s1.79-4,4-4,4,1.79,4,4-1.79,4-4,4Z"
+  />
+</svg>`;
+const connectivityNodeIcon = b `<svg
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <circle
+    stroke="currentColor"
+    fill="currentColor"
+    stroke-width="1"
+    cx="12.5"
+    cy="12.5"
+    r="5"
+  />
+</svg>`;
+const powerTransformerTwoWindingIcon = b `<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 25 25"
+>
+  <line
+    x1="12.5"
+    y1="2"
+    x2="12.5"
+    y2="5"
+    stroke="currentColor"
+    stroke-width="1.5"
+    stroke-linecap="round"
+  />
+  <circle
+    cx="12.5"
+    cy="10"
+    r="5"
+    stroke="currentColor"
+    fill="transparent"
+    stroke-width="1.5"
+    stroke-linecap="round"
+  />
+  <circle
+    cx="12.5"
+    cy="15"
+    r="5"
+    stroke="currentColor"
+    fill="transparent"
+    stroke-width="1.5"
+    stroke-linecap="round"
+  />
+  <line
+    x1="12.5"
+    y1="20"
+    x2="12.5"
+    y2="23"
+    stroke="currentColor"
+    stroke-width="1.5"
+    stroke-linecap="round"
+  />
+</svg>`;
+const openSCDIcon = b ` <svg
+  xmlns="http://www.w3.org/2000/svg"
+  style="width:100px;height:100px"
+  viewBox="0 0 25 25"
+>
+  <path
+    d="M 2 9 L 12.5 2 L 23 9 L 21 9 L 21 21 L 4 21 L 4 9 Z"
+    fill="#eee8d5"
+    stroke="#6c71c4"
+    stroke-width="2"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M 11 7 L 17.5 7 L 13.5 11 L 16.5 11 L 10 19 L 11.5 13 L 8.5 13 Z "
+    fill="#2aa198"
+  />
+</svg>`;
+const sizableSmvIcon = b `
+  <svg viewBox="0 0 24 24">
+    <path fill="currentColor" d="M11,7H15V9H11V11H13A2,2 0 0,1 15,13V15A2,2 0 0,1 13,17H9V15H13V13H11A2,2 0 0,1 9,11V9A2,2 0 0,1 11,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+  </svg>`;
+const sizableGooseIcon = b `<svg viewBox="0 0 24 24">
+<path fill="currentColor" d="M11,7H15V9H11V15H13V11H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+</svg>`;
+const substationIcon = b `<svg id="Laag_1" data-name="Laag 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+<defs>
+  <style>
+    .cls-1 {
+      fill: currentColor;
+    }
+
+    .cls-1, .cls-2 {
+      stroke-width: 0px;
+    }
+
+    .cls-2 {
+      fill: currentColor;
+      opacity: 0;
+    }
+  </style>
+</defs>
+<g>
+  <path class="cls-1" d="M19.3,7.94l-6-5.14c-.75-.64-1.85-.65-2.6,0l-6,5.14c-.44.38-.7.93-.7,1.52v9.54c0,1.1.9,2,2,2h12c1.1,0,2-.9,2-2v-9.54c0-.58-.25-1.14-.7-1.52ZM18,19H6v-9.54l6-5.14,6,5.14v9.54Z"/>
+  <path class="cls-1" d="M11.57,7.74l-3,5c-.09.15-.09.35,0,.5.09.16.26.25.44.25h2v3.5c0,.22.15.42.37.48.04.01.09.02.13.02.17,0,.34-.09.43-.24l3-5c.09-.15.09-.35,0-.5-.09-.16-.26-.25-.44-.25h-2v-3.5c0-.22-.15-.42-.37-.48-.22-.06-.45.03-.56.22Z"/>
+</g>
+<rect class="cls-2" y="0" width="24" height="24"/>
+</svg>`;
+const lineIcon = b `<svg id="Laag_1" data-name="Laag 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+<defs>
+  <style>
+    .cls-1 {
+      fill: currentColor;
+    }
+
+    .cls-1, .cls-2 {
+      stroke-width: 0px;
+    }
+
+    .cls-2 {
+      fill: currentColor;
+      opacity: 0;
+    }
+  </style>
+</defs>
+<path class="cls-1" d="M14.39,11.93l-1.39.58v-1.84l2.15-.89c.51-.21.75-.8.54-1.31-.21-.51-.8-.75-1.31-.54l-1.39.58V3c0-.55-.45-1-1-1s-1,.45-1,1v6.33l-2.15.89c-.51.21-.75.8-.54,1.31.21.51.8.75,1.31.54l1.39-.58v1.84l-2.15.89c-.51.21-.75.8-.54,1.31.21.51.8.75,1.31.54l1.39-.58v5.5c0,.55.45,1,1,1s1-.45,1-1v-6.33l2.15-.89c.51-.21.75-.8.54-1.31-.21-.51-.8-.75-1.31-.54Z"/>
+<rect class="cls-2" width="24" height="24"/>
+</svg>`;
+const processIcon = b `<svg id="Laag_1" data-name="Laag 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+<defs>
+  <style>
+    .cls-1 {
+      fill: currentColor;
+    }
+
+    .cls-1, .cls-2 {
+      stroke-width: 0px;
+    }
+
+    .cls-2 {
+      fill: currentColor;
+      opacity: 0;
+    }
+  </style>
+</defs>
+<path class="cls-1" d="M18.71,15.29c-.39-.39-1.02-.39-1.41,0s-.39,1.02,0,1.41l.29.29h-5.59c0-1.1-.9-2-2-2h-2c-1.01,0-1.84.76-1.97,1.74-.61-.34-1.03-.99-1.03-1.74,0-1.1.9-2,2-2h5c0,1.1.9,2,2,2h2c1.1,0,2-.9,2-2v-.14c1.72-.45,3-2,3-3.86,0-2.21-1.79-4-4-4h-5c0-1.1-.9-2-2-2h-2c-1.1,0-2,.9-2,2h-2c-.55,0-1,.45-1,1s.45,1,1,1h2c0,1.1.9,2,2,2h2c1.1,0,2-.9,2-2h5c1.1,0,2,.9,2,2,0,.75-.42,1.39-1.03,1.74-.13-.98-.96-1.74-1.97-1.74h-2c-1.1,0-2,.9-2,2h-5c-2.21,0-4,1.79-4,4,0,1.86,1.28,3.41,3,3.86v.14c0,1.1.9,2,2,2h2c1.1,0,2-.9,2-2h5.59l-.29.29c-.39.39-.39,1.02,0,1.41.2.2.45.29.71.29s.51-.1.71-.29l2-2c.39-.39.39-1.02,0-1.41l-2-2ZM8,7v-2h2v2s-2,0-2,0ZM14,11h2v2s-2,0-2,0v-2ZM8,19v-2h2v2s-2,0-2,0Z"/>
+<rect class="cls-2" y="0" width="24" height="24"/>
+</svg>`;
+const transformerWindingIcon = b `<svg id="Laag_1" data-name="Laag 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+<defs>
+  <style>
+    .cls-1 {
+      fill: currentColor;
+    }
+
+    .cls-1, .cls-2 {
+      stroke-width: 0px;
+    }
+
+    .cls-2 {
+      fill: currentColor;
+      opacity: 0;
+    }
+  </style>
+</defs>
+<g>
+  <path class="cls-1" d="M19,20h-2c-1.21,0-2.18-1.09-1.97-2.34.16-.98,1.09-1.66,2.08-1.66h-.11c.55,0,1-.45,1-1s-.42-.96-.95-.99c.04,0,.08-.01.12-.01h-.17c-1.21,0-2.18-1.09-1.97-2.34.16-.98,1.09-1.66,2.08-1.66h-.11c.55,0,1-.45,1-1s-.42-.96-.95-.99c.04,0,.08-.01.12-.01h-.17c-1.21,0-2.18-1.09-1.97-2.34.16-.98,1.09-1.66,2.08-1.66h1.89c.55,0,1-.45,1-1s-.45-1-1-1h-1.83c-2.09,0-3.95,1.53-4.15,3.61-.13,1.37.44,2.59,1.38,3.41-.76.64-1.28,1.55-1.38,2.59-.13,1.37.44,2.59,1.38,3.41-.76.64-1.28,1.55-1.38,2.59-.23,2.39,1.64,4.39,3.98,4.39h2c.55,0,1-.45,1-1s-.45-1-1-1Z"/>
+  <path class="cls-1" d="M10.98,6.39c.23-2.39-1.64-4.39-3.98-4.39h-2c-.55,0-1,.45-1,1s.45,1,1,1h2c1.21,0,2.18,1.09,1.97,2.34-.16.98-1.09,1.66-2.08,1.66h.11c-.55,0-1,.45-1,1s.42.96.95.99c-.04,0-.08.01-.12.01h.17c1.21,0,2.18,1.09,1.97,2.34-.16.98-1.09,1.66-2.08,1.66h.11c-.55,0-1,.45-1,1,0,.28.11.53.29.71.17.17.4.27.65.28h0s.03.01.05.01c1.21,0,2.18,1.09,1.97,2.34-.16.98-1.09,1.66-2.08,1.66h-1.89c-.55,0-1,.45-1,1s.45,1,1,1h1.83c2.09,0,3.95-1.53,4.15-3.61.13-1.37-.44-2.59-1.38-3.41.76-.64,1.28-1.55,1.38-2.59.13-1.37-.44-2.59-1.38-3.41.76-.64,1.28-1.55,1.38-2.59Z"/>
+  <path class="cls-1" d="M6.83,16h.17s-.03,0-.05-.01c-.04,0-.08.01-.12.01Z"/>
+</g>
+<rect class="cls-2" width="24" height="24"/>
+</svg>`;
+
+const accessPointIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">
+<path fill="currentColor" d="M4.93,4.93C3.12,6.74 2,9.24 2,12C2,14.76 3.12,17.26 4.93,19.07L6.34,17.66C4.89,16.22 4,14.22 4,12C4,9.79 4.89,7.78 6.34,6.34L4.93,4.93M19.07,4.93L17.66,6.34C19.11,7.78 20,9.79 20,12C20,14.22 19.11,16.22 17.66,17.66L19.07,19.07C20.88,17.26 22,14.76 22,12C22,9.24 20.88,6.74 19.07,4.93M7.76,7.76C6.67,8.85 6,10.35 6,12C6,13.65 6.67,15.15 7.76,16.24L9.17,14.83C8.45,14.11 8,13.11 8,12C8,10.89 8.45,9.89 9.17,9.17L7.76,7.76M16.24,7.76L14.83,9.17C15.55,9.89 16,10.89 16,12C16,13.11 15.55,14.11 14.83,14.83L16.24,16.24C17.33,15.15 18,13.65 18,12C18,10.35 17.33,8.85 16.24,7.76M12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12A2,2 0 0,0 12,10Z" />
+</svg>`;
+const serverIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">
+<path fill="currentColor" d="M4,1H20A1,1 0 0,1 21,2V6A1,1 0 0,1 20,7H4A1,1 0 0,1 3,6V2A1,1 0 0,1 4,1M4,9H20A1,1 0 0,1 21,10V14A1,1 0 0,1 20,15H4A1,1 0 0,1 3,14V10A1,1 0 0,1 4,9M4,17H20A1,1 0 0,1 21,18V22A1,1 0 0,1 20,23H4A1,1 0 0,1 3,22V18A1,1 0 0,1 4,17M9,5H10V3H9V5M9,13H10V11H9V13M9,21H10V19H9V21M5,3V5H7V3H5M5,11V13H7V11H5M5,19V21H7V19H5Z" />
+</svg>`;
+const logicalDeviceIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">
+<path fill="currentColor" d="M13,13H18V15H13M13,9H18V11H13M6.91,7.41L11.5,12L6.91,16.6L5.5,15.18L8.68,12L5.5,8.82M5,3C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3H5Z" />
+</svg>`;
+
+const systemLogicalNode = b `<svg viewBox="0 0 24 24">
+    <path fill="currentColor" d="M9,7H11V15H15V17H9V7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+</svg>`;
+const automationLogicalNode = b `<svg viewBox="0 0 24 24">
+    <path fill="currentColor" d="M11,7H13A2,2 0 0,1 15,9V17H13V13H11V17H9V9A2,2 0 0,1 11,7M11,9V11H13V9H11M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2Z" />
+</svg>`;
+const controlLogicalNode = b `<svg viewBox="0 0 24 24">
+    <path fill="currentColor" d="M11,7H13A2,2 0 0,1 15,9V10H13V9H11V15H13V14H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+</svg>`;
+const functionalLogicalNode = b `<svg viewBox="0 0 24 24">
+    <path fill="currentColor" d="M9,7H15V9H11V11H14V13H11V17H9V7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+</svg>`;
+const generalLogicalNode = b `<svg  viewBox="0 0 24 24">
+    <path fill="currentColor" d="M11,7H15V9H11V15H13V11H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+</svg>`;
+const interfacingLogicalNode = b `<svg viewBox="0 0 24 24">
+    <path fill="currentColor" d="M14,7V9H13V15H14V17H10V15H11V9H10V7H14M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+</svg>`;
+const nonElectricalLogicalNode = b `<svg viewBox="0 0 24 24">
+<path fill="currentColor" d="M9,7H11V10.33L13,7H15L12,12L15,17H13L11,13.67V17H9V7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+</svg>`;
+const measurementLogicalNode = b `<svg viewBox="0 0 24 24">
+    <path fill="currentColor" d="M9,7H15A2,2 0 0,1 17,9V17H15V9H13V16H11V9H9V17H7V9A2,2 0 0,1 9,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+</svg>`;
+const protectionLogicalNode = b `<svg viewBox="0 0 24 24">
+    <path fill="currentColor" d="M9,7H13A2,2 0 0,1 15,9V11A2,2 0 0,1 13,13H11V17H9V7M11,9V11H13V9H11M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+</svg>`;
+const qualityLogicalNode = b `<svg  viewBox="0 0 24 24">
+    <path fill="currentColor" d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,7H13A2,2 0 0,1 15,9V15A2,2 0 0,1 13,17V19H11V17A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7M11,9V15H13V9H11Z" />
+</svg>`;
+const protectionRelatedLogicalNode = b `<svg viewBox="0 0 24 24">
+    <path fill="currentColor" d="M9,7H13A2,2 0 0,1 15,9V11C15,11.84 14.5,12.55 13.76,12.85L15,17H13L11.8,13H11V17H9V7M11,9V11H13V9H11M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12C4,16.41 7.58,20 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+</svg>`;
+const supervisionLogicalNode = b `<svg viewBox="0 0 24 24">
+    <path fill="currentColor" d="M11,7H15V9H11V11H13A2,2 0 0,1 15,13V15A2,2 0 0,1 13,17H9V15H13V13H11A2,2 0 0,1 9,11V9A2,2 0 0,1 11,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+</svg>`;
+const transformerLogicalNode = b `<svg viewBox="0 0 24 24">
+    <path fill="currentColor" d="M9,7H15V9H13V17H11V9H9V7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+</svg>`;
+const switchgearLogicalNode = b `<svg viewBox="0 0 24 24">
+    <path fill="currentColor" d="M9,7H11L12,9.5L13,7H15L13,12L15,17H13L12,14.5L11,17H9L11,12L9,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+</svg>`;
+const powerTransformerLogicalNode = b `<svg viewBox="0 0 24 24">
+    <path fill="currentColor" d="M9,7H11L12,10L13,7H15L13,13V17H11V13L9,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+</svg>`;
+const furtherPowerSystemEquipmentLogicalNode = b `<svg viewBox="0 0 24 24">
+    <path fill="currentColor" d="M9,7H15V9L11,15H15V17H9V15L13,9H9V7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+</svg>`;
+
+/**
+ * @license
+ * Copyright 2026 OMICRON electronics GmbH
+ * SPDX-License-Identifier: Apache-2.0
+ */
+function pathToSvg(type) {
+    return b `<svg
+    xmlns="http://www.w3.org/2000/svg"
+    height="24"
+    viewBox="0 0 26.5 24"
+    width="24"
+  >
+    ${pathsSVG[type]}
+  </svg> `;
+}
+const SCL_ICONS = {
+    elementIcon: elementIcon,
+    attributeIcon: attributeIcon,
+    contentIcon: contentIcon,
+    editIcon: editIcon,
+    gooseIcon: gooseIcon,
+    reportIcon: reportIcon,
+    smvIcon: smvIcon,
+    dataSetIcon: dataSetIcon,
+    logIcon: logIcon,
+    inputIcon: inputIcon,
+    clientIcon: clientIcon,
+    disconnect: disconnect,
+    networkConfigIcon: networkConfigIcon,
+    zeroLineIcon: zeroLineIcon,
+    voltageLevelIcon: voltageLevelIcon,
+    bayIcon: bayIcon,
+    disconnectorIcon: disconnectorIcon,
+    circuitBreakerIcon: circuitBreakerIcon,
+    currentTransformerIcon: currentTransformerIcon,
+    voltageTransformerIcon: voltageTransformerIcon,
+    earthSwitchIcon: earthSwitchIcon,
+    generalConductingEquipmentIcon: generalConductingEquipmentIcon,
+    connectivityNodeIcon: connectivityNodeIcon,
+    powerTransformerTwoWindingIcon: powerTransformerTwoWindingIcon,
+    openSCDIcon: openSCDIcon,
+    sizableSmvIcon: sizableSmvIcon,
+    sizableGooseIcon: sizableGooseIcon,
+    substationIcon: substationIcon,
+    lineIcon: lineIcon,
+    processIcon: processIcon,
+    transformerWindingIcon: transformerWindingIcon,
+    accessPointIcon: accessPointIcon,
+    serverIcon: serverIcon,
+    logicalDeviceIcon: logicalDeviceIcon,
+    systemLogicalNode: systemLogicalNode,
+    automationLogicalNode: automationLogicalNode,
+    controlLogicalNode: controlLogicalNode,
+    functionalLogicalNode: functionalLogicalNode,
+    generalLogicalNode: generalLogicalNode,
+    interfacingLogicalNode: interfacingLogicalNode,
+    nonElectricalLogicalNode: nonElectricalLogicalNode,
+    measurementLogicalNode: measurementLogicalNode,
+    protectionLogicalNode: protectionLogicalNode,
+    qualityLogicalNode: qualityLogicalNode,
+    protectionRelatedLogicalNode: protectionRelatedLogicalNode,
+    supervisionLogicalNode: supervisionLogicalNode,
+    transformerLogicalNode: transformerLogicalNode,
+    switchgearLogicalNode: switchgearLogicalNode,
+    powerTransformerLogicalNode: powerTransformerLogicalNode,
+    furtherPowerSystemEquipmentLogicalNode: furtherPowerSystemEquipmentLogicalNode,
+    ...Object.keys(pathsSVG).reduce((acc, key) => {
+        acc[key] = pathToSvg(key);
+        return acc;
+    }, {}),
+};
+({
+    DAType: pathToSvg('dAIcon'),
+    DOType: pathToSvg('dOIcon'),
+    EnumType: pathToSvg('enumIcon'),
+    LNodeType: pathToSvg('lNIcon'),
+});
+function toSVG(name) {
+    return SCL_ICONS[name];
+}
+
+/**
+ * @license
+ * Copyright 2026 OMICRON electronics GmbH
+ * SPDX-License-Identifier: Apache-2.0
+ */
+/**
+ * Internal Icon base class that extends the Material Design Icon with
+ * automatic SCL icon resolution.
+ *
+ * When the text content of the element matches a key in {@link SCL_ICONS},
+ * the corresponding SVG is rendered instead of the default Material Symbols
+ * font ligature. If no match is found the element falls through to the
+ * standard `<slot></slot>` rendering from the Material base class so that
+ * Material Symbols font ligatures continue to work as before.
+ */
+let Icon$1 = class Icon extends Icon$2 {
+    constructor() {
+        super(...arguments);
+        this._sclName = '';
+    }
+    connectedCallback() {
+        super.connectedCallback();
+        this._updateSclName();
+        this._observer = new MutationObserver(() => {
+            this._updateSclName();
+        });
+        this._observer.observe(this, {
+            characterData: true,
+            subtree: true,
+            childList: true,
+        });
+    }
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        this._observer?.disconnect();
+        this._observer = undefined;
+    }
+    _updateSclName() {
+        const name = (this.textContent ?? '').trim();
+        if (name !== this._sclName) {
+            this._sclName = name;
+            this.requestUpdate();
+        }
+    }
+    render() {
+        const sclSvg = SCL_ICONS[this._sclName];
+        if (sclSvg) {
+            return x `${sclSvg}`;
+        }
+        return super.render();
+    }
+};
+
 /**
  * @license
  * Copyright 2024 Google LLC
@@ -55565,12 +56681,29 @@ let Icon$1 = class Icon extends i$3 {
 const styles$K = i$6 `:host{font-size:var(--md-icon-size, 24px);width:var(--md-icon-size, 24px);height:var(--md-icon-size, 24px);color:inherit;font-variation-settings:inherit;font-weight:400;font-family:var(--md-icon-font, Material Symbols Outlined);display:inline-flex;font-style:normal;place-items:center;place-content:center;line-height:1;overflow:hidden;letter-spacing:normal;text-transform:none;user-select:none;white-space:nowrap;word-wrap:normal;flex-shrink:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;-moz-osx-font-smoothing:grayscale}::slotted(svg){fill:currentColor}::slotted(*){height:100%;width:100%}
 `;
 
-/*
- * GENERATED SOURCE FILE. DO NOT MODIFY.
- * Modifications will be overwritten.
- * To prevent this file from being overwritten, remove this comment entirely.
+/**
+ * @license
+ * Copyright 2022 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
  */
 /**
+ * @license
+ * Copyright 2026 OMICRON electronics GmbH
+ * SPDX-License-Identifier: Apache-2.0
+ */
+/**
+ * Icon component that renders SCL domain icons by name or falls back to
+ * Material Symbols font ligatures.
+ *
+ * @example
+ * ```html
+ * <!-- SCL icon by name -->
+ * <oscd-icon>gooseIcon</oscd-icon>
+ *
+ * <!-- Material Symbols ligature (unchanged) -->
+ * <oscd-icon>edit</oscd-icon>
+ * ```
+ *
  * @tagname oscd-icon
  * @final
  * @suppress {visibility}
@@ -57301,6 +58434,10 @@ let Field$1 = class Field extends i$3 {
         if (wasFloating === shouldBeFloating) {
             return;
         }
+        const keyframes = this.getLabelKeyframes();
+        if (!keyframes.length) {
+            return;
+        }
         this.isAnimating = true;
         this.labelAnimation?.cancel();
         // Only one label is visible at a time for clearer text rendering.
@@ -57315,7 +58452,10 @@ let Field$1 = class Field extends i$3 {
         // Re-calculating the animation each time will prevent any visual glitches
         // from appearing.
         // TODO(b/241113345): use animation tokens
-        this.labelAnimation = this.floatingLabelEl?.animate(this.getLabelKeyframes(), { duration: 150, easing: EASING$1.STANDARD });
+        this.labelAnimation = this.floatingLabelEl?.animate(keyframes, {
+            duration: 150,
+            easing: EASING$1.STANDARD,
+        });
         this.labelAnimation?.addEventListener('finish', () => {
             // At the end of the animation, update the visible label.
             this.isAnimating = false;
@@ -57330,6 +58470,10 @@ let Field$1 = class Field extends i$3 {
         const { x: restingX, y: restingY, height: restingHeight, } = restingLabelEl.getBoundingClientRect();
         const floatingScrollWidth = floatingLabelEl.scrollWidth;
         const restingScrollWidth = restingLabelEl.scrollWidth;
+        // If either label has no dimensions (e.g., display: none), skip animation
+        if (floatingScrollWidth === 0 || restingScrollWidth === 0) {
+            return [];
+        }
         // Scale by width ratio instead of font size since letter-spacing will scale
         // incorrectly. Using the width we can better approximate the adjusted
         // scale and compensate for tracking and overflow.
@@ -57497,7 +58641,7 @@ OscdOutlinedField.styles = [styles$F, styles$G];
  */
 /**
  * @license
- * Copyright 2025 Omicron Energy GmbH
+ * Copyright 2026 OMICRON electronics GmbH
  * SPDX-License-Identifier: Apache-2.0
  */
 /**
@@ -57700,7 +58844,7 @@ OscdSelectionList.styles = i$6 `
 
     oscd-outlined-text-field {
       background-color: var(--md-sys-color-surface, #fef7ff);
-      --oscd-outlined-text-field-container-shape: 32px;
+      --md-outlined-text-field-container-shape: 32px;
       padding: 8px;
     }
 
@@ -58487,7 +59631,7 @@ const styles$D = i$6 `:host{border-start-start-radius:var(--md-dialog-container-
  */
 /**
  * @license
- * Copyright 2025 Omicron Energy GmbH
+ * Copyright 2026 OMICRON electronics GmbH
  * SPDX-License-Identifier: Apache-2.0
  */
 /**
@@ -58610,7 +59754,7 @@ const styles$A = i$6 `md-elevation{transition-duration:280ms}:host(:is([disabled
  */
 /**
  * @license
- * Copyright 2025 Omicron Energy GmbH
+ * Copyright 2026 OMICRON electronics GmbH
  * SPDX-License-Identifier: Apache-2.0
  */
 /**
@@ -58646,621 +59790,6 @@ OscdFilledButton.styles = [
     styles$B,
 ];
 
-const elementIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">
-<path fill="currentColor" d="M9,7H15V9H11V11H15V13H11V15H15V17H9V7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
-</svg>`;
-const attributeIcon = b `<svg viewBox="0 0 24 24">
-<path fill="currentColor" d="M11,7H13A2,2 0 0,1 15,9V17H13V13H11V17H9V9A2,2 0 0,1 11,7M11,9V11H13V9H11M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2Z" />
-</svg>`;
-const contentIcon = b `<svg viewBox="0 0 24 24">
-<path fill="currentColor" d="M11,7H13A2,2 0 0,1 15,9V10H13V9H11V15H13V14H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
-</svg>`;
-
-const editIcon = b `<svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 25 25"
->
-  <path
-    d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z"
-    stroke="currentColor"
-    fill="transparent"
-    stroke-width="1.5"
-    stroke-linecap="round"
-  />
-</svg>`;
-const pathsSVG = {
-    action: b `<path d="M0 0h24v24H0z" fill="none"></path><path d="M13 3c-4.97 0-9
-  4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7
-  7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0
-  9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z" fill="currentColor"></path>`,
-    dAIcon: b `<path fill="currentColor" d="m4.2 0c-2.31 0-4.2 1.89-4.2 4.2v11.6c0 2.31 1.89 4.2 4.2 4.2h18.1c2.31 0 4.2-1.89 4.2-4.2v-11.6c0-2.31-1.89-4.2-4.2-4.2zm0 1.89h18.1c1.29 0 2.3 1.01 2.3 2.3v11.6c0 1.29-1.01 2.31-2.3 2.31h-18.1c-1.29 0-2.3-1.01-2.3-2.31v-11.6c0-1.29 1.01-2.3 2.3-2.3z"/><path fill="currentColor" d="m12.5 9.94q0 1.55-0.509 2.71-0.503 1.15-1.43 1.76-0.923 0.611-2.12 0.611h-3.37v-10h3.02q2.11 0 3.26 1.28 1.15 1.27 1.15 3.65zm-1.76 0q0-1.61-0.698-2.46-0.698-0.852-1.99-0.852h-1.24v6.77h1.48q1.12 0 1.79-0.931 0.663-0.931 0.663-2.53z"/><path fill="currentColor" d="m19.7 15-0.74-2.56h-3.18l-0.74 2.56h-1.75l3.04-10h2.06l3.03 10zm-1.13-4.13-0.823-2.88-0.379-1.46q-0.0947 0.412-0.178 0.739-0.0829 0.327-1.02 3.59z"/>`,
-    dOIcon: b `<path fill="none" stroke="currentColor" stroke-width="1.89" d="m4.2 0.945h18.1c1.8 0 3.25 1.45 3.25 3.25v11.6c0 1.8-1.45 3.25-3.25 3.25h-18.1c-1.8 0-3.25-1.45-3.25-3.25v-11.6c0-1.8 1.45-3.25 3.25-3.25z"/><path d="m12.1 9.94q0 1.55-0.509 2.71-0.503 1.15-1.43 1.76-0.923 0.611-2.12 0.611h-3.37v-10h3.02q2.11 0 3.26 1.28 1.15 1.27 1.15 3.65zm-1.76 0q0-1.61-0.698-2.46-0.698-0.852-1.99-0.852h-1.24v6.77h1.48q1.12 0 1.79-0.931 0.663-0.931 0.663-2.53z"/><path d="m21.6 9.97q0 1.56-0.515 2.75-0.515 1.19-1.47 1.82-0.959 0.625-2.24 0.625-1.97 0-3.08-1.39-1.11-1.39-1.11-3.81 0-2.41 1.11-3.76t3.1-1.35 3.1 1.36q1.12 1.36 1.12 3.74zm-1.78 0q0-1.62-0.639-2.54-0.639-0.923-1.79-0.923-1.17 0-1.81 0.916-0.639 0.909-0.639 2.54 0 1.65 0.651 2.6 0.657 0.945 1.79 0.945 1.17 0 1.81-0.923 0.639-0.923 0.639-2.62z"/>`,
-    enumIcon: b `<path fill="none" stroke="currentColor" stroke-width="1.89" d="m4.2 0.945h18.1c1.8 0 3.25 1.45 3.25 3.25v11.6c0 1.8-1.45 3.25-3.25 3.25h-18.1c-1.8 0-3.25-1.45-3.25-3.25v-11.6c0-1.8 1.45-3.25 3.25-3.25z"/><path d="m5.37 15v-10h6.56v1.62h-4.81v2.51h4.45v1.62h-4.45v2.64h5.06v1.62z"/><path d="m18.5 15-3.63-7.71q0.107 1.12 0.107 1.8v5.9h-1.55v-10h1.99l3.69 7.77q-0.107-1.07-0.107-1.95v-5.82h1.55v10z"/>`,
-    info: b `<path d="M0 0h24v24H0z" fill="none"></path><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor"></path>`,
-    warning: b `<path d="M0 0h24v24H0z" fill="none"></path><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" fill="currentColor"></path>`,
-    error: b `<path d="M0 0h24v24H0V0z" fill="none"></path><path d="M15.73 3H8.27L3 8.27v7.46L8.27 21h7.46L21 15.73V8.27L15.73 3zM19 14.9L14.9 19H9.1L5 14.9V9.1L9.1 5h5.8L19 9.1v5.8z" fill="currentColor"></path><path d="M11 7h2v7h-2z" fill="currentColor"></path><circle cx="12" cy="16" r="1" fill="currentColor"></circle>`,
-    gooseIcon: b `<path fill="currentColor" d="M11,7H15V9H11V15H13V11H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />`,
-    lNIcon: b `<path stroke="currentColor" stroke-width="1.89" fill="none" d="m4.2 0.945h18.1c1.8 0 3.25 1.45 3.25 3.25v11.6c0 1.8-1.45 3.25-3.25 3.25h-18.1c-1.8 0-3.25-1.45-3.25-3.25v-11.6c0-1.8 1.45-3.25 3.25-3.25z"/><path fill="currentColor" d="m5.71 15v-10h1.75v8.39h4.47v1.62z"/><path fill="currentColor" d="m18.2 15-3.63-7.71q0.107 1.12 0.107 1.8v5.9h-1.55v-10h1.99l3.69 7.77q-0.107-1.07-0.107-1.95v-5.82h1.55v10z"/>`,
-    logIcon: b `<path fill="currentColor" d="M9,7H11V15H15V17H9V7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />`,
-    reportIcon: b `<path fill="currentColor" d="M9,7H13A2,2 0 0,1 15,9V11C15,11.84 14.5,12.55 13.76,12.85L15,17H13L11.8,13H11V17H9V7M11,9V11H13V9H11M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12C4,16.41 7.58,20 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />`,
-    smvIcon: b `<path fill="currentColor" d="M11,7H15V9H11V11H13A2,2 0 0,1 15,13V15A2,2 0 0,1 13,17H9V15H13V13H11A2,2 0 0,1 9,11V9A2,2 0 0,1 11,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />`,
-    reset: b ``,
-};
-const gooseIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">${pathsSVG['gooseIcon']}</svg>`;
-const reportIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">${pathsSVG['reportIcon']}</svg>`;
-const smvIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">${pathsSVG['smvIcon']}</svg>`;
-const logIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">${pathsSVG['logIcon']}</svg>`;
-const inputIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">
-<path fill="currentColor" d="M14,12L10,8V11H2V13H10V16M20,18V6C20,4.89 19.1,4 18,4H6A2,2 0 0,0 4,6V9H6V6H18V18H6V15H4V18A2,2 0 0,0 6,20H18A2,2 0 0,0 20,18Z" />
-</svg>`;
-const clientIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">
-<path fill="currentColor" d="M21,14V4H3V14H21M21,2A2,2 0 0,1 23,4V16A2,2 0 0,1 21,18H14L16,21V22H8V21L10,18H3C1.89,18 1,17.1 1,16V4C1,2.89 1.89,2 3,2H21M4,5H15V10H4V5M16,5H20V7H16V5M20,8V13H16V8H20M4,11H9V13H4V11M10,11H15V13H10V11Z" />
-</svg>`;
-const disconnect = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">
-<path fill="currentColor" d="M4,1C2.89,1 2,1.89 2,3V7C2,8.11 2.89,9 4,9H1V11H13V9H10C11.11,9 12,8.11 12,7V3C12,1.89 11.11,1 10,1H4M4,3H10V7H4V3M14,13C12.89,13 12,13.89 12,15V19C12,20.11 12.89,21 14,21H11V23H23V21H20C21.11,21 22,20.11 22,19V15C22,13.89 21.11,13 20,13H14M3.88,13.46L2.46,14.88L4.59,17L2.46,19.12L3.88,20.54L6,18.41L8.12,20.54L9.54,19.12L7.41,17L9.54,14.88L8.12,13.46L6,15.59L3.88,13.46M14,15H20V19H14V15Z" />
-</svg>`;
-const networkConfigIcon = b `<svg
-  xmlns="http://www.w3.org/2000/svg"
-  slot="icon"
-  width="25px"
-  height="25px"
-  style="margin-bottom:0px;"
->
-  <rect
-    width="8"
-    height="8"
-    x="8.5"
-    y="2"
-    rx="1"
-    ry="1"
-    fill="transparent"
-    stroke="currentColor"
-    stroke-width="1.5"
-  />
-  <rect
-    width="8"
-    height="8"
-    x="2.5"
-    y="15"
-    rx="1"
-    ry="1"
-    fill="transparent"
-    stroke="currentColor"
-    stroke-width="1.5"
-  />
-  <rect
-    width="8"
-    height="8"
-    x="15"
-    y="15"
-    rx="1"
-    ry="1"
-    fill="transparent"
-    stroke="currentColor"
-    stroke-width="1.5"
-  />
-
-  <line
-    x1="2"
-    y1="12.5"
-    x2="23"
-    y2="12.5"
-    stroke="currentColor"
-    stroke-linecap="round"
-    stroke-width="1.5"
-  />
-  <line
-    x1="12.5"
-    y1="10"
-    x2="12.5"
-    y2="12.5"
-    stroke="currentColor"
-    stroke-width="1.5"
-  />
-  <line
-    x1="6.5"
-    y1="12.5"
-    x2="6.5"
-    y2="15"
-    stroke="currentColor"
-    stroke-width="1.5"
-  />
-  <line
-    x1="19"
-    y1="12.5"
-    x2="19"
-    y2="15"
-    stroke="currentColor"
-    stroke-width="1.5"
-  />
-</svg>`;
-const zeroLineIcon = b `<svg
-  xmlns="http://www.w3.org/2000/svg"
-  slot="icon"
-  viewBox="0 0 25 25"
->
-  <path
-    d="M 2 9 L 12.5 2 L 23 9 L 21 9 L 21 21 L 4 21 L 4 9 Z"
-    fill="transparent"
-    stroke="currentColor"
-    stroke-width="2"
-    stroke-linejoin="round"
-  />
-  <path
-    d="M 11 7 L 17.5 7 L 13.5 11 L 16.5 11 L 10 19 L 11.5 13 L 8.5 13 Z "
-    fill="currentColor"
-  />
-</svg>`;
-const voltageLevelIcon = b `<svg
-  id="Laag_1"
-  data-name="Laag 1"
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
->
-  <defs>
-    <style>
-      .cls-1 {
-        fill: currentColor;
-      }
-
-      .cls-1,
-      .cls-2 {
-        stroke-width: 0px;
-      }
-
-      .cls-2 {
-        fill: currentColor;
-        opacity: 0;
-      }
-    </style>
-  </defs>
-  <path
-    class="cls-1"
-    d="M11.13,20.06L3.63,6.93c-.27-.48-.11-1.09.37-1.36h0c.48-.27,1.09-.11,1.36.37l6.64,11.61,6.64-11.61c.27-.48.88-.65,1.36-.37h0c.48.27.65.88.37,1.36l-7.5,13.13c-.38.67-1.35.67-1.74,0Z"
-  />
-  <rect class="cls-2" width="24" height="24" />
-</svg>`;
-const bayIcon = b `<svg
-  id="Laag_1"
-  data-name="Laag 1"
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
->
-  <defs>
-    <style>
-      .cls-1 {
-        fill: currentColor;
-        stroke-width: 0px;
-      }
-    </style>
-  </defs>
-  <path
-    class="cls-1"
-    d="M7.75,8c0-.41-.34-.75-.75-.75s-.75.34-.75.75v1.5h-1.25c0,.84.52,1.55,1.25,1.85v8.65h1.5v-8.65c.73-.3,1.25-1.01,1.25-1.85h-1.25v-1.5Z"
-  />
-  <path
-    class="cls-1"
-    d="M12.75,8c0-.41-.34-.75-.75-.75s-.75.34-.75.75v1.5h-1.25c0,.84.52,1.55,1.25,1.85v8.65h1.5v-8.65c.73-.3,1.25-1.01,1.25-1.85h-1.25v-1.5Z"
-  />
-  <path
-    class="cls-1"
-    d="M17.75,8c0-.41-.34-.75-.75-.75s-.75.34-.75.75v1.5h-1.25c0,.84.52,1.55,1.25,1.85v8.65h1.5v-8.65c.73-.3,1.25-1.01,1.25-1.85h-1.25v-1.5Z"
-  />
-  <path
-    class="cls-1"
-    d="M20,4H4c-1.1,0-2,.9-2,2v4c0,1.1.9,2,2,2v-6h16v6c1.1,0,2-.9,2-2v-4c0-1.1-.9-2-2-2Z"
-  />
-</svg>`;
-const disconnectorIcon = b `<svg
-  id="Laag_1"
-  data-name="Laag 1"
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
->
-  <defs>
-    <style>
-      .cls-1 {
-        fill: currentColor;
-      }
-
-      .cls-1,
-      .cls-2 {
-        stroke-width: 0px;
-      }
-
-      .cls-2 {
-        fill: #fff;
-        opacity: 0;
-      }
-    </style>
-  </defs>
-  <g>
-    <path
-      class="cls-1"
-      d="M12.71,15.29l-6.79-6.79c-.39-.39-1.02-.39-1.41,0-.39.39-.39,1.02,0,1.41l6.5,6.5v4.59c0,.55.45,1,1,1s1-.45,1-1v-5c0-.13-.03-.26-.08-.38-.05-.12-.12-.23-.22-.33Z"
-    />
-    <path
-      class="cls-1"
-      d="M14,6h-1v-3c0-.55-.45-1-1-1s-1,.45-1,1v3h-1c-.55,0-1,.45-1,1s.45,1,1,1h4c.55,0,1-.45,1-1s-.45-1-1-1Z"
-    />
-  </g>
-  <rect class="cls-2" width="24" height="24" />
-</svg>`;
-const circuitBreakerIcon = b `<svg
-  id="Laag_1"
-  data-name="Laag 1"
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
->
-  <defs>
-    <style>
-      .cls-1 {
-        fill: currentColor;
-      }
-
-      .cls-1,
-      .cls-2 {
-        stroke-width: 0px;
-      }
-
-      .cls-2 {
-        fill: #fff;
-        opacity: 0;
-      }
-    </style>
-  </defs>
-  <g>
-    <path
-      class="cls-1"
-      d="M12.71,15.29l-6.79-6.79c-.39-.39-1.02-.39-1.41,0-.39.39-.39,1.02,0,1.41l6.5,6.5v4.59c0,.55.45,1,1,1s1-.45,1-1v-5c0-.13-.03-.26-.08-.38-.05-.12-.12-.23-.22-.33Z"
-    />
-    <path
-      class="cls-1"
-      d="M13.41,7l1.29-1.29c.39-.39.39-1.02,0-1.41s-1.02-.39-1.41,0l-1.29,1.29-1.29-1.29c-.39-.39-1.02-.39-1.41,0s-.39,1.02,0,1.41l1.29,1.29-1.29,1.29c-.39.39-.39,1.02,0,1.41.2.2.45.29.71.29s.51-.1.71-.29l1.29-1.29,1.29,1.29c.2.2.45.29.71.29s.51-.1.71-.29c.39-.39.39-1.02,0-1.41l-1.29-1.29Z"
-    />
-  </g>
-  <rect class="cls-2" width="24" height="24" />
-</svg>`;
-const currentTransformerIcon = b `<svg
-  id="Laag_1"
-  data-name="Laag 1"
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
->
-  <defs>
-    <style>
-      .cls-1 {
-        fill: currentColor;
-      }
-
-      .cls-1,
-      .cls-2 {
-        stroke-width: 0px;
-      }
-
-      .cls-2 {
-        fill: #fff;
-        opacity: 0;
-      }
-    </style>
-  </defs>
-  <path
-    class="cls-1"
-    d="M19,12c0-3.53-2.61-6.43-6-6.92v-2.08c0-.55-.45-1-1-1s-1,.45-1,1v2.08c-3.39.49-6,3.39-6,6.92s2.61,6.43,6,6.92v2.08c0,.55.45,1,1,1s1-.45,1-1v-2.08c3.39-.49,6-3.39,6-6.92ZM7,12c0-2.42,1.72-4.44,4-4.9v9.8c-2.28-.46-4-2.48-4-4.9ZM13,16.9V7.1c2.28.46,4,2.48,4,4.9s-1.72,4.44-4,4.9Z"
-  />
-  <rect class="cls-2" width="24" height="24" />
-</svg>`;
-const voltageTransformerIcon = b `<svg
-  id="Laag_1"
-  data-name="Laag 1"
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
->
-  <defs>
-    <style>
-      .cls-1 {
-        fill: currentColor;
-      }
-
-      .cls-1,
-      .cls-2 {
-        stroke-width: 0px;
-      }
-
-      .cls-2 {
-        fill: #fff;
-        opacity: 0;
-      }
-    </style>
-  </defs>
-  <path
-    class="cls-1"
-    d="M17,10c0-2.42-1.72-4.44-4-4.9v-2.1s0-1-1-1-1,1-1,1v2.1c-2.28.46-4,2.48-4,4.9,0,.71.15,1.39.42,2-.27.61-.42,1.29-.42,2,0,2.42,1.72,4.44,4,4.9v1.1h-1c-.55,0-1,.45-1,1s.45,1,1,1h4c.55,0,1-.45,1-1s-.45-1-1-1h-1v-1.1c2.28-.46,4-2.48,4-4.9,0-.71-.15-1.39-.42-2,.27-.61.42-1.29.42-2ZM12,7c1.66,0,3,1.34,3,3,0,0,0,.01,0,.02-.84-.63-1.87-1.02-3-1.02s-2.16.39-3,1.02c0,0,0-.01,0-.02,0-1.66,1.34-3,3-3ZM14.22,12c-.55.61-1.34,1-2.22,1s-1.67-.39-2.22-1c.55-.61,1.34-1,2.22-1s1.67.39,2.22,1ZM12,17c-1.66,0-3-1.34-3-3,0,0,0-.01,0-.02.84.63,1.87,1.02,3,1.02s2.16-.39,3-1.02c0,0,0,.01,0,.02,0,1.66-1.34,3-3,3Z"
-  />
-  <rect class="cls-2" width="24" height="24" />
-</svg>`;
-const earthSwitchIcon = b `<svg
-  id="Laag_1"
-  data-name="Laag 1"
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
->
-  <defs>
-    <style>
-      .cls-1 {
-        fill: currentColor;
-      }
-
-      .cls-1,
-      .cls-2 {
-        stroke-width: 0px;
-      }
-
-      .cls-2 {
-        fill: #fff;
-        opacity: 0;
-      }
-    </style>
-  </defs>
-  <g>
-    <path
-      class="cls-1"
-      d="M13,20h-2c-.55,0-1,.45-1,1s.45,1,1,1h2c.55,0,1-.45,1-1s-.45-1-1-1Z"
-    />
-    <path
-      class="cls-1"
-      d="M15,16h-2v-5c0-.13-.03-.26-.08-.38-.05-.12-.12-.23-.22-.33L5.91,3.5c-.39-.39-1.02-.39-1.41,0-.39.39-.39,1.02,0,1.41l6.5,6.5v4.59h-2c-.55,0-1,.45-1,1s.45,1,1,1h6c.55,0,1-.45,1-1s-.45-1-1-1Z"
-    />
-    <path
-      class="cls-1"
-      d="M10,4h4c.55,0,1-.45,1-1s-.45-1-1-1h-4c-.55,0-1,.45-1,1s.45,1,1,1Z"
-    />
-  </g>
-  <rect class="cls-2" width="24" height="24" />
-</svg>`;
-const generalConductingEquipmentIcon = b `<svg
-  id="Laag_1"
-  data-name="Laag 1"
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
->
-  <defs>
-    <style>
-      .cls-1 {
-        fill: currentColor;
-        stroke-width: 0px;
-      }
-    </style>
-  </defs>
-  <path
-    class="cls-1"
-    d="M20.41,3.59c-.78-.78-2.05-.78-2.83,0-.59.59-.73,1.47-.43,2.19l-1.49,1.49c-1.02-.79-2.29-1.27-3.67-1.27-3.31,0-6,2.69-6,6,0,1.38.48,2.66,1.27,3.67l-1.49,1.49c-.73-.31-1.6-.17-2.19.43-.78.78-.78,2.05,0,2.83.78.78,2.05.78,2.83,0,.59-.59.73-1.47.43-2.19l1.49-1.49c1.02.79,2.29,1.27,3.67,1.27,3.31,0,6-2.69,6-6,0-1.38-.48-2.66-1.27-3.67l1.49-1.49c.73.31,1.6.17,2.19-.43.78-.78.78-2.05,0-2.83ZM12,16c-2.21,0-4-1.79-4-4s1.79-4,4-4,4,1.79,4,4-1.79,4-4,4Z"
-  />
-</svg>`;
-const connectivityNodeIcon = b `<svg
-  xmlns="http://www.w3.org/2000/svg"
->
-  <circle
-    stroke="currentColor"
-    fill="currentColor"
-    stroke-width="1"
-    cx="12.5"
-    cy="12.5"
-    r="5"
-  />
-</svg>`;
-const powerTransformerTwoWindingIcon = b `<svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 25 25"
->
-  <line
-    x1="12.5"
-    y1="2"
-    x2="12.5"
-    y2="5"
-    stroke="currentColor"
-    stroke-width="1.5"
-    stroke-linecap="round"
-  />
-  <circle
-    cx="12.5"
-    cy="10"
-    r="5"
-    stroke="currentColor"
-    fill="transparent"
-    stroke-width="1.5"
-    stroke-linecap="round"
-  />
-  <circle
-    cx="12.5"
-    cy="15"
-    r="5"
-    stroke="currentColor"
-    fill="transparent"
-    stroke-width="1.5"
-    stroke-linecap="round"
-  />
-  <line
-    x1="12.5"
-    y1="20"
-    x2="12.5"
-    y2="23"
-    stroke="currentColor"
-    stroke-width="1.5"
-    stroke-linecap="round"
-  />
-</svg>`;
-const openSCDIcon = b ` <svg
-  xmlns="http://www.w3.org/2000/svg"
-  style="width:100px;height:100px"
-  viewBox="0 0 25 25"
->
-  <path
-    d="M 2 9 L 12.5 2 L 23 9 L 21 9 L 21 21 L 4 21 L 4 9 Z"
-    fill="#eee8d5"
-    stroke="#6c71c4"
-    stroke-width="2"
-    stroke-linejoin="round"
-  />
-  <path
-    d="M 11 7 L 17.5 7 L 13.5 11 L 16.5 11 L 10 19 L 11.5 13 L 8.5 13 Z "
-    fill="#2aa198"
-  />
-</svg>`;
-const sizableSmvIcon = b `
-  <svg viewBox="0 0 24 24">
-    <path fill="currentColor" d="M11,7H15V9H11V11H13A2,2 0 0,1 15,13V15A2,2 0 0,1 13,17H9V15H13V13H11A2,2 0 0,1 9,11V9A2,2 0 0,1 11,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
-  </svg>`;
-const sizableGooseIcon = b `<svg viewBox="0 0 24 24">
-<path fill="currentColor" d="M11,7H15V9H11V15H13V11H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
-</svg>`;
-const substationIcon = b `<svg id="Laag_1" data-name="Laag 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-<defs>
-  <style>
-    .cls-1 {
-      fill: currentColor;
-    }
-
-    .cls-1, .cls-2 {
-      stroke-width: 0px;
-    }
-
-    .cls-2 {
-      fill: currentColor;
-      opacity: 0;
-    }
-  </style>
-</defs>
-<g>
-  <path class="cls-1" d="M19.3,7.94l-6-5.14c-.75-.64-1.85-.65-2.6,0l-6,5.14c-.44.38-.7.93-.7,1.52v9.54c0,1.1.9,2,2,2h12c1.1,0,2-.9,2-2v-9.54c0-.58-.25-1.14-.7-1.52ZM18,19H6v-9.54l6-5.14,6,5.14v9.54Z"/>
-  <path class="cls-1" d="M11.57,7.74l-3,5c-.09.15-.09.35,0,.5.09.16.26.25.44.25h2v3.5c0,.22.15.42.37.48.04.01.09.02.13.02.17,0,.34-.09.43-.24l3-5c.09-.15.09-.35,0-.5-.09-.16-.26-.25-.44-.25h-2v-3.5c0-.22-.15-.42-.37-.48-.22-.06-.45.03-.56.22Z"/>
-</g>
-<rect class="cls-2" y="0" width="24" height="24"/>
-</svg>`;
-const lineIcon = b `<svg id="Laag_1" data-name="Laag 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-<defs>
-  <style>
-    .cls-1 {
-      fill: currentColor;
-    }
-
-    .cls-1, .cls-2 {
-      stroke-width: 0px;
-    }
-
-    .cls-2 {
-      fill: currentColor;
-      opacity: 0;
-    }
-  </style>
-</defs>
-<path class="cls-1" d="M14.39,11.93l-1.39.58v-1.84l2.15-.89c.51-.21.75-.8.54-1.31-.21-.51-.8-.75-1.31-.54l-1.39.58V3c0-.55-.45-1-1-1s-1,.45-1,1v6.33l-2.15.89c-.51.21-.75.8-.54,1.31.21.51.8.75,1.31.54l1.39-.58v1.84l-2.15.89c-.51.21-.75.8-.54,1.31.21.51.8.75,1.31.54l1.39-.58v5.5c0,.55.45,1,1,1s1-.45,1-1v-6.33l2.15-.89c.51-.21.75-.8.54-1.31-.21-.51-.8-.75-1.31-.54Z"/>
-<rect class="cls-2" width="24" height="24"/>
-</svg>`;
-const processIcon = b `<svg id="Laag_1" data-name="Laag 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-<defs>
-  <style>
-    .cls-1 {
-      fill: currentColor;
-    }
-
-    .cls-1, .cls-2 {
-      stroke-width: 0px;
-    }
-
-    .cls-2 {
-      fill: currentColor;
-      opacity: 0;
-    }
-  </style>
-</defs>
-<path class="cls-1" d="M18.71,15.29c-.39-.39-1.02-.39-1.41,0s-.39,1.02,0,1.41l.29.29h-5.59c0-1.1-.9-2-2-2h-2c-1.01,0-1.84.76-1.97,1.74-.61-.34-1.03-.99-1.03-1.74,0-1.1.9-2,2-2h5c0,1.1.9,2,2,2h2c1.1,0,2-.9,2-2v-.14c1.72-.45,3-2,3-3.86,0-2.21-1.79-4-4-4h-5c0-1.1-.9-2-2-2h-2c-1.1,0-2,.9-2,2h-2c-.55,0-1,.45-1,1s.45,1,1,1h2c0,1.1.9,2,2,2h2c1.1,0,2-.9,2-2h5c1.1,0,2,.9,2,2,0,.75-.42,1.39-1.03,1.74-.13-.98-.96-1.74-1.97-1.74h-2c-1.1,0-2,.9-2,2h-5c-2.21,0-4,1.79-4,4,0,1.86,1.28,3.41,3,3.86v.14c0,1.1.9,2,2,2h2c1.1,0,2-.9,2-2h5.59l-.29.29c-.39.39-.39,1.02,0,1.41.2.2.45.29.71.29s.51-.1.71-.29l2-2c.39-.39.39-1.02,0-1.41l-2-2ZM8,7v-2h2v2s-2,0-2,0ZM14,11h2v2s-2,0-2,0v-2ZM8,19v-2h2v2s-2,0-2,0Z"/>
-<rect class="cls-2" y="0" width="24" height="24"/>
-</svg>`;
-const transformerWindingIcon = b `<svg id="Laag_1" data-name="Laag 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-<defs>
-  <style>
-    .cls-1 {
-      fill: currentColor;
-    }
-
-    .cls-1, .cls-2 {
-      stroke-width: 0px;
-    }
-
-    .cls-2 {
-      fill: currentColor;
-      opacity: 0;
-    }
-  </style>
-</defs>
-<g>
-  <path class="cls-1" d="M19,20h-2c-1.21,0-2.18-1.09-1.97-2.34.16-.98,1.09-1.66,2.08-1.66h-.11c.55,0,1-.45,1-1s-.42-.96-.95-.99c.04,0,.08-.01.12-.01h-.17c-1.21,0-2.18-1.09-1.97-2.34.16-.98,1.09-1.66,2.08-1.66h-.11c.55,0,1-.45,1-1s-.42-.96-.95-.99c.04,0,.08-.01.12-.01h-.17c-1.21,0-2.18-1.09-1.97-2.34.16-.98,1.09-1.66,2.08-1.66h1.89c.55,0,1-.45,1-1s-.45-1-1-1h-1.83c-2.09,0-3.95,1.53-4.15,3.61-.13,1.37.44,2.59,1.38,3.41-.76.64-1.28,1.55-1.38,2.59-.13,1.37.44,2.59,1.38,3.41-.76.64-1.28,1.55-1.38,2.59-.23,2.39,1.64,4.39,3.98,4.39h2c.55,0,1-.45,1-1s-.45-1-1-1Z"/>
-  <path class="cls-1" d="M10.98,6.39c.23-2.39-1.64-4.39-3.98-4.39h-2c-.55,0-1,.45-1,1s.45,1,1,1h2c1.21,0,2.18,1.09,1.97,2.34-.16.98-1.09,1.66-2.08,1.66h.11c-.55,0-1,.45-1,1s.42.96.95.99c-.04,0-.08.01-.12.01h.17c1.21,0,2.18,1.09,1.97,2.34-.16.98-1.09,1.66-2.08,1.66h.11c-.55,0-1,.45-1,1,0,.28.11.53.29.71.17.17.4.27.65.28h0s.03.01.05.01c1.21,0,2.18,1.09,1.97,2.34-.16.98-1.09,1.66-2.08,1.66h-1.89c-.55,0-1,.45-1,1s.45,1,1,1h1.83c2.09,0,3.95-1.53,4.15-3.61.13-1.37-.44-2.59-1.38-3.41.76-.64,1.28-1.55,1.38-2.59.13-1.37-.44-2.59-1.38-3.41.76-.64,1.28-1.55,1.38-2.59Z"/>
-  <path class="cls-1" d="M6.83,16h.17s-.03,0-.05-.01c-.04,0-.08.01-.12.01Z"/>
-</g>
-<rect class="cls-2" width="24" height="24"/>
-</svg>`;
-
-const accessPointIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">
-<path fill="currentColor" d="M4.93,4.93C3.12,6.74 2,9.24 2,12C2,14.76 3.12,17.26 4.93,19.07L6.34,17.66C4.89,16.22 4,14.22 4,12C4,9.79 4.89,7.78 6.34,6.34L4.93,4.93M19.07,4.93L17.66,6.34C19.11,7.78 20,9.79 20,12C20,14.22 19.11,16.22 17.66,17.66L19.07,19.07C20.88,17.26 22,14.76 22,12C22,9.24 20.88,6.74 19.07,4.93M7.76,7.76C6.67,8.85 6,10.35 6,12C6,13.65 6.67,15.15 7.76,16.24L9.17,14.83C8.45,14.11 8,13.11 8,12C8,10.89 8.45,9.89 9.17,9.17L7.76,7.76M16.24,7.76L14.83,9.17C15.55,9.89 16,10.89 16,12C16,13.11 15.55,14.11 14.83,14.83L16.24,16.24C17.33,15.15 18,13.65 18,12C18,10.35 17.33,8.85 16.24,7.76M12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12A2,2 0 0,0 12,10Z" />
-</svg>`;
-const serverIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">
-<path fill="currentColor" d="M4,1H20A1,1 0 0,1 21,2V6A1,1 0 0,1 20,7H4A1,1 0 0,1 3,6V2A1,1 0 0,1 4,1M4,9H20A1,1 0 0,1 21,10V14A1,1 0 0,1 20,15H4A1,1 0 0,1 3,14V10A1,1 0 0,1 4,9M4,17H20A1,1 0 0,1 21,18V22A1,1 0 0,1 20,23H4A1,1 0 0,1 3,22V18A1,1 0 0,1 4,17M9,5H10V3H9V5M9,13H10V11H9V13M9,21H10V19H9V21M5,3V5H7V3H5M5,11V13H7V11H5M5,19V21H7V19H5Z" />
-</svg>`;
-const logicalDeviceIcon = b `<svg style="width:24px;height:24px" viewBox="0 0 24 24">
-<path fill="currentColor" d="M13,13H18V15H13M13,9H18V11H13M6.91,7.41L11.5,12L6.91,16.6L5.5,15.18L8.68,12L5.5,8.82M5,3C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3H5Z" />
-</svg>`;
-
-const systemLogicalNode = b `<svg viewBox="0 0 24 24">
-    <path fill="currentColor" d="M9,7H11V15H15V17H9V7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
-</svg>`;
-const automationLogicalNode = b `<svg viewBox="0 0 24 24">
-    <path fill="currentColor" d="M11,7H13A2,2 0 0,1 15,9V17H13V13H11V17H9V9A2,2 0 0,1 11,7M11,9V11H13V9H11M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2Z" />
-</svg>`;
-const controlLogicalNode = b `<svg viewBox="0 0 24 24">
-    <path fill="currentColor" d="M11,7H13A2,2 0 0,1 15,9V10H13V9H11V15H13V14H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
-</svg>`;
-const functionalLogicalNode = b `<svg viewBox="0 0 24 24">
-    <path fill="currentColor" d="M9,7H15V9H11V11H14V13H11V17H9V7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
-</svg>`;
-const generalLogicalNode = b `<svg  viewBox="0 0 24 24">
-    <path fill="currentColor" d="M11,7H15V9H11V15H13V11H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
-</svg>`;
-const interfacingLogicalNode = b `<svg viewBox="0 0 24 24">
-    <path fill="currentColor" d="M14,7V9H13V15H14V17H10V15H11V9H10V7H14M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
-</svg>`;
-const nonElectricalLogicalNode = b `<svg viewBox="0 0 24 24">
-<path fill="currentColor" d="M9,7H11V10.33L13,7H15L12,12L15,17H13L11,13.67V17H9V7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
-</svg>`;
-const measurementLogicalNode = b `<svg viewBox="0 0 24 24">
-    <path fill="currentColor" d="M9,7H15A2,2 0 0,1 17,9V17H15V9H13V16H11V9H9V17H7V9A2,2 0 0,1 9,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
-</svg>`;
-const protectionLogicalNode = b `<svg viewBox="0 0 24 24">
-    <path fill="currentColor" d="M9,7H13A2,2 0 0,1 15,9V11A2,2 0 0,1 13,13H11V17H9V7M11,9V11H13V9H11M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
-</svg>`;
-const qualityLogicalNode = b `<svg  viewBox="0 0 24 24">
-    <path fill="currentColor" d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,7H13A2,2 0 0,1 15,9V15A2,2 0 0,1 13,17V19H11V17A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7M11,9V15H13V9H11Z" />
-</svg>`;
-const protectionRelatedLogicalNode = b `<svg viewBox="0 0 24 24">
-    <path fill="currentColor" d="M9,7H13A2,2 0 0,1 15,9V11C15,11.84 14.5,12.55 13.76,12.85L15,17H13L11.8,13H11V17H9V7M11,9V11H13V9H11M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12C4,16.41 7.58,20 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
-</svg>`;
-const supervisionLogicalNode = b `<svg viewBox="0 0 24 24">
-    <path fill="currentColor" d="M11,7H15V9H11V11H13A2,2 0 0,1 15,13V15A2,2 0 0,1 13,17H9V15H13V13H11A2,2 0 0,1 9,11V9A2,2 0 0,1 11,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
-</svg>`;
-const transformerLogicalNode = b `<svg viewBox="0 0 24 24">
-    <path fill="currentColor" d="M9,7H15V9H13V17H11V9H9V7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
-</svg>`;
-const switchgearLogicalNode = b `<svg viewBox="0 0 24 24">
-    <path fill="currentColor" d="M9,7H11L12,9.5L13,7H15L13,12L15,17H13L12,14.5L11,17H9L11,12L9,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
-</svg>`;
-const powerTransformerLogicalNode = b `<svg viewBox="0 0 24 24">
-    <path fill="currentColor" d="M9,7H11L12,10L13,7H15L13,13V17H11V13L9,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
-</svg>`;
-const furtherPowerSystemEquipmentLogicalNode = b `<svg viewBox="0 0 24 24">
-    <path fill="currentColor" d="M9,7H15V9L11,15H15V17H9V15L13,9H9V7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
-</svg>`;
-
 /**
  * @license
  * Copyright 2022 Google LLC
@@ -59268,111 +59797,9 @@ const furtherPowerSystemEquipmentLogicalNode = b `<svg viewBox="0 0 24 24">
  */
 /**
  * @license
- * Copyright 2025 Omicron Energy GmbH
+ * Copyright 2026 OMICRON electronics GmbH
  * SPDX-License-Identifier: Apache-2.0
  */
-const SCL_ICONS = {
-    // From compare.ts
-    elementIcon: elementIcon,
-    attributeIcon: attributeIcon,
-    contentIcon: contentIcon,
-    // From icons.ts
-    editIcon: editIcon,
-    gooseIcon: gooseIcon,
-    reportIcon: reportIcon,
-    smvIcon: smvIcon,
-    logIcon: logIcon,
-    inputIcon: inputIcon,
-    clientIcon: clientIcon,
-    disconnect: disconnect,
-    networkConfigIcon: networkConfigIcon,
-    zeroLineIcon: zeroLineIcon,
-    voltageLevelIcon: voltageLevelIcon,
-    bayIcon: bayIcon,
-    disconnectorIcon: disconnectorIcon,
-    circuitBreakerIcon: circuitBreakerIcon,
-    currentTransformerIcon: currentTransformerIcon,
-    voltageTransformerIcon: voltageTransformerIcon,
-    earthSwitchIcon: earthSwitchIcon,
-    generalConductingEquipmentIcon: generalConductingEquipmentIcon,
-    connectivityNodeIcon: connectivityNodeIcon,
-    powerTransformerTwoWindingIcon: powerTransformerTwoWindingIcon,
-    openSCDIcon: openSCDIcon,
-    sizableSmvIcon: sizableSmvIcon,
-    sizableGooseIcon: sizableGooseIcon,
-    substationIcon: substationIcon,
-    lineIcon: lineIcon,
-    processIcon: processIcon,
-    transformerWindingIcon: transformerWindingIcon,
-    // From ied-icons.ts
-    accessPointIcon: accessPointIcon,
-    serverIcon: serverIcon,
-    logicalDeviceIcon: logicalDeviceIcon,
-    // From lnode.ts
-    systemLogicalNode: systemLogicalNode,
-    automationLogicalNode: automationLogicalNode,
-    controlLogicalNode: controlLogicalNode,
-    functionalLogicalNode: functionalLogicalNode,
-    generalLogicalNode: generalLogicalNode,
-    interfacingLogicalNode: interfacingLogicalNode,
-    nonElectricalLogicalNode: nonElectricalLogicalNode,
-    measurementLogicalNode: measurementLogicalNode,
-    protectionLogicalNode: protectionLogicalNode,
-    qualityLogicalNode: qualityLogicalNode,
-    protectionRelatedLogicalNode: protectionRelatedLogicalNode,
-    supervisionLogicalNode: supervisionLogicalNode,
-    transformerLogicalNode: transformerLogicalNode,
-    switchgearLogicalNode: switchgearLogicalNode,
-    powerTransformerLogicalNode: powerTransformerLogicalNode,
-    furtherPowerSystemEquipmentLogicalNode: furtherPowerSystemEquipmentLogicalNode,
-    ...Object.keys(pathsSVG).reduce((acc, key) => {
-        acc[key] = pathToSvg(key);
-        return acc;
-    }, {}),
-};
-({
-    DAType: pathToSvg('dAIcon'),
-    DOType: pathToSvg('dOIcon'),
-    EnumType: pathToSvg('enumIcon'),
-    LNodeType: pathToSvg('lNIcon'),
-});
-function pathToSvg(type) {
-    return b `<svg
-    xmlns="http://www.w3.org/2000/svg"
-    height="24"
-    viewBox="0 0 26.5 24"
-    width="24"
-  >
-    ${pathsSVG[type]}
-  </svg> `;
-}
-// export function getFilterIcon(
-//   type: iconType,
-//   state: boolean,
-// ): SVGTemplateResult {
-//   if (type === 'reset') {
-//     return svg``;
-//   }
-//   const height = iconProperties[type]?.height ?? 24;
-//   const width = iconProperties[type]?.width ?? 24;
-//   return svg`<svg
-//     slot="${state ? 'onIcon' : 'offIcon'}"
-//     xmlns="http://www.w3.org/2000/svg"
-//     height="${height}"
-//     viewBox="0 0 ${width} ${height}"
-//     width="${width}"
-//   >
-//     ${icons.pathsSVG[type]}
-//   </svg> `;
-// }
-/**
- * Returns an SVG template result for the given icon name.
- * @param name - The name of the icon to retrieve
- * @returns The SVG template result, or undefined if the icon doesn't exist
- */
-function toSVG(name) {
-    return SCL_ICONS[name];
-}
 /**
  * @tagname oscd-scl-icon
  * @summary SCL icon component.
@@ -59448,7 +59875,7 @@ function isRtl$1(el, shouldCheck = true) {
  * SPDX-License-Identifier: Apache-2.0
  */
 // Separate variable needed for closure.
-const iconButtonBaseClass$1 = mixinDelegatesAria$1(mixinElementInternals$1(i$3));
+const iconButtonBaseClass$1 = mixinDelegatesAria$1(mixinFormSubmitter(mixinFormAssociated$1(mixinElementInternals$1(i$3))));
 /**
  * A button for rendering icons.
  *
@@ -59457,30 +59884,8 @@ const iconButtonBaseClass$1 = mixinDelegatesAria$1(mixinElementInternals$1(i$3))
  * @fires change {Event} Dispatched when a toggle button toggles --bubbles
  */
 let IconButton$1 = class IconButton extends iconButtonBaseClass$1 {
-    get name() {
-        return this.getAttribute('name') ?? '';
-    }
-    set name(name) {
-        this.setAttribute('name', name);
-    }
-    /**
-     * The associated form element with which this element's value will submit.
-     */
-    get form() {
-        return this[internals$1].form;
-    }
-    /**
-     * The labels this element is associated with.
-     */
-    get labels() {
-        return this[internals$1].labels;
-    }
     constructor() {
         super();
-        /**
-         * Disables the icon button and makes it non-interactive.
-         */
-        this.disabled = false;
         /**
          * "Soft-disables" the icon button (disabled but still focusable).
          *
@@ -59522,20 +59927,32 @@ let IconButton$1 = class IconButton extends iconButtonBaseClass$1 {
          * icon is provided.
          */
         this.selected = false;
-        /**
-         * The default behavior of the button. May be "button", "reset", or "submit"
-         * (default).
-         */
-        this.type = 'submit';
-        /**
-         * The value added to a form with the button's name when the button submits a
-         * form.
-         */
-        this.value = '';
         this.flipIcon = isRtl$1(this, this.flipIconInRtl);
-        {
-            this.addEventListener('click', this.handleClick.bind(this));
-        }
+        setupDispatchHooks$1(this, 'click');
+        this.addEventListener('click', (event) => {
+            // If the button is soft-disabled or a disabled link, we need to
+            // explicitly prevent the click from propagating to other event listeners
+            // as well as prevent the default action. This is because the underlying
+            // `<button>` or `<a>` element is not actually `:disabled`.
+            if (this.softDisabled || (this.disabled && this.href)) {
+                event.stopImmediatePropagation();
+                event.preventDefault();
+                return;
+            }
+            // Save current selected state to toggle, since an external event listener
+            // may also change the selected state on click.
+            const wasSelected = this.selected;
+            afterDispatch$1(event, () => {
+                if (!this.toggle || this.disabled || event.defaultPrevented) {
+                    return;
+                }
+                this.selected = !wasSelected;
+                this.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }));
+                // Bubbles but does not compose to mimic native browser <input> & <select>
+                // Additionally, native change event is not an InputEvent.
+                this.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+        });
     }
     willUpdate() {
         // Link buttons cannot be disabled or soft-disabled.
@@ -59565,8 +59982,7 @@ let IconButton$1 = class IconButton extends iconButtonBaseClass$1 {
         aria-expanded="${(!this.href && ariaExpanded) || E}"
         aria-pressed="${ariaPressedValue}"
         aria-disabled=${(!this.href && this.softDisabled) || E}
-        ?disabled="${!this.href && this.disabled}"
-        @click="${this.handleClickOnChild}">
+        ?disabled="${!this.href && this.disabled}">
         ${this.renderFocusRing()}
         ${this.renderRipple()}
         ${!this.selected ? this.renderIcon() : E}
@@ -59624,50 +60040,12 @@ let IconButton$1 = class IconButton extends iconButtonBaseClass$1 {
         this.flipIcon = isRtl$1(this, this.flipIconInRtl);
         super.connectedCallback();
     }
-    /** Handles a click on this element. */
-    handleClick(event) {
-        // If the icon button is soft-disabled, we need to explicitly prevent the
-        // click from propagating to other event listeners as well as prevent the
-        // default action.
-        if (!this.href && this.softDisabled) {
-            event.stopImmediatePropagation();
-            event.preventDefault();
-            return;
-        }
-    }
-    /**
-     * Handles a click on the child <div> or <button> element within this
-     * element's shadow DOM.
-     */
-    async handleClickOnChild(event) {
-        // Allow the event to propagate
-        await 0;
-        if (!this.toggle ||
-            this.disabled ||
-            this.softDisabled ||
-            event.defaultPrevented) {
-            return;
-        }
-        this.selected = !this.selected;
-        this.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }));
-        // Bubbles but does not compose to mimic native browser <input> & <select>
-        // Additionally, native change event is not an InputEvent.
-        this.dispatchEvent(new Event('change', { bubbles: true }));
-    }
 };
-(() => {
-    setupFormSubmitter$1(IconButton$1);
-})();
-/** @nocollapse */
-IconButton$1.formAssociated = true;
 /** @nocollapse */
 IconButton$1.shadowRootOptions = {
     mode: 'open',
     delegatesFocus: true,
 };
-__decorate([
-    n$3({ type: Boolean, reflect: true })
-], IconButton$1.prototype, "disabled", void 0);
 __decorate([
     n$3({ type: Boolean, attribute: 'soft-disabled', reflect: true })
 ], IconButton$1.prototype, "softDisabled", void 0);
@@ -59692,12 +60070,6 @@ __decorate([
 __decorate([
     n$3({ type: Boolean, reflect: true })
 ], IconButton$1.prototype, "selected", void 0);
-__decorate([
-    n$3()
-], IconButton$1.prototype, "type", void 0);
-__decorate([
-    n$3({ reflect: true })
-], IconButton$1.prototype, "value", void 0);
 __decorate([
     r$1()
 ], IconButton$1.prototype, "flipIcon", void 0);
@@ -59727,7 +60099,7 @@ const styles$y = i$6 `:host{--_disabled-icon-color: var(--md-icon-button-disable
  */
 /**
  * @license
- * Copyright 2025 Omicron Energy GmbH
+ * Copyright 2026 OMICRON electronics GmbH
  * SPDX-License-Identifier: Apache-2.0
  */
 /**
@@ -59826,10 +60198,6 @@ OscdFilterButton.scopedElements = {
 };
 OscdFilterButton.styles = i$6 `
     ${OscdSelectionList.styles}
-    oscd-icon-button {
-      color: var(--mdc-theme-on-surface);
-    }
-
     oscd-dialog {
       max-height: calc(100vh - 150px);
     }
@@ -60020,12 +60388,12 @@ function closestTo(node, selector) {
  * @slot action - Places element in <nav/> section.
  * @slot icon - Action Pane Icon.
  * @slot - The default slot will be rendered into the pane body in a single column.
- * @cssprop [--oscd-action-pane-theme-primary=var(--md-sys-color-primary)] - Color for border on even levels.
- * @cssprop [--oscd-action-pane-theme-on-primary=var(--md-sys-color-on)-primary] - Pane color for the uneven levels.
- * @cssprop [--oscd-action-pane-theme-secondary=var(--md-sys-color-secondary)] - Color for border on uneven levels.
- * @cssprop [--oscd-action-pane-theme-surface=var(--md-sys-color-surface)] - Pane color for the even levels.
- * @cssprop [--oscd-action-pane-theme-on-surface=var(--md-sys-color-on-surface)] - Icon and label color.
- * @cssprop [--oscd-action-pane-theme-font=var(--md-sys-color-font)] - Font for label.
+ * @cssprop [--oscd-action-pane-container-color=var(--md-sys-color-surface, #fef7ff)] - Pane background.
+ * @cssprop [--oscd-action-pane-contrasted-container-color=var(--md-sys-color-on-primary, #fff)] - Background on even nesting levels.
+ * @cssprop [--oscd-action-pane-outline-color=var(--md-sys-color-primary, #6750a4)] - Pane outline.
+ * @cssprop [--oscd-action-pane-secondary-outline-color=var(--md-sys-color-secondary, #625b71)] - Outline when secondary.
+ * @cssprop [--oscd-action-pane-headline-color=var(--md-sys-color-on-surface, #1d1b20)] - Heading text color.
+ * @cssprop [--oscd-action-pane-headline-font-family=var(--md-ref-typeface-plain, Roboto)] - Heading font.
  *
  * @summary A responsive container rendering actions in a header.
  * @tag oscd-action-pane
@@ -60056,9 +60424,7 @@ class OscdActionPane extends ScopedElementsMixin(i$3) {
     renderHeader() {
         const content = x `<span
         ><slot name="icon"
-          >${this.icon
-            ? x `<oscd-icon>${this.icon}</oscd-icon>`
-            : E}</slot
+          >${this.icon ? x `<oscd-icon>${this.icon}</oscd-icon>` : E}</slot
         ></span
       >
       ${this.label ?? E}
@@ -60087,12 +60453,14 @@ class OscdActionPane extends ScopedElementsMixin(i$3) {
             contrasted: this.resolvedLevel % 2 === 0,
         })}"
     >
+      <oscd-elevation></oscd-elevation>
       ${this.renderHeader()}
       <div><slot></slot></div>
     </section>`;
     }
 }
 OscdActionPane.scopedElements = {
+    'oscd-elevation': OscdElevation,
     'oscd-icon': OscdIcon,
 };
 OscdActionPane.styles = i$6 `
@@ -60101,34 +60469,31 @@ OscdActionPane.styles = i$6 `
     }
 
     :host(:focus-within) section {
-      /* TODO consider using oscd-elevation instead */
-      box-shadow:
-        0 8px 10px 1px rgba(0, 0, 0, 0.14),
-        0 3px 14px 2px rgba(0, 0, 0, 0.12),
-        0 5px 5px -3px rgba(0, 0, 0, 0.2);
+      --md-elevation-level: 3;
       outline-width: 1px;
       transition: all 250ms linear;
     }
 
     section {
+      position: relative;
       background-color: var(
-        --oscd-action-pane-theme-surface,
-        var(--md-sys-color-surface)
+        --oscd-action-pane-container-color,
+        var(--md-sys-color-surface, #fef7ff)
       );
       transition: all 200ms linear;
       outline-style: solid;
       margin: 0px;
       outline-width: 0px;
       outline-color: var(
-        --oscd-action-pane-theme-primary,
-        var(--md-sys-color-primary)
+        --oscd-action-pane-outline-color,
+        var(--md-sys-color-primary, #6750a4)
       );
     }
 
     section.secondary {
       outline-color: var(
-        --oscd-action-pane-theme-secondary,
-        var(--md-sys-color-secondary)
+        --oscd-action-pane-secondary-outline-color,
+        var(--md-sys-color-secondary, #625b71)
       );
     }
 
@@ -60151,8 +60516,8 @@ OscdActionPane.styles = i$6 `
 
     .contrasted {
       background-color: var(
-        --oscd-action-pane-theme-on-primary,
-        var(--oscd-base2)
+        --oscd-action-pane-contrasted-container-color,
+        var(--md-sys-color-on-primary, #fff)
       );
     }
 
@@ -60161,10 +60526,13 @@ OscdActionPane.styles = i$6 `
     h3,
     h4 {
       color: var(
-        --oscd-action-pane-theme-on-surface,
-        var(--md-sys-color-on-surface)
+        --oscd-action-pane-headline-color,
+        var(--md-sys-color-on-surface, #1d1b20)
       );
-      font-family: var(--oscd-action-pane-theme-font, var(--oscd-text-font));
+      font-family: var(
+        --oscd-action-pane-headline-font-family,
+        var(--md-ref-typeface-plain, Roboto)
+      );
       font-weight: 300;
       overflow: clip visible;
       white-space: nowrap;
@@ -85991,7 +86359,7 @@ OscdFilledField.styles = [styles$F, styles$w];
  */
 /**
  * @license
- * Copyright 2025 Omicron Energy GmbH
+ * Copyright 2026 OMICRON electronics GmbH
  * SPDX-License-Identifier: Apache-2.0
  */
 /**
@@ -88486,9 +88854,11 @@ let Select$1 = class Select extends selectBaseClass$1 {
         selectedOptions.forEach(([option]) => {
             if (item !== option) {
                 option.selected = false;
+                option.tabIndex = -1;
             }
         });
         item.selected = true;
+        item.tabIndex = 0;
         return this.updateValueAndDisplayText();
     }
     /**
@@ -88692,7 +89062,7 @@ const styles$t = i$6 `:host{--md-elevation-level: var(--md-menu-container-elevat
  */
 /**
  * @license
- * Copyright 2025 Omicron Energy GmbH
+ * Copyright 2026 OMICRON electronics GmbH
  * SPDX-License-Identifier: Apache-2.0
  */
 class InternalMenu extends Menu$1 {
@@ -88762,7 +89132,7 @@ OscdMenu.styles = [styles$t];
  */
 /**
  * @license
- * Copyright 2025 Omicron Energy GmbH
+ * Copyright 2026 OMICRON electronics GmbH
  * SPDX-License-Identifier: Apache-2.0
  */
 class InternalFilledSelect extends FilledSelect {
@@ -89258,7 +89628,7 @@ __decorate([
  */
 /**
  * @license
- * Copyright 2025 Omicron Energy GmbH
+ * Copyright 2026 OMICRON electronics GmbH
  * SPDX-License-Identifier: Apache-2.0
  */
 /**
@@ -92744,7 +93114,7 @@ MdCheckbox.styles = [styles$p];
 /**
  * A symbol used to access dispatch hooks on an event.
  */
-const dispatchHooks$1 = Symbol('dispatchHooks');
+const dispatchHooks = Symbol('dispatchHooks');
 /**
  * Add a hook for an event that is called after the event is dispatched and
  * propagates to other event listeners.
@@ -92800,8 +93170,8 @@ const dispatchHooks$1 = Symbol('dispatchHooks');
  * @param event The event to add a hook to.
  * @param callback A hook that is called after the event finishes dispatching.
  */
-function afterDispatch$1(event, callback) {
-    const hooks = event[dispatchHooks$1];
+function afterDispatch(event, callback) {
+    const hooks = event[dispatchHooks];
     if (!hooks) {
         throw new Error(`'${event.type}' event needs setupDispatchHooks().`);
     }
@@ -92812,7 +93182,7 @@ function afterDispatch$1(event, callback) {
  * set up. Used to ensure we don't set up multiple hook listeners on the same
  * element for the same event.
  */
-const ELEMENT_DISPATCH_HOOK_TYPES$1 = new WeakMap();
+const ELEMENT_DISPATCH_HOOK_TYPES = new WeakMap();
 /**
  * Sets up an element to add dispatch hooks to given event types. This must be
  * called before adding any event listeners that need to use dispatch hooks
@@ -92836,11 +93206,11 @@ const ELEMENT_DISPATCH_HOOK_TYPES$1 = new WeakMap();
  * @param element The element to set up event dispatch hooks for.
  * @param eventTypes The event types to add dispatch hooks to.
  */
-function setupDispatchHooks$1(element, ...eventTypes) {
-    let typesAlreadySetUp = ELEMENT_DISPATCH_HOOK_TYPES$1.get(element);
+function setupDispatchHooks(element, ...eventTypes) {
+    let typesAlreadySetUp = ELEMENT_DISPATCH_HOOK_TYPES.get(element);
     if (!typesAlreadySetUp) {
         typesAlreadySetUp = new Set();
-        ELEMENT_DISPATCH_HOOK_TYPES$1.set(element, typesAlreadySetUp);
+        ELEMENT_DISPATCH_HOOK_TYPES.set(element, typesAlreadySetUp);
     }
     for (const eventType of eventTypes) {
         // Don't register multiple dispatch hook listeners. A second registration
@@ -92866,7 +93236,7 @@ function setupDispatchHooks$1(element, ...eventTypes) {
             ]);
             // Add hooks onto the event.
             const hooks = new EventTarget();
-            eventCopy[dispatchHooks$1] = hooks;
+            eventCopy[dispatchHooks] = hooks;
             // Re-dispatch the event. We can't reuse `redispatchEvent()` since we
             // need to add the hooks to the copy before it's dispatched.
             isRedispatching = true;
@@ -92940,9 +93310,9 @@ let Switch$1 = class Switch extends switchBaseClass$1 {
         });
         // Add the aria keyboard interaction pattern for switch and the Enter key.
         // See https://www.w3.org/WAI/ARIA/apg/patterns/switch/.
-        setupDispatchHooks$1(this, 'keydown');
+        setupDispatchHooks(this, 'keydown');
         this.addEventListener('keydown', (event) => {
-            afterDispatch$1(event, () => {
+            afterDispatch(event, () => {
                 const ignoreEvent = event.defaultPrevented || event.key !== 'Enter';
                 if (ignoreEvent || this.disabled || !this.input) {
                     return;
@@ -130111,7 +130481,7 @@ __decorate([
  */
 /**
  * @license
- * Copyright 2025 Omicron Energy GmbH
+ * Copyright 2026 OMICRON electronics GmbH
  * SPDX-License-Identifier: Apache-2.0
  */
 /**
@@ -130137,157 +130507,6 @@ OscdMenuItem.scopedElements = {
     'md-focus-ring': OscdFocusRing,
 };
 OscdMenuItem.styles = [styles$s];
-
-/**
- * @license
- * Copyright 2023 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-/**
- * A symbol used to access dispatch hooks on an event.
- */
-const dispatchHooks = Symbol('dispatchHooks');
-/**
- * Add a hook for an event that is called after the event is dispatched and
- * propagates to other event listeners.
- *
- * This is useful for behaviors that need to check if an event is canceled.
- *
- * The callback is invoked synchronously, which allows for better integration
- * with synchronous platform APIs (like `<form>` or `<label>` clicking).
- *
- * Note: `setupDispatchHooks()` must be called on the element before adding any
- * other event listeners. Call it in the constructor of an element or
- * controller.
- *
- * @example
- * ```ts
- * class MyControl extends LitElement {
- *   constructor() {
- *     super();
- *     setupDispatchHooks(this, 'click');
- *     this.addEventListener('click', event => {
- *       afterDispatch(event, () => {
- *         if (event.defaultPrevented) {
- *           return
- *         }
- *
- *         // ... perform logic
- *       });
- *     });
- *   }
- * }
- * ```
- *
- * @example
- * ```ts
- * class MyController implements ReactiveController {
- *   constructor(host: ReactiveElement) {
- *     // setupDispatchHooks() may be called multiple times for the same
- *     // element and events, making it safe for multiple controllers to use it.
- *     setupDispatchHooks(host, 'click');
- *     host.addEventListener('click', event => {
- *       afterDispatch(event, () => {
- *         if (event.defaultPrevented) {
- *           return;
- *         }
- *
- *         // ... perform logic
- *       });
- *     });
- *   }
- * }
- * ```
- *
- * @param event The event to add a hook to.
- * @param callback A hook that is called after the event finishes dispatching.
- */
-function afterDispatch(event, callback) {
-    const hooks = event[dispatchHooks];
-    if (!hooks) {
-        throw new Error(`'${event.type}' event needs setupDispatchHooks().`);
-    }
-    hooks.addEventListener('after', callback);
-}
-/**
- * A lookup map of elements and event types that have a dispatch hook listener
- * set up. Used to ensure we don't set up multiple hook listeners on the same
- * element for the same event.
- */
-const ELEMENT_DISPATCH_HOOK_TYPES = new WeakMap();
-/**
- * Sets up an element to add dispatch hooks to given event types. This must be
- * called before adding any event listeners that need to use dispatch hooks
- * like `afterDispatch()`.
- *
- * This function is safe to call multiple times with the same element or event
- * types. Call it in the constructor of elements, mixins, and controllers to
- * ensure it is set up before external listeners.
- *
- * @example
- * ```ts
- * class MyControl extends LitElement {
- *   constructor() {
- *     super();
- *     setupDispatchHooks(this, 'click');
- *     this.addEventListener('click', this.listenerUsingAfterDispatch);
- *   }
- * }
- * ```
- *
- * @param element The element to set up event dispatch hooks for.
- * @param eventTypes The event types to add dispatch hooks to.
- */
-function setupDispatchHooks(element, ...eventTypes) {
-    let typesAlreadySetUp = ELEMENT_DISPATCH_HOOK_TYPES.get(element);
-    if (!typesAlreadySetUp) {
-        typesAlreadySetUp = new Set();
-        ELEMENT_DISPATCH_HOOK_TYPES.set(element, typesAlreadySetUp);
-    }
-    for (const eventType of eventTypes) {
-        // Don't register multiple dispatch hook listeners. A second registration
-        // would lead to the second listener re-dispatching a re-dispatched event,
-        // which can cause an infinite loop inside the other one.
-        if (typesAlreadySetUp.has(eventType)) {
-            continue;
-        }
-        // When we re-dispatch the event, it's going to immediately trigger this
-        // listener again. Use a flag to ignore it.
-        let isRedispatching = false;
-        element.addEventListener(eventType, (event) => {
-            if (isRedispatching) {
-                return;
-            }
-            // Do not let the event propagate to any other listener (not just
-            // bubbling listeners with `stopPropagation()`).
-            event.stopImmediatePropagation();
-            // Make a copy.
-            const eventCopy = Reflect.construct(event.constructor, [
-                event.type,
-                event,
-            ]);
-            // Add hooks onto the event.
-            const hooks = new EventTarget();
-            eventCopy[dispatchHooks] = hooks;
-            // Re-dispatch the event. We can't reuse `redispatchEvent()` since we
-            // need to add the hooks to the copy before it's dispatched.
-            isRedispatching = true;
-            const dispatched = element.dispatchEvent(eventCopy);
-            isRedispatching = false;
-            if (!dispatched) {
-                event.preventDefault();
-            }
-            // Synchronously call afterDispatch() hooks.
-            hooks.dispatchEvent(new Event('after'));
-        }, {
-            // Ensure this listener runs before other listeners.
-            // `setupDispatchHooks()` should be called in constructors to also
-            // ensure they run before any other externally-added capture listeners.
-            capture: true,
-        });
-        typesAlreadySetUp.add(eventType);
-    }
-}
 
 /**
  * @license
@@ -130342,9 +130561,9 @@ class Switch extends switchBaseClass {
         });
         // Add the aria keyboard interaction pattern for switch and the Enter key.
         // See https://www.w3.org/WAI/ARIA/apg/patterns/switch/.
-        setupDispatchHooks(this, 'keydown');
+        setupDispatchHooks$1(this, 'keydown');
         this.addEventListener('keydown', (event) => {
-            afterDispatch(event, () => {
+            afterDispatch$1(event, () => {
                 const ignoreEvent = event.defaultPrevented || event.key !== 'Enter';
                 if (ignoreEvent || this.disabled || !this.input) {
                     return;
@@ -130507,7 +130726,7 @@ const styles = i$6 `@layer styles, hcm;@layer styles{:host{display:inline-flex;o
  */
 /**
  * @license
- * Copyright 2025 Omicron Energy GmbH
+ * Copyright 2026 OMICRON electronics GmbH
  * SPDX-License-Identifier: Apache-2.0
  */
 /**
@@ -131672,9 +131891,7 @@ class OscdSclCheckbox extends ScopedElementsMixin(i$3) {
         <div class="input container">
           <label
             class="input element"
-            style="${this.disabled || this.isNull
-            ? `color:rgba(0, 0, 0, 0.38)`
-            : ``}"
+            style="${this.disabled || this.isNull ? `color:rgba(0, 0, 0, 0.38)` : ``}"
           >
             <oscd-checkbox
               touch-target="wrapper"
@@ -133945,6 +134162,7 @@ OscdEditorIED.styles = i$6 `
     }
     :host {
       position: relative;
+      --oscd-action-pane-contrasted-container-color: var(--oscd-base2);
     }
 
     .header,
@@ -133974,10 +134192,6 @@ OscdEditorIED.styles = i$6 `
       margin-left: auto;
       padding-right: 12px;
       min-width: 0;
-    }
-
-    oscd-action-pane {
-      --oscd-action-pane-theme-on-primary: var(--oscd-base2);
     }
   `;
 __decorate([
