@@ -240,7 +240,7 @@ describe('dai-value-create-dialog', () => {
       valElements.length,
       'Number of Val elements does not match numberOfSGs',
     ).to.equal(numberOfSGs);
-    valElements.forEach(valEl => {
+    valElements.forEach((valEl) => {
       const sGroup = valEl.getAttribute('sGroup');
       const value = valEl.textContent?.trim();
       expect(value).to.equal((Number(sGroup) * 10).toString());

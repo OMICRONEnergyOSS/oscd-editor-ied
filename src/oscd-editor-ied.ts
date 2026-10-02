@@ -6,6 +6,7 @@ import {
   css,
   nothing,
 } from 'lit';
+import { oscdMd3Mappings } from '@omicronenergy/oscd-ui/oscd-md3-mappings.js';
 import { property, query, state } from 'lit/decorators.js';
 import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
 import { OscdListItem } from '@omicronenergy/oscd-ui/list/OscdListItem.js';
@@ -120,10 +121,10 @@ export class OscdEditorIED extends ScopedElementsMixin(LitElement) {
   private get iedList(): Element[] {
     const ieds = this.doc
       ? Array.from(this.doc.querySelectorAll(':root > IED')).sort((a, b) =>
-          compareNames(a, b),
-        )
+        compareNames(a, b),
+      )
       : [];
-    ieds.forEach(ied => {
+    ieds.forEach((ied) => {
       this.iedMap[ied.getAttribute('name') || ''] = ied;
     });
     return ieds;
@@ -136,7 +137,7 @@ export class OscdEditorIED extends ScopedElementsMixin(LitElement) {
     if (currentIed) {
       return Array.from(currentIed.querySelectorAll('LN0, LN'))
         .filter(element => element.hasAttribute('lnClass'))
-        .filter(element => {
+        .filter((element) => {
           const lnClass = element.getAttribute('lnClass') ?? '';
           if (uniqueLNClassList.includes(lnClass)) {
             return false;
@@ -407,12 +408,13 @@ export class OscdEditorIED extends ScopedElementsMixin(LitElement) {
     </div>`;
   }
 
-  static styles = css`
-    * {
+  static styles = [
+    oscdMd3Mappings,
+    css`
+    :host {
       /* patch theme colors defined in shell until we can correct them */
       --md-icon-button-disabled-icon-color: var(--oscd-base00);
-    }
-    :host {
+
       position: relative;
       --oscd-action-pane-contrasted-container-color: var(--oscd-base2);
     }
@@ -445,5 +447,5 @@ export class OscdEditorIED extends ScopedElementsMixin(LitElement) {
       padding-right: 12px;
       min-width: 0;
     }
-  `;
+  `];
 }

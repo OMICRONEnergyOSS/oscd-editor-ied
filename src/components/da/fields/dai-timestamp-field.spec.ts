@@ -33,7 +33,7 @@ describe('dai-timestamp-field', () => {
     );
 
     let lastDetail: unknown = null;
-    field.addEventListener('change', event => {
+    field.addEventListener('change', (event) => {
       lastDetail = (event as CustomEvent).detail;
     });
 
@@ -61,7 +61,7 @@ describe('dai-timestamp-field', () => {
     );
 
     let lastDetail: unknown = null;
-    field.addEventListener('change', event => {
+    field.addEventListener('change', (event) => {
       lastDetail = (event as CustomEvent).detail;
     });
 

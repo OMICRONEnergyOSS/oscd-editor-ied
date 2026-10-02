@@ -139,8 +139,8 @@ export class DOContainer extends ScopedElementsMixin(BaseContainer) {
           : nothing}
         ${this.expanded
           ? daElements.map(
-              daElement =>
-                html`<da-container
+            daElement =>
+              html`<da-container
                   .docVersion=${this.docVersion}
                   .doc=${this.doc}
                   .element=${daElement}
@@ -151,12 +151,12 @@ export class DOContainer extends ScopedElementsMixin(BaseContainer) {
                   .nsdoc=${this.nsdoc}
                   .ancestors=${[...this.ancestors, this.element]}
                 ></da-container>`,
-            )
+          )
           : nothing}
         ${this.expanded
           ? doElements.map(
-              doElement =>
-                html`<do-container
+            doElement =>
+              html`<do-container
                   .docVersion=${this.docVersion}
                   .doc=${this.doc}
                   .element=${doElement}
@@ -164,7 +164,7 @@ export class DOContainer extends ScopedElementsMixin(BaseContainer) {
                   .nsdoc=${this.nsdoc}
                   .ancestors=${[...this.ancestors, this.element]}
                 ></do-container>`,
-            )
+          )
           : nothing}
       </oscd-action-pane>
       <do-info-dialog

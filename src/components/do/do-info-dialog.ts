@@ -35,15 +35,15 @@ export function buildDoInfoGroups({
     [
       ...(detailed
         ? [
-            {
-              label: 'NSDoc description',
-              value: templateElement
-                ? nsdoc.getDataDescription(templateElement, ancestors).label
-                : MISSING_VALUE,
-              multiline: true,
-              rows: 3,
-            },
-          ]
+          {
+            label: 'NSDoc description',
+            value: templateElement
+              ? nsdoc.getDataDescription(templateElement, ancestors).label
+              : MISSING_VALUE,
+            multiline: true,
+            rows: 3,
+          },
+        ]
         : []),
       {
         label: 'Data object name',
@@ -51,11 +51,11 @@ export function buildDoInfoGroups({
       },
       ...(detailed
         ? [
-            {
-              label: 'Data object description',
-              value: instanceElement?.getAttribute('desc') ?? MISSING_VALUE,
-            },
-          ]
+          {
+            label: 'Data object description',
+            value: instanceElement?.getAttribute('desc') ?? MISSING_VALUE,
+          },
+        ]
         : []),
       {
         label: 'Data object common data class',

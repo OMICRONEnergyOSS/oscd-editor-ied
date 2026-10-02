@@ -89,7 +89,7 @@ export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
 
   private getLnElements(): Element[] {
     return Array.from(this.element.querySelectorAll(':scope > LN,LN0')).filter(
-      element => {
+      (element) => {
         const lnClass = element.getAttribute('lnClass') ?? '';
         return this.selectedLNClasses.includes(lnClass);
       },
@@ -138,15 +138,15 @@ export class LDeviceContainer extends ScopedElementsMixin(BaseContainer) {
         <div id="lnContainer">
           ${this.expanded
             ? lnElements.map(
-                ln =>
-                  html`<ln-container
+              ln =>
+                html`<ln-container
                     .docVersion=${this.docVersion}
                     .doc=${this.doc}
                     .element=${ln}
                     .nsdoc=${this.nsdoc}
                     .ancestors=${[...this.ancestors, this.element]}
                   ></ln-container> `,
-              )
+            )
             : nothing}
         </div> </oscd-action-pane
       ><oscd-scl-dialogs></oscd-scl-dialogs>`;

@@ -170,8 +170,8 @@ export function planInstanceInitialization(
       subtree.getAttribute('name') === targetInstanceNameAttr
         ? subtree
         : subtree.querySelector(
-            `${targetInstanceTagName}[name="${targetInstanceNameAttr}"]`,
-          );
+          `${targetInstanceTagName}[name="${targetInstanceNameAttr}"]`,
+        );
     if (!instanceElement) {
       throw new Error(
         'Instance initialization planning error: initialized subtree has no instance tip',

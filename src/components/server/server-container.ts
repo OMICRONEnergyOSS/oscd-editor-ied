@@ -89,10 +89,10 @@ export class ServerContainer extends ScopedElementsMixin(BaseContainer) {
 
   private getLDeviceElements(): Element[] {
     return Array.from(this.element.querySelectorAll(':scope > LDevice')).filter(
-      element => {
+      (element) => {
         return (
           Array.from(element.querySelectorAll(':scope > LN,LN0')).filter(
-            element => {
+            (element) => {
               const lnClass = element.getAttribute('lnClass') ?? '';
               return this.selectedLNClasses.includes(lnClass);
             },

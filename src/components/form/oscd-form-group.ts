@@ -1,7 +1,7 @@
 import { LitElement, html, css } from 'lit';
 
 export class OscdFormGroup extends LitElement {
-  // eslint-disable-next-line class-methods-use-this
+   
   render() {
     return html`<slot></slot>`;
   }

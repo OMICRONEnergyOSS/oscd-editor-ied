@@ -223,10 +223,10 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
 
     return hasInstantiatedVal
       ? getValueElements(element).map(val =>
-          renderValueRow(getValueDisplayString(val), bType, 'edit', () =>
-            this.openEditDialog(val, 1),
-          ),
-        )
+        renderValueRow(getValueDisplayString(val), bType, 'edit', () =>
+          this.openEditDialog(val, 1),
+        ),
+      )
       : [renderValueRow('\u00A0', bType, 'add', this.openCreateDialog)];
   }
 
@@ -273,8 +273,8 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
           : html`${this.renderValueSection()}`}
         ${this.expanded && bType === 'Struct'
           ? this.getBDAElements().map(
-              bdaElement =>
-                html`<da-container
+            bdaElement =>
+              html`<da-container
                   .docVersion=${this.docVersion}
                   .doc=${this.doc}
                   .element=${bdaElement}
@@ -286,7 +286,7 @@ export class DAContainer extends ScopedElementsMixin(BaseContainer) {
                   .ancestors=${[...this.ancestors, this.element]}
                 >
                 </da-container>`,
-            )
+          )
           : nothing}
       </oscd-action-pane>
       <dai-value-create-dialog></dai-value-create-dialog>

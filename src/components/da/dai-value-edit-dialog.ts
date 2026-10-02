@@ -147,7 +147,7 @@ export class DaiValueEditDialog extends ScopedElementsMixin(LitElement) {
 
     const vals = Array.from(this.instanceElement.querySelectorAll('Val'));
     return (
-      vals.find(val => {
+      vals.find((val) => {
         const current = parseInt(val.getAttribute('sGroup') ?? '0');
         return !Number.isNaN(current) && current > this.sGroup!;
       }) ?? null

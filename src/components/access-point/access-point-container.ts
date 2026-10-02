@@ -74,7 +74,7 @@ export class AccessPointContainer extends ScopedElementsMixin(BaseContainer) {
 
   private getLnElements(): Element[] {
     return Array.from(this.element.querySelectorAll(':scope > LN')).filter(
-      element => {
+      (element) => {
         const lnClass = element.getAttribute('lnClass') ?? '';
         return this.selectedLNClasses.includes(lnClass);
       },

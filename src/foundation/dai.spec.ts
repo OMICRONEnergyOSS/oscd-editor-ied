@@ -54,8 +54,8 @@ function setupTestHarness({
     ...iedToLnAncestors,
     ...(templatePathSelectors.length
       ? templatePathSelectors.map(selector =>
-          getFirstAndAssertBySelector(doc, selector),
-        )
+        getFirstAndAssertBySelector(doc, selector),
+      )
       : []),
   ];
 

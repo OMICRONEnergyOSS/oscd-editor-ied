@@ -27,18 +27,18 @@ export class OscdForm<T extends FormValue> extends LitElement {
     }, this.data);
   }
 
-  // eslint-disable-next-line class-methods-use-this
+   
   setValue(_path: string, _value: FormValue): void {
     // No-op for now (readonly)
   }
 
-  // eslint-disable-next-line class-methods-use-this
+   
   getError(_path: string): string | null {
     // No validation yet
     return null;
   }
 
-  // eslint-disable-next-line class-methods-use-this
+   
   render() {
     return html`<slot></slot>`;
   }

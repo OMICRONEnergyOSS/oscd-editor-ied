@@ -176,14 +176,14 @@ export class AccessPointEditDialog extends ScopedElementsMixin(LitElement) {
           ${renderApNameField({
             value: this.apName,
             ied: this.element.closest('IED')!,
-            onInput: value => {
+            onInput: (value) => {
               this.apName = value;
             },
             currentName: this.element.getAttribute('name') ?? '',
           })}
           ${renderDescField({
             value: this.desc,
-            onInput: value => {
+            onInput: (value) => {
               this.desc = value;
             },
           })}

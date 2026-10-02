@@ -1,52 +1,16 @@
-import nodeResolve from '@rollup/plugin-node-resolve';
-import typescript from '@rollup/plugin-typescript';
-import { rollupPluginHTML as html } from '@web/rollup-plugin-html';
-import { importMetaAssets } from '@web/rollup-plugin-import-meta-assets';
+import base from '@omicronenergy/oscd-tooling/configs/rollup.config.js';
 import copy from 'rollup-plugin-copy';
 
+const [lib, demo] = base;
+
 export default [
+  lib,
   {
-    input: `src/oscd-editor-ied.ts`,
-    output: {
-      sourcemap: true, // Add source map to build output
-      format: 'es', // ES module type export
-      dir: 'dist', // The build output folder
-      // preserveModules: true, // Keep directory structure and files
-    },
-    preserveEntrySignatures: 'strict', // leaves export of the plugin entry point
-
+    ...demo,
     plugins: [
-      /** Resolve bare module imports */
-      nodeResolve(),
-
-      typescript(),
-
-      /** Bundle assets references via import.meta.url */
-      importMetaAssets(),
-    ],
-  },
-  {
-    input: 'demo/index.html',
-    plugins: [
-      html({
-        input: 'demo/index.html',
-        minify: true,
-      }),
-      /** Resolve bare module imports */
-      nodeResolve(),
-
-      /** Bundle assets references via import.meta.url */
-      importMetaAssets(),
-      copy({
-        targets: [
-          { src: 'demo/sample.scd', dest: 'dist/demo' },
-          // Add more patterns if you have more assets
-        ],
-        verbose: true,
-        flatten: false,
-      }),
-      // because the IED editor uses oscd-scl-dialogs (which uses ace-editor), it doesn't hurt to
-      // include the ace-editor assets in the demo build.
+      ...demo.plugins,
+      // the IED editor uses oscd-scl-dialogs (which uses ace-editor), so bundle
+      // the ace-editor assets alongside the demo build.
       copy({
         targets: [
           {
@@ -58,10 +22,5 @@ export default [
         flatten: true,
       }),
     ],
-    output: {
-      dir: 'dist/demo',
-      format: 'es',
-      sourcemap: true,
-    },
   },
 ];

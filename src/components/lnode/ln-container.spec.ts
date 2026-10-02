@@ -132,7 +132,7 @@ describe('ln-container', () => {
       );
       expect(editButton).to.exist;
 
-      const editEventPromise = new Promise<CustomEvent>(resolve => {
+      const editEventPromise = new Promise<CustomEvent>((resolve) => {
         testHarness.lnContainer.addEventListener(
           EVENTS.EDIT_ELEMENT,
           event => resolve(event as CustomEvent),
@@ -155,7 +155,7 @@ describe('ln-container', () => {
       let confirmDetail: { onConfirm: () => void } | null = null;
       testHarness.lnContainer.addEventListener(
         EVENTS.CONFIRM_DELETE,
-        event => {
+        (event) => {
           confirmDetail = (event as CustomEvent).detail;
         },
         { once: true },

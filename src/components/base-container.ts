@@ -25,7 +25,7 @@ export class BaseContainer extends ScopedElementsMixin(LitElement) {
   constructor() {
     super();
 
-    this.addEventListener('focus', event => {
+    this.addEventListener('focus', (event) => {
       event.stopPropagation();
       const pathOfAncestorNames = this.ancestors.map(
         ancestor => getTitleForElementPath(ancestor)!,

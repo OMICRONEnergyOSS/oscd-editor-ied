@@ -28,7 +28,7 @@ function getElement(
 
 export function getAncestors(doc: XMLDocument, selectors: string[]): Element[] {
   const ancestors: Element[] = [];
-  selectors.forEach(selector => {
+  selectors.forEach((selector) => {
     const baseElement = ancestors.length
       ? ancestors[ancestors.length - 1]
       : doc;
@@ -49,7 +49,7 @@ export class ComponentTestHarness {
     this.editor.commit((event as CustomEvent).detail.edit);
   }
 
-  // eslint-disable-next-line class-methods-use-this
+   
   protected handleDelete(confirmDeleteEvent: ConfirmDeleteEvent): void {
     confirmDeleteEvent.detail.onConfirm();
   }

@@ -257,19 +257,19 @@ export function extractServicesData(element: Element): Services | null {
       maxSMV: attr(clientServices, 'maxSMV'),
       timeSyncProt: csTimeSyncProt
         ? {
-            yes: attr(csTimeSyncProt, 'yes'),
-            sntp: attr(csTimeSyncProt, 'sntp'),
-            iec61850_9_3: attr(csTimeSyncProt, 'iec61850_9_3'),
-            c37_238: attr(csTimeSyncProt, 'c37_238'),
-            other: attr(csTimeSyncProt, 'other'),
-          }
+          yes: attr(csTimeSyncProt, 'yes'),
+          sntp: attr(csTimeSyncProt, 'sntp'),
+          iec61850_9_3: attr(csTimeSyncProt, 'iec61850_9_3'),
+          c37_238: attr(csTimeSyncProt, 'c37_238'),
+          other: attr(csTimeSyncProt, 'other'),
+        }
         : null,
 
       mcSecurity: csMcSecurity
         ? {
-            signature: attr(csMcSecurity, 'signature'),
-            encryption: attr(csMcSecurity, 'encryption'),
-          }
+          signature: attr(csMcSecurity, 'signature'),
+          encryption: attr(csMcSecurity, 'encryption'),
+        }
         : null,
     },
 
@@ -346,12 +346,12 @@ export function extractServicesData(element: Element): Services | null {
 
     timeSyncProt: timeSyncProt
       ? {
-          yes: attr(timeSyncProt, 'yes'),
-          sntp: attr(timeSyncProt, 'sntp'),
-          iec61850_9_3: attr(timeSyncProt, 'iec61850_9_3'),
-          c37_238: attr(timeSyncProt, 'c37_238'),
-          other: attr(timeSyncProt, 'other'),
-        }
+        yes: attr(timeSyncProt, 'yes'),
+        sntp: attr(timeSyncProt, 'sntp'),
+        iec61850_9_3: attr(timeSyncProt, 'iec61850_9_3'),
+        c37_238: attr(timeSyncProt, 'c37_238'),
+        other: attr(timeSyncProt, 'other'),
+      }
       : null,
 
     redProt: {
@@ -378,9 +378,9 @@ export function extractServicesData(element: Element): Services | null {
 
       mcSecurity: smvMcSecurity
         ? {
-            signature: attr(smvMcSecurity, 'signature'),
-            encryption: attr(smvMcSecurity, 'encryption'),
-          }
+          signature: attr(smvMcSecurity, 'signature'),
+          encryption: attr(smvMcSecurity, 'encryption'),
+        }
         : null,
 
       smpRateVal: smvSettings?.querySelector('SmpRate')?.textContent ?? null,

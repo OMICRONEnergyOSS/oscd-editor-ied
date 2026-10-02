@@ -95,14 +95,14 @@ export class LNContainer extends ScopedElementsMixin(BaseContainer) {
     return html`<oscd-action-pane label="${this.header()}">
       ${doElements.length > 0
         ? html`${this.element.tagName === 'LN'
-              ? html`<oscd-icon-button
+          ? html`<oscd-icon-button
                   slot="action"
                   title="${msg('remove')}"
                   @click=${() => this.removeLN()}
                 >
                   <oscd-icon>delete</oscd-icon>
                 </oscd-icon-button>`
-              : nothing}<abbr slot="action">
+          : nothing}<abbr slot="action">
               <oscd-icon-button
                 slot="action"
                 mini
@@ -126,8 +126,8 @@ export class LNContainer extends ScopedElementsMixin(BaseContainer) {
         : nothing}
       ${this.expanded
         ? doElements.map(
-            dO =>
-              html`<do-container
+          dO =>
+            html`<do-container
                 .docVersion=${this.docVersion}
                 .doc=${this.doc}
                 .element=${dO}
@@ -135,7 +135,7 @@ export class LNContainer extends ScopedElementsMixin(BaseContainer) {
                 .nsdoc=${this.nsdoc}
                 .ancestors=${[...this.ancestors, this.element]}
               ></do-container> `,
-          )
+        )
         : nothing}
     </oscd-action-pane>`;
   }

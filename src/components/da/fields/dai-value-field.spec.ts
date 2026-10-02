@@ -23,7 +23,7 @@ describe('dai-value-field', () => {
     expect(select).to.exist;
 
     let lastDetail: unknown = null;
-    field.addEventListener('change', event => {
+    field.addEventListener('change', (event) => {
       lastDetail = (event as CustomEvent).detail;
     });
 
