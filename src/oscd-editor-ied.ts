@@ -414,6 +414,7 @@ export class OscdEditorIED extends ScopedElementsMixin(LitElement) {
     }
     :host {
       position: relative;
+      --oscd-action-pane-contrasted-container-color: var(--oscd-base2);
     }
 
     .header,
@@ -443,10 +444,6 @@ export class OscdEditorIED extends ScopedElementsMixin(LitElement) {
       margin-left: auto;
       padding-right: 12px;
       min-width: 0;
-    }
-
-    oscd-action-pane {
-      --oscd-action-pane-theme-on-primary: var(--oscd-base2);
     }
   `;
 }

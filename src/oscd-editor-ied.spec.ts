@@ -53,6 +53,51 @@ describe('oscd-editor-ied', () => {
     expect(apActionPane.label).to.equal('AP1');
   });
 
+  it('keeps alternating pane backgrounds visible through nested components', async () => {
+    oscdEditorIED.style.setProperty('--oscd-base2', '#f3f5f6');
+    oscdEditorIED.style.setProperty('--md-sys-color-surface', '#fff');
+    oscdEditorIED.style.setProperty('--md-sys-color-on-primary', '#fff');
+
+    const iedContainer =
+      oscdEditorIED.shadowRoot?.querySelector('ied-container');
+    const iedPane = iedContainer?.shadowRoot?.querySelector('oscd-action-pane');
+    await waitUntil(
+      () =>
+        Boolean(
+          iedContainer?.shadowRoot
+            ?.querySelector('access-point-container')
+            ?.shadowRoot?.querySelector('oscd-action-pane')
+            ?.shadowRoot?.querySelector('section'),
+        ),
+      'nested pane did not render',
+    );
+    const apContainer = iedContainer?.shadowRoot?.querySelector(
+      'access-point-container',
+    );
+    const apPane = apContainer?.shadowRoot?.querySelector('oscd-action-pane');
+    const iedSection = iedPane?.shadowRoot?.querySelector('section');
+    const apSection = apPane?.shadowRoot?.querySelector('section');
+
+    if (
+      !(iedSection instanceof HTMLElement) ||
+      !(apSection instanceof HTMLElement)
+    ) {
+      throw new Error('Expected IED and access point panes');
+    }
+    await waitUntil(
+      () =>
+        getComputedStyle(apSection).backgroundColor === 'rgb(243, 245, 246)',
+      'nested pane did not acquire the contrasting background',
+    );
+
+    expect(getComputedStyle(iedSection).backgroundColor).to.equal(
+      'rgb(255, 255, 255)',
+    );
+    expect(getComputedStyle(apSection).backgroundColor).to.equal(
+      'rgb(243, 245, 246)',
+    );
+  });
+
   it('creates a virtual IED', async () => {
     const addButton = oscdEditorIED.shadowRoot?.querySelector(
       '[data-testid="add-ied-button"]',
