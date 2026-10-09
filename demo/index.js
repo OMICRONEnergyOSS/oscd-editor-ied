@@ -1,7 +1,7 @@
 import '@webcomponents/scoped-custom-element-registry';
 import '@omicronenergy/oscd-shell/oscd-shell.js';
-import OscdMenuOpen from '@omicronenergy/oscd-menu-open';
-import OscdMenuSave from '@omicronenergy/oscd-menu-save';
+import OscdMenuOpen from "@omicronenergy/oscd-menu-commons/oscd-menu-open.js";
+import OscdMenuSave from "@omicronenergy/oscd-menu-commons/oscd-menu-save.js";
 import OscdEditorSource from '@omicronenergy/oscd-editor-source';
 
 import { OscdEditorIED } from '@omicronenergy/oscd-editor-ied/oscd-editor-ied.js';
