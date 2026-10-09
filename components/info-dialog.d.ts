@@ -9,7 +9,7 @@ export type InfoField = {
     rows?: number;
 };
 export type InfoGroup = InfoField[];
-declare const InfoDialog_base: typeof LitElement & import("@open-wc/scoped-elements/lit-element.js").ScopedElementsHostConstructor;
+declare const InfoDialog_base: typeof LitElement & import("@open-wc/dedupe-mixin").Constructor<import("@open-wc/scoped-elements/types.js").ScopedElementsHost> & import("@open-wc/scoped-elements/types.js").ScopedElementsHostConstructor;
 /** Read-only info dialog composed of grouped label/value fields. */
 export declare class InfoDialog extends InfoDialog_base {
     static scopedElements: {

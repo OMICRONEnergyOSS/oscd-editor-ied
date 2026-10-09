@@ -6,7 +6,7 @@ import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
 import { TemplateResult } from 'lit';
 import { DOContainer } from '../do/do-container.js';
 import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
-declare const LNContainer_base: typeof BaseContainer & import("@open-wc/scoped-elements/lit-element.js").ScopedElementsHostConstructor;
+declare const LNContainer_base: typeof BaseContainer & import("@open-wc/dedupe-mixin").Constructor<import("@open-wc/scoped-elements/types.js").ScopedElementsHost> & import("@open-wc/scoped-elements/types.js").ScopedElementsHostConstructor;
 /** [[`IED`]] plugin subeditor for editing `LN` and `LN0` element. */
 export declare class LNContainer extends LNContainer_base {
     static scopedElements: {

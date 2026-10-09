@@ -8,7 +8,7 @@ import { BaseContainer } from '../base-container.js';
 import { DAContainer } from '../da/da-container.js';
 import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
 import { DoInfoDialog } from './do-info-dialog.js';
-declare const DOContainer_base: typeof BaseContainer & import("@open-wc/scoped-elements/lit-element.js").ScopedElementsHostConstructor;
+declare const DOContainer_base: typeof BaseContainer & import("@open-wc/dedupe-mixin").Constructor<import("@open-wc/scoped-elements/types.js").ScopedElementsHost> & import("@open-wc/scoped-elements/types.js").ScopedElementsHostConstructor;
 export declare class DOContainer extends DOContainer_base {
     static scopedElements: {
         'oscd-outlined-button': typeof OscdOutlinedButton;

@@ -5,7 +5,7 @@ import { OscdFilledButton } from '@omicronenergy/oscd-ui/button/OscdFilledButton
 import { OscdFilledTextField } from '@omicronenergy/oscd-ui/textfield/OscdFilledTextField.js';
 import { DaiValueField } from './fields/dai-value-field.js';
 import { DaiTimestampField } from './fields/dai-timestamp-field.js';
-declare const DaiValueCreateDialog_base: typeof LitElement & import("@open-wc/scoped-elements/lit-element.js").ScopedElementsHostConstructor;
+declare const DaiValueCreateDialog_base: typeof LitElement & import("@open-wc/dedupe-mixin").Constructor<import("@open-wc/scoped-elements/types.js").ScopedElementsHost> & import("@open-wc/scoped-elements/types.js").ScopedElementsHostConstructor;
 export declare class DaiValueCreateDialog extends DaiValueCreateDialog_base {
     static scopedElements: {
         'oscd-dialog': typeof OscdDialog;

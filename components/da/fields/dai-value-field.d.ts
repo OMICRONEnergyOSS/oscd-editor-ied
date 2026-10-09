@@ -6,7 +6,7 @@ export type DaiValueFieldChange = {
     value: string;
     sGroup?: number | null;
 };
-declare const DaiValueField_base: typeof LitElement & import("@open-wc/scoped-elements/lit-element.js").ScopedElementsHostConstructor;
+declare const DaiValueField_base: typeof LitElement & import("@open-wc/dedupe-mixin").Constructor<import("@open-wc/scoped-elements/types.js").ScopedElementsHost> & import("@open-wc/scoped-elements/types.js").ScopedElementsHostConstructor;
 export declare class DaiValueField extends DaiValueField_base {
     static scopedElements: {
         'oscd-filled-text-field': typeof OscdFilledTextField;

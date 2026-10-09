@@ -32,7 +32,7 @@ export interface AccessPointEditData {
     name: string;
     desc: string | null;
 }
-declare const AccessPointEditDialog_base: typeof LitElement & import("@open-wc/scoped-elements/lit-element.js").ScopedElementsHostConstructor;
+declare const AccessPointEditDialog_base: typeof LitElement & import("@open-wc/dedupe-mixin").Constructor<import("@open-wc/scoped-elements/types.js").ScopedElementsHost> & import("@open-wc/scoped-elements/types.js").ScopedElementsHostConstructor;
 /** A dialog component for adding new AccessPoints */
 export declare class AccessPointEditDialog extends AccessPointEditDialog_base {
     static scopedElements: {

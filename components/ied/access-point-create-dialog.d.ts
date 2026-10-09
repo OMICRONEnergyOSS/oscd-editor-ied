@@ -14,7 +14,7 @@ export interface AccessPointCreateData {
     serverAtApName?: string;
     serverAtDesc?: string;
 }
-declare const AccessPointCreateDialog_base: typeof LitElement & import("@open-wc/scoped-elements/lit-element.js").ScopedElementsHostConstructor;
+declare const AccessPointCreateDialog_base: typeof LitElement & import("@open-wc/dedupe-mixin").Constructor<import("@open-wc/scoped-elements/types.js").ScopedElementsHost> & import("@open-wc/scoped-elements/types.js").ScopedElementsHostConstructor;
 /** A dialog component for adding new AccessPoints */
 export declare class AccessPointCreateDialog extends AccessPointCreateDialog_base {
     static scopedElements: {

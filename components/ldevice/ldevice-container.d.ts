@@ -6,7 +6,7 @@ import { OscdSclIcon } from '@omicronenergy/oscd-ui/scl-icon/OscdSclIcon.js';
 import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPane.js';
 import { LNContainer } from '../lnode/ln-container.js';
 import OscdSclDialogs from '@omicronenergy/oscd-scl-dialogs/OscdSclDialogs.js';
-declare const LDeviceContainer_base: typeof BaseContainer & import("@open-wc/scoped-elements/lit-element.js").ScopedElementsHostConstructor;
+declare const LDeviceContainer_base: typeof BaseContainer & import("@open-wc/dedupe-mixin").Constructor<import("@open-wc/scoped-elements/types.js").ScopedElementsHost> & import("@open-wc/scoped-elements/types.js").ScopedElementsHostConstructor;
 export declare class LDeviceContainer extends LDeviceContainer_base {
     static scopedElements: {
         'oscd-action-pane': typeof OscdActionPane;

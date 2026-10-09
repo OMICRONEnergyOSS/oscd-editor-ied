@@ -11,7 +11,7 @@ import { ConfirmDeleteEvent, EditElementEvent } from './foundation/events.js';
 import { ConfirmDeleteDialog } from './components/confirm-delete-dialog.js';
 import { VirtualIedCreateDialog } from './components/virtual-ied-create-dialog.js';
 import OscdSclDialogs from '@omicronenergy/oscd-scl-dialogs/OscdSclDialogs.js';
-declare const OscdEditorIED_base: typeof LitElement & import("@open-wc/scoped-elements/lit-element.js").ScopedElementsHostConstructor;
+declare const OscdEditorIED_base: typeof LitElement & import("@open-wc/dedupe-mixin").Constructor<import("@open-wc/scoped-elements/types.js").ScopedElementsHost> & import("@open-wc/scoped-elements/types.js").ScopedElementsHostConstructor;
 /** An editor [[`plugin`]] for editing the `IED` section. */
 export declare class OscdEditorIED extends OscdEditorIED_base {
     static scopedElements: {
@@ -60,6 +60,6 @@ export declare class OscdEditorIED extends OscdEditorIED_base {
     private renderHeader;
     private renderSelectedIED;
     render(): TemplateResult;
-    static styles: import("lit").CSSResult;
+    static styles: import("lit").CSSResult[];
 }
 export {};

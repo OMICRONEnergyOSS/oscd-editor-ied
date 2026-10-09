@@ -6,7 +6,7 @@ export type DaiTimestampFieldChange = {
     timeValue: string;
     sGroup?: number | null;
 };
-declare const DaiTimestampField_base: typeof LitElement & import("@open-wc/scoped-elements/lit-element.js").ScopedElementsHostConstructor;
+declare const DaiTimestampField_base: typeof LitElement & import("@open-wc/dedupe-mixin").Constructor<import("@open-wc/scoped-elements/types.js").ScopedElementsHost> & import("@open-wc/scoped-elements/types.js").ScopedElementsHostConstructor;
 export declare class DaiTimestampField extends DaiTimestampField_base {
     static scopedElements: {
         'oscd-filled-text-field': typeof OscdFilledTextField;

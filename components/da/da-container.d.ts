@@ -7,7 +7,7 @@ import { BaseContainer } from '../base-container.js';
 import { DaiValueCreateDialog } from './dai-value-create-dialog.js';
 import { DaiValueEditDialog } from './dai-value-edit-dialog.js';
 import { DaInfoDialog } from './da-info-dialog.js';
-declare const DAContainer_base: typeof BaseContainer & import("@open-wc/scoped-elements/lit-element.js").ScopedElementsHostConstructor;
+declare const DAContainer_base: typeof BaseContainer & import("@open-wc/dedupe-mixin").Constructor<import("@open-wc/scoped-elements/types.js").ScopedElementsHost> & import("@open-wc/scoped-elements/types.js").ScopedElementsHostConstructor;
 /** [[`IED`]] plugin subeditor for editing `(B)DA` element. */
 export declare class DAContainer extends DAContainer_base {
     static scopedElements: {

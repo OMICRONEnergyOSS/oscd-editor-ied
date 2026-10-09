@@ -9,7 +9,7 @@ export type InfoContext = {
     detailed?: boolean;
 };
 export declare function buildDoInfoGroups({ ancestors, nsdoc, templateElement, instanceElement, detailed, }: InfoContext): InfoGroup[];
-declare const DoInfoDialog_base: typeof LitElement & import("@open-wc/scoped-elements/lit-element.js").ScopedElementsHostConstructor;
+declare const DoInfoDialog_base: typeof LitElement & import("@open-wc/dedupe-mixin").Constructor<import("@open-wc/scoped-elements/types.js").ScopedElementsHost> & import("@open-wc/scoped-elements/types.js").ScopedElementsHostConstructor;
 /** Read-only info dialog for a DO/DOI */
 export declare class DoInfoDialog extends DoInfoDialog_base {
     static scopedElements: {

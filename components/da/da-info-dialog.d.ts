@@ -3,7 +3,7 @@ import { Nsdoc } from '../../foundation/nsdoc.js';
 import { InfoDialog, InfoGroup } from '../info-dialog.js';
 import { InfoContext } from '../do/do-info-dialog.js';
 export declare function buildDaInfoGroups({ ancestors, nsdoc, templateElement, instanceElement, }: InfoContext): InfoGroup[];
-declare const DaInfoDialog_base: typeof LitElement & import("@open-wc/scoped-elements/lit-element.js").ScopedElementsHostConstructor;
+declare const DaInfoDialog_base: typeof LitElement & import("@open-wc/dedupe-mixin").Constructor<import("@open-wc/scoped-elements/types.js").ScopedElementsHost> & import("@open-wc/scoped-elements/types.js").ScopedElementsHostConstructor;
 /** Read-only info dialog for a DA/DAI */
 export declare class DaInfoDialog extends DaInfoDialog_base {
     static scopedElements: {
