@@ -10,6 +10,9 @@ import { OscdActionPane } from '@omicronenergy/oscd-ui/action-pane/OscdActionPan
 import { OscdFilledButton } from '@omicronenergy/oscd-ui/button/OscdFilledButton.js';
 import { IedContainer } from './components/ied/ied-container.js';
 import { newEditEventV2 } from '@openscd/oscd-api/utils.js';
+import { sendKeys } from '@web/test-runner-commands';
+import { VirtualIedCreateDialog } from './components/virtual-ied-create-dialog.js';
+import { OscdFilledTextField } from '@omicronenergy/oscd-ui/textfield/OscdFilledTextField.js';
 
 customElements.define('oscd-editor-ied', OscdEditorIED);
 
@@ -125,6 +128,94 @@ describe('oscd-editor-ied', () => {
     await oscdEditorIED.updateComplete;
 
     expect(getNamedElement(oscdEditorIED.doc, 'IED', 'IED_NEW')).to.exist;
+  });
+
+  describe('virtual IED dialog keyboard shortcuts', () => {
+    let createDialog: VirtualIedCreateDialog;
+    let nameInput: OscdFilledTextField;
+
+    beforeEach(async () => {
+      const addButton = oscdEditorIED.shadowRoot!.querySelector<HTMLElement>(
+        '[data-testid="add-ied-button"]',
+      )!;
+      addButton.click();
+      await oscdEditorIED.updateComplete;
+      createDialog =
+        oscdEditorIED.shadowRoot!.querySelector<VirtualIedCreateDialog>(
+          'virtual-ied-create-dialog',
+        )!;
+      await createDialog.updateComplete;
+      await waitUntil(() => createDialog.dialog.open);
+      nameInput =
+        createDialog.shadowRoot!.querySelector<OscdFilledTextField>(
+          '[data-testid="ied-name-input"]',
+        )!;
+      nameInput.focus();
+      harness.commitSpy.resetHistory();
+    });
+
+    it('creates exactly one IED and closes on Enter in the name field', async () => {
+      await typeIn(nameInput, 'IED_NEW');
+      await sendKeys({ press: 'Enter' });
+      await waitUntil(() => !createDialog.dialog.open);
+
+      expect(harness.commitSpy).to.have.been.calledOnce;
+      expect(doc.querySelectorAll('IED[name="IED_NEW"]')).to.have.length(1);
+    });
+
+    for (const name of ['', 'IED1', 'Invalid Name']) {
+      it(`keeps the dialog open for invalid name "${name}" on Enter`, async () => {
+        if (name) {
+          await typeIn(nameInput, name);
+        }
+        await sendKeys({ press: 'Enter' });
+
+        expect(createDialog.dialog.open).to.equal(true);
+        expect(harness.commitSpy).not.to.have.been.called;
+      });
+    }
+
+    it('closes without creating an IED on Escape and clears the name', async () => {
+      await typeIn(nameInput, 'IED_NEW');
+      await sendKeys({ press: 'Escape' });
+      await waitUntil(() => !createDialog.dialog.open);
+
+      expect(harness.commitSpy).not.to.have.been.called;
+      createDialog.show();
+      await waitUntil(() => createDialog.dialog.open);
+      await createDialog.updateComplete;
+      expect(nameInput.value).to.equal('');
+    });
+
+    it('cancels instead of creating when Enter is pressed on Cancel', async () => {
+      await typeIn(nameInput, 'IED_NEW');
+      const cancelButton = createDialog.shadowRoot!.querySelector<HTMLElement>(
+        '[slot="secondaryAction"]',
+      )!;
+      cancelButton.focus();
+      await sendKeys({ press: 'Enter' });
+      await waitUntil(() => !createDialog.dialog.open);
+
+      expect(harness.commitSpy).not.to.have.been.called;
+    });
+
+    for (const options of [{ isComposing: true }, { repeat: true }]) {
+      it(`ignores Enter with ${Object.keys(options)[0]}`, async () => {
+        await typeIn(nameInput, 'IED_NEW');
+        nameInput.dispatchEvent(
+          new KeyboardEvent('keydown', {
+            key: 'Enter',
+            bubbles: true,
+            composed: true,
+            cancelable: true,
+            ...options,
+          }),
+        );
+
+        expect(createDialog.dialog.open).to.equal(true);
+        expect(harness.commitSpy).not.to.have.been.called;
+      });
+    }
   });
 
   it('keeps the selected IED after document has been edited', async () => {

@@ -50,6 +50,21 @@ export class VirtualIedCreateDialog extends ScopedElementsMixin(LitElement) {
     }
   }
 
+  private handleKeydown(event: KeyboardEvent): void {
+    if (
+      event.key !== 'Enter' ||
+      !this.dialog.open ||
+      event.isComposing ||
+      event.repeat
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    this.handleCreate();
+  }
+
   private isIedNameValid(name: string): boolean {
     const trimmedName = name.trim();
     return (
@@ -110,6 +125,7 @@ export class VirtualIedCreateDialog extends ScopedElementsMixin(LitElement) {
             @input=${(e: Event) => {
               this.newIedName = (e.target as HTMLInputElement).value;
             }}
+            @keydown=${this.handleKeydown}
           ></oscd-filled-textfield>
         </div>
         <div slot="actions">
