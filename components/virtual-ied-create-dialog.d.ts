@@ -19,6 +19,7 @@ export declare class VirtualIedCreateDialog extends VirtualIedCreateDialog_base 
     show(): void;
     private close;
     private handleCreate;
+    private handleKeydown;
     private isIedNameValid;
     private getIedNameError;
     private isIedNameUnique;
