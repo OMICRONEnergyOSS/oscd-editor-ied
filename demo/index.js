@@ -21,7 +21,7 @@ function ha(a,b,d){if(0!==b.size&&void 0!==d){var e=a.prototype.setAttribute;e&&
 function(g,h){N(this);g=g.toLowerCase();if(b.has(g)){var u=this.getAttribute(g);f.call(this,g,h);h=this.getAttribute(g);u!==h&&d.call(this,g,u,h);}else f.call(this,g,h);});}}var O;"loading"===document.readyState&&(O=new Set,document.addEventListener("readystatechange",function(){O.forEach(function(a){return P(a,E.get(a))});},{once:true}));function N(a){var b;null!=(b=O)&&b.has(a)&&P(a,E.get(a));}
 function P(a,b){var d;null==(d=O)||d.delete(a);b.attributeChangedCallback&&b.observedAttributes.forEach(function(e){a.hasAttribute(e)&&b.attributeChangedCallback.call(a,e,null,a.getAttribute(e));});}function Q(a){var b=Object.getPrototypeOf(a);if(b!==window.HTMLElement)return b===C?Object.setPrototypeOf(a,window.HTMLElement):Q(b)}
 function J(a,b,d){d=void 0===d?false:d;Object.setPrototypeOf(a,b.g.prototype);E.set(a,b);M=a;try{new b.g;}catch(e){Q(b.g),new b.g;}b.attributeChangedCallback&&(void 0===O||a.hasAttributes()?P(a,b):O.add(a));d&&b.connectedCallback&&a.isConnected&&b.connectedCallback.call(a);}var R=Element.prototype.attachShadow;
-Element.prototype.attachShadow=function(a,b){for(var d=[],e=1;e<arguments.length;++e)d[e-1]=arguments[e];var c=Object.assign({},a);e=a.customElements;e=void 0===a.registry?e:a.registry;c=(delete c.customElements,delete c.registry,c);d=R.call.apply(R,[this,c].concat(r(d)));void 0!==e&&(d.customElements=d.registry=e);return d};var K=[document];
+Element.prototype.attachShadow=function(a,b){for(var d=[],e=1;e<arguments.length;++e)d[e-1]=arguments[e];var c=Object.assign({},a);e=a.customElements;e=void 0===a.registry?e:a.registry;c=(delete c.customElements,delete c.registry,c);d=R.call.apply(R,[this,c].concat(r(d)));void 0!==e&&(e={value:e,configurable:true,writable:true},Object.defineProperty(d,"customElements",e),Object.defineProperty(d,"registry",e));return d};var K=[document];
 function S(a,b,d){var e=(d?Object.getPrototypeOf(d):a.prototype)[b];a.prototype[b]=function(c){for(var f=[],g=0;g<arguments.length;++g)f[g]=arguments[g];K.push(this);f=e.apply(d||this,f);void 0!==f&&H.set(f,this);K.pop();return f};}S(ShadowRoot,"createElement",document);S(ShadowRoot,"createElementNS",document);S(ShadowRoot,"importNode",document);S(Element,"insertAdjacentHTML");
 function T(a){var b=Object.getOwnPropertyDescriptor(a.prototype,"innerHTML");Object.defineProperty(a.prototype,"innerHTML",Object.assign({},b,{set:function(d){K.push(this);b.set.call(this,d);K.pop();}}));}T(Element);T(ShadowRoot);Object.defineProperty(window,"customElements",{value:new CustomElementRegistry,configurable:true,writable:true});
 if(window.ElementInternals&&window.ElementInternals.prototype.setFormValue){var U=new WeakMap,V=HTMLElement.prototype.attachInternals,methods=["setFormValue","setValidity","checkValidity","reportValidity"];HTMLElement.prototype.attachInternals=function(a){for(var b=[],d=0;d<arguments.length;++d)b[d]=arguments[d];b=V.call.apply(V,[this].concat(r(b)));U.set(b,this);return b};methods.forEach(function(a){var b=window.ElementInternals.prototype,d=b[a];b[a]=function(e){for(var c=[],f=0;f<arguments.length;++f)c[f]=
@@ -2939,7 +2939,7 @@ const pathsSVG$1 = {
     dOIcon: w$1 `<path fill="none" stroke="currentColor" stroke-width="1.89" d="m4.2 0.945h18.1c1.8 0 3.25 1.45 3.25 3.25v11.6c0 1.8-1.45 3.25-3.25 3.25h-18.1c-1.8 0-3.25-1.45-3.25-3.25v-11.6c0-1.8 1.45-3.25 3.25-3.25z"/><path stroke="none" fill="currentColor" d="m12.1 9.94q0 1.55-0.509 2.71-0.503 1.15-1.43 1.76-0.923 0.611-2.12 0.611h-3.37v-10h3.02q2.11 0 3.26 1.28 1.15 1.27 1.15 3.65zm-1.76 0q0-1.61-0.698-2.46-0.698-0.852-1.99-0.852h-1.24v6.77h1.48q1.12 0 1.79-0.931 0.663-0.931 0.663-2.53z"/><path stroke="none" fill="currentColor" d="m21.6 9.97q0 1.56-0.515 2.75-0.515 1.19-1.47 1.82-0.959 0.625-2.24 0.625-1.97 0-3.08-1.39-1.11-1.39-1.11-3.81 0-2.41 1.11-3.76t3.1-1.35 3.1 1.36q1.12 1.36 1.12 3.74zm-1.78 0q0-1.62-0.639-2.54-0.639-0.923-1.79-0.923-1.17 0-1.81 0.916-0.639 0.909-0.639 2.54 0 1.65 0.651 2.6 0.657 0.945 1.79 0.945 1.17 0 1.81-0.923 0.639-0.923 0.639-2.62z"/>`,
     enumIcon: w$1 `<path fill="none" stroke="currentColor" stroke-width="1.89" d="m4.2 0.945h18.1c1.8 0 3.25 1.45 3.25 3.25v11.6c0 1.8-1.45 3.25-3.25 3.25h-18.1c-1.8 0-3.25-1.45-3.25-3.25v-11.6c0-1.8 1.45-3.25 3.25-3.25z"/><path d="m5.37 15v-10h6.56v1.62h-4.81v2.51h4.45v1.62h-4.45v2.64h5.06v1.62z"/><path d="m18.5 15-3.63-7.71q0.107 1.12 0.107 1.8v5.9h-1.55v-10h1.99l3.69 7.77q-0.107-1.07-0.107-1.95v-5.82h1.55v10z"/>`,
     info: w$1 `<path d="M0 0h24v24H0z" fill="none"></path><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor"></path>`,
-    warning: w$1 `<path d="M0 0h24v24H0z" fill="none"></path><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" fill="currentColor"></path>`,
+    'scl-warning': w$1 `<path d="M0 0h24v24H0z" fill="none"></path><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" fill="currentColor"></path>`,
     error: w$1 `<path d="M0 0h24v24H0V0z" fill="none"></path><path d="M15.73 3H8.27L3 8.27v7.46L8.27 21h7.46L21 15.73V8.27L15.73 3zM19 14.9L14.9 19H9.1L5 14.9V9.1L9.1 5h5.8L19 9.1v5.8z" fill="currentColor"></path><path d="M11 7h2v7h-2z" fill="currentColor"></path><circle cx="12" cy="16" r="1" fill="currentColor"></circle>`,
     gooseIcon: w$1 `<path fill="currentColor" d="M11,7H15V9H11V15H13V11H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />`,
     lNIcon: w$1 `<path stroke="currentColor" stroke-width="1.89" fill="none" d="m4.2 0.945h18.1c1.8 0 3.25 1.45 3.25 3.25v11.6c0 1.8-1.45 3.25-3.25 3.25h-18.1c-1.8 0-3.25-1.45-3.25-3.25v-11.6c0-1.8 1.45-3.25 3.25-3.25z"/><path fill="currentColor" d="m5.71 15v-10h1.75v8.39h4.47v1.62z"/><path fill="currentColor" d="m18.2 15-3.63-7.71q0.107 1.12 0.107 1.8v5.9h-1.55v-10h1.99l3.69 7.77q-0.107-1.07-0.107-1.95v-5.82h1.55v10z"/>`,
@@ -3695,7 +3695,17 @@ const styles$1a = i$d `:host{font-size:var(--md-icon-size, 24px);width:var(--md-
 let OscdIcon$2 = class OscdIcon extends Icon$3 {
 };
 /** @nocollapse */
-OscdIcon$2.styles = [styles$1a];
+OscdIcon$2.styles = [
+    styles$1a,
+    i$d `
+      :host > svg {
+        /* Legacy SVG templates include inline 24px dimensions. */
+        width: 100% !important;
+        height: 100% !important;
+        fill: currentColor;
+      }
+    `,
+];
 
 function isAttributesV2(attributes) {
     if (typeof attributes !== 'object' || attributes === null) {
@@ -36094,13 +36104,6 @@ OscdDivider$1.styles = [styles$1b];
  * The default dialog open animation.
  */
 const DIALOG_DEFAULT_OPEN_ANIMATION$2 = {
-    dialog: [
-        [
-            // Dialog slide down
-            [{ 'transform': 'translateY(-50px)' }, { 'transform': 'translateY(0)' }],
-            { duration: 500, easing: EASING$2.EMPHASIZED },
-        ],
-    ],
     scrim: [
         [
             // Scrim fade in
@@ -36109,6 +36112,11 @@ const DIALOG_DEFAULT_OPEN_ANIMATION$2 = {
         ],
     ],
     container: [
+        [
+            // Slide the content without changing the fixed scrim's containing block.
+            [{ 'transform': 'translateY(-50px)' }, { 'transform': 'translateY(0)' }],
+            { duration: 500, easing: EASING$2.EMPHASIZED },
+        ],
         [
             // Container fade in
             [{ 'opacity': 0 }, { 'opacity': 1 }],
@@ -36150,13 +36158,6 @@ const DIALOG_DEFAULT_OPEN_ANIMATION$2 = {
  * The default dialog close animation.
  */
 const DIALOG_DEFAULT_CLOSE_ANIMATION$2 = {
-    dialog: [
-        [
-            // Dialog slide up
-            [{ 'transform': 'translateY(0)' }, { 'transform': 'translateY(-50px)' }],
-            { duration: 150, easing: EASING$2.EMPHASIZED_ACCELERATE },
-        ],
-    ],
     scrim: [
         [
             // Scrim fade out
@@ -36165,6 +36166,11 @@ const DIALOG_DEFAULT_CLOSE_ANIMATION$2 = {
         ],
     ],
     container: [
+        [
+            // Slide the content without changing the fixed scrim's containing block.
+            [{ 'transform': 'translateY(0)' }, { 'transform': 'translateY(-50px)' }],
+            { duration: 150, easing: EASING$2.EMPHASIZED_ACCELERATE },
+        ],
         [
             // Container shrink
             [{ 'height': '100%' }, { 'height': '35%' }],
@@ -36422,7 +36428,6 @@ let Dialog$2 = class Dialog extends dialogBaseClass$2 {
     `;
         const { ariaLabel } = this;
         return b$2 `
-      <div class="scrim"></div>
       <dialog
         class=${e$8(classes)}
         aria-label=${ariaLabel || A$1}
@@ -36433,6 +36438,7 @@ let Dialog$2 = class Dialog extends dialogBaseClass$2 {
         @close=${this.handleClose}
         @keydown=${this.handleKeydown}
         .returnValue=${this.returnValue || A$1}>
+        <div class="scrim"></div>
         ${showFocusTrap ? focusTrap : A$1}
         <div class="container" @click=${this.handleContentClick}>
           <div class="headline">
@@ -41000,7 +41006,7 @@ const pathsSVG = {
     dOIcon: w `<path fill="none" stroke="currentColor" stroke-width="1.89" d="m4.2 0.945h18.1c1.8 0 3.25 1.45 3.25 3.25v11.6c0 1.8-1.45 3.25-3.25 3.25h-18.1c-1.8 0-3.25-1.45-3.25-3.25v-11.6c0-1.8 1.45-3.25 3.25-3.25z"/><path stroke="none" fill="currentColor" d="m12.1 9.94q0 1.55-0.509 2.71-0.503 1.15-1.43 1.76-0.923 0.611-2.12 0.611h-3.37v-10h3.02q2.11 0 3.26 1.28 1.15 1.27 1.15 3.65zm-1.76 0q0-1.61-0.698-2.46-0.698-0.852-1.99-0.852h-1.24v6.77h1.48q1.12 0 1.79-0.931 0.663-0.931 0.663-2.53z"/><path stroke="none" fill="currentColor" d="m21.6 9.97q0 1.56-0.515 2.75-0.515 1.19-1.47 1.82-0.959 0.625-2.24 0.625-1.97 0-3.08-1.39-1.11-1.39-1.11-3.81 0-2.41 1.11-3.76t3.1-1.35 3.1 1.36q1.12 1.36 1.12 3.74zm-1.78 0q0-1.62-0.639-2.54-0.639-0.923-1.79-0.923-1.17 0-1.81 0.916-0.639 0.909-0.639 2.54 0 1.65 0.651 2.6 0.657 0.945 1.79 0.945 1.17 0 1.81-0.923 0.639-0.923 0.639-2.62z"/>`,
     enumIcon: w `<path fill="none" stroke="currentColor" stroke-width="1.89" d="m4.2 0.945h18.1c1.8 0 3.25 1.45 3.25 3.25v11.6c0 1.8-1.45 3.25-3.25 3.25h-18.1c-1.8 0-3.25-1.45-3.25-3.25v-11.6c0-1.8 1.45-3.25 3.25-3.25z"/><path d="m5.37 15v-10h6.56v1.62h-4.81v2.51h4.45v1.62h-4.45v2.64h5.06v1.62z"/><path d="m18.5 15-3.63-7.71q0.107 1.12 0.107 1.8v5.9h-1.55v-10h1.99l3.69 7.77q-0.107-1.07-0.107-1.95v-5.82h1.55v10z"/>`,
     info: w `<path d="M0 0h24v24H0z" fill="none"></path><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor"></path>`,
-    warning: w `<path d="M0 0h24v24H0z" fill="none"></path><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" fill="currentColor"></path>`,
+    'scl-warning': w `<path d="M0 0h24v24H0z" fill="none"></path><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" fill="currentColor"></path>`,
     error: w `<path d="M0 0h24v24H0V0z" fill="none"></path><path d="M15.73 3H8.27L3 8.27v7.46L8.27 21h7.46L21 15.73V8.27L15.73 3zM19 14.9L14.9 19H9.1L5 14.9V9.1L9.1 5h5.8L19 9.1v5.8z" fill="currentColor"></path><path d="M11 7h2v7h-2z" fill="currentColor"></path><circle cx="12" cy="16" r="1" fill="currentColor"></circle>`,
     gooseIcon: w `<path fill="currentColor" d="M11,7H15V9H11V15H13V11H15V15A2,2 0 0,1 13,17H11A2,2 0 0,1 9,15V9A2,2 0 0,1 11,7M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />`,
     lNIcon: w `<path stroke="currentColor" stroke-width="1.89" fill="none" d="m4.2 0.945h18.1c1.8 0 3.25 1.45 3.25 3.25v11.6c0 1.8-1.45 3.25-3.25 3.25h-18.1c-1.8 0-3.25-1.45-3.25-3.25v-11.6c0-1.8 1.45-3.25 3.25-3.25z"/><path fill="currentColor" d="m5.71 15v-10h1.75v8.39h4.47v1.62z"/><path fill="currentColor" d="m18.2 15-3.63-7.71q0.107 1.12 0.107 1.8v5.9h-1.55v-10h1.99l3.69 7.77q-0.107-1.07-0.107-1.95v-5.82h1.55v10z"/>`,
@@ -41759,7 +41765,17 @@ const styles$L = i$6 `:host{font-size:var(--md-icon-size, 24px);width:var(--md-i
 class OscdIcon extends Icon$1 {
 }
 /** @nocollapse */
-OscdIcon.styles = [styles$L];
+OscdIcon.styles = [
+    styles$L,
+    i$6 `
+      :host > svg {
+        /* Legacy SVG templates include inline 24px dimensions. */
+        width: 100% !important;
+        height: 100% !important;
+        fill: currentColor;
+      }
+    `,
+];
 
 /**
  * @license
@@ -44008,13 +44024,6 @@ OscdDivider.styles = [styles$F];
  * The default dialog open animation.
  */
 const DIALOG_DEFAULT_OPEN_ANIMATION$1 = {
-    dialog: [
-        [
-            // Dialog slide down
-            [{ 'transform': 'translateY(-50px)' }, { 'transform': 'translateY(0)' }],
-            { duration: 500, easing: EASING$1.EMPHASIZED },
-        ],
-    ],
     scrim: [
         [
             // Scrim fade in
@@ -44023,6 +44032,11 @@ const DIALOG_DEFAULT_OPEN_ANIMATION$1 = {
         ],
     ],
     container: [
+        [
+            // Slide the content without changing the fixed scrim's containing block.
+            [{ 'transform': 'translateY(-50px)' }, { 'transform': 'translateY(0)' }],
+            { duration: 500, easing: EASING$1.EMPHASIZED },
+        ],
         [
             // Container fade in
             [{ 'opacity': 0 }, { 'opacity': 1 }],
@@ -44064,13 +44078,6 @@ const DIALOG_DEFAULT_OPEN_ANIMATION$1 = {
  * The default dialog close animation.
  */
 const DIALOG_DEFAULT_CLOSE_ANIMATION$1 = {
-    dialog: [
-        [
-            // Dialog slide up
-            [{ 'transform': 'translateY(0)' }, { 'transform': 'translateY(-50px)' }],
-            { duration: 150, easing: EASING$1.EMPHASIZED_ACCELERATE },
-        ],
-    ],
     scrim: [
         [
             // Scrim fade out
@@ -44079,6 +44086,11 @@ const DIALOG_DEFAULT_CLOSE_ANIMATION$1 = {
         ],
     ],
     container: [
+        [
+            // Slide the content without changing the fixed scrim's containing block.
+            [{ 'transform': 'translateY(0)' }, { 'transform': 'translateY(-50px)' }],
+            { duration: 150, easing: EASING$1.EMPHASIZED_ACCELERATE },
+        ],
         [
             // Container shrink
             [{ 'height': '100%' }, { 'height': '35%' }],
@@ -44336,7 +44348,6 @@ let Dialog$1 = class Dialog extends dialogBaseClass$1 {
     `;
         const { ariaLabel } = this;
         return b `
-      <div class="scrim"></div>
       <dialog
         class=${e(classes)}
         aria-label=${ariaLabel || A}
@@ -44347,6 +44358,7 @@ let Dialog$1 = class Dialog extends dialogBaseClass$1 {
         @close=${this.handleClose}
         @keydown=${this.handleKeydown}
         .returnValue=${this.returnValue || A}>
+        <div class="scrim"></div>
         ${showFocusTrap ? focusTrap : A}
         <div class="container" @click=${this.handleContentClick}>
           <div class="headline">
@@ -44665,12 +44677,13 @@ function isFocusable$1(element) {
 
 /**
  * @license
- * Copyright 2024 Google LLC
+ * Copyright 2026 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 // Generated stylesheet for ./dialog/internal/dialog-styles.css.
-const styles$E = i$6 `:host{border-start-start-radius:var(--md-dialog-container-shape-start-start, var(--md-dialog-container-shape, var(--md-sys-shape-corner-extra-large, 28px)));border-start-end-radius:var(--md-dialog-container-shape-start-end, var(--md-dialog-container-shape, var(--md-sys-shape-corner-extra-large, 28px)));border-end-end-radius:var(--md-dialog-container-shape-end-end, var(--md-dialog-container-shape, var(--md-sys-shape-corner-extra-large, 28px)));border-end-start-radius:var(--md-dialog-container-shape-end-start, var(--md-dialog-container-shape, var(--md-sys-shape-corner-extra-large, 28px)));display:contents;margin:auto;max-height:min(560px,100% - 48px);max-width:min(560px,100% - 48px);min-height:140px;min-width:280px;position:fixed;height:fit-content;width:fit-content}dialog{background:rgba(0,0,0,0);border:none;border-radius:inherit;flex-direction:column;height:inherit;margin:inherit;max-height:inherit;max-width:inherit;min-height:inherit;min-width:inherit;outline:none;overflow:visible;padding:0;width:inherit}dialog[open]{display:flex}::backdrop{background:none}.scrim{background:var(--md-sys-color-scrim, #000);display:none;inset:0;opacity:32%;pointer-events:none;position:fixed;z-index:1}:host([open]) .scrim{display:flex}h2{all:unset;align-self:stretch}.headline{align-items:center;color:var(--md-dialog-headline-color, var(--md-sys-color-on-surface, #1d1b20));display:flex;flex-direction:column;font-family:var(--md-dialog-headline-font, var(--md-sys-typescale-headline-small-font, var(--md-ref-typeface-brand, Roboto)));font-size:var(--md-dialog-headline-size, var(--md-sys-typescale-headline-small-size, 1.5rem));line-height:var(--md-dialog-headline-line-height, var(--md-sys-typescale-headline-small-line-height, 2rem));font-weight:var(--md-dialog-headline-weight, var(--md-sys-typescale-headline-small-weight, var(--md-ref-typeface-weight-regular, 400)));position:relative}slot[name=headline]::slotted(*){align-items:center;align-self:stretch;box-sizing:border-box;display:flex;gap:8px;padding:24px 24px 0}.icon{display:flex}slot[name=icon]::slotted(*){color:var(--md-dialog-icon-color, var(--md-sys-color-secondary, #625b71));fill:currentColor;font-size:var(--md-dialog-icon-size, 24px);margin-top:24px;height:var(--md-dialog-icon-size, 24px);width:var(--md-dialog-icon-size, 24px)}.has-icon slot[name=headline]::slotted(*){justify-content:center;padding-top:16px}.scrollable slot[name=headline]::slotted(*){padding-bottom:16px}.scrollable.has-headline slot[name=content]::slotted(*){padding-top:8px}.container{border-radius:inherit;display:flex;flex-direction:column;flex-grow:1;overflow:hidden;position:relative;transform-origin:top}.container::before{background:var(--md-dialog-container-color, var(--md-sys-color-surface-container-high, #ece6f0));border-radius:inherit;content:"";inset:0;position:absolute}.scroller{display:flex;flex:1;flex-direction:column;overflow:hidden;z-index:1}.scrollable .scroller{overflow-y:scroll}.content{color:var(--md-dialog-supporting-text-color, var(--md-sys-color-on-surface-variant, #49454f));font-family:var(--md-dialog-supporting-text-font, var(--md-sys-typescale-body-medium-font, var(--md-ref-typeface-plain, Roboto)));font-size:var(--md-dialog-supporting-text-size, var(--md-sys-typescale-body-medium-size, 0.875rem));line-height:var(--md-dialog-supporting-text-line-height, var(--md-sys-typescale-body-medium-line-height, 1.25rem));flex:1;font-weight:var(--md-dialog-supporting-text-weight, var(--md-sys-typescale-body-medium-weight, var(--md-ref-typeface-weight-regular, 400)));height:min-content;position:relative}slot[name=content]::slotted(*){box-sizing:border-box;padding:24px}.anchor{position:absolute}.top.anchor{top:0}.bottom.anchor{bottom:0}.actions{position:relative}slot[name=actions]::slotted(*){box-sizing:border-box;display:flex;gap:8px;justify-content:flex-end;padding:16px 24px 24px}.has-actions slot[name=content]::slotted(*){padding-bottom:8px}md-divider{display:none;position:absolute}.has-headline.show-top-divider .headline md-divider,.has-actions.show-bottom-divider .actions md-divider{display:flex}.headline md-divider{bottom:0}.actions md-divider{top:0}@media(forced-colors: active){dialog{outline:2px solid WindowText}}
+const styles$E = i$6 `:host{border-start-start-radius:var(--md-dialog-container-shape-start-start, var(--md-dialog-container-shape, var(--md-sys-shape-corner-extra-large, 28px)));border-start-end-radius:var(--md-dialog-container-shape-start-end, var(--md-dialog-container-shape, var(--md-sys-shape-corner-extra-large, 28px)));border-end-end-radius:var(--md-dialog-container-shape-end-end, var(--md-dialog-container-shape, var(--md-sys-shape-corner-extra-large, 28px)));border-end-start-radius:var(--md-dialog-container-shape-end-start, var(--md-dialog-container-shape, var(--md-sys-shape-corner-extra-large, 28px)));display:contents;margin:auto;max-height:min(560px,100% - 48px);max-width:min(560px,100% - 48px);min-height:140px;min-width:280px;position:fixed;height:fit-content;width:fit-content}dialog{background:rgba(0,0,0,0);border:none;border-radius:inherit;flex-direction:column;height:inherit;margin:inherit;max-height:inherit;max-width:inherit;min-height:inherit;min-width:inherit;outline:none;overflow:visible;padding:0;width:inherit}dialog[open]{display:flex}::backdrop{background:none}.scrim{background:var(--md-sys-color-scrim, #000);display:none;inset:0;opacity:32%;pointer-events:none;position:fixed;z-index:-1}:host([open]) .scrim{display:flex}h2{all:unset;align-self:stretch}.headline{align-items:center;color:var(--md-dialog-headline-color, var(--md-sys-color-on-surface, #1d1b20));display:flex;flex-direction:column;font-family:var(--md-dialog-headline-font, var(--md-sys-typescale-headline-small-font, var(--md-ref-typeface-brand, Roboto)));font-size:var(--md-dialog-headline-size, var(--md-sys-typescale-headline-small-size, 1.5rem));line-height:var(--md-dialog-headline-line-height, var(--md-sys-typescale-headline-small-line-height, 2rem));font-weight:var(--md-dialog-headline-weight, var(--md-sys-typescale-headline-small-weight, var(--md-ref-typeface-weight-regular, 400)));position:relative}slot[name=headline]::slotted(*){align-items:center;align-self:stretch;box-sizing:border-box;display:flex;gap:8px;padding:24px 24px 0}.icon{display:flex}slot[name=icon]::slotted(*){color:var(--md-dialog-icon-color, var(--md-sys-color-secondary, #625b71));fill:currentColor;font-size:var(--md-dialog-icon-size, 24px);margin-top:24px;height:var(--md-dialog-icon-size, 24px);width:var(--md-dialog-icon-size, 24px)}.has-icon slot[name=headline]::slotted(*){justify-content:center;padding-top:16px}.scrollable slot[name=headline]::slotted(*){padding-bottom:16px}.scrollable.has-headline slot[name=content]::slotted(*){padding-top:8px}.container{border-radius:inherit;display:flex;flex-direction:column;flex-grow:1;overflow:hidden;position:relative;transform-origin:top}.container::before{background:var(--md-dialog-container-color, var(--md-sys-color-surface-container-high, #ece6f0));border-radius:inherit;content:"";inset:0;position:absolute}.scroller{display:flex;flex:1;flex-direction:column;overflow:hidden;z-index:1}.scrollable .scroller{overflow-y:scroll}.content{color:var(--md-dialog-supporting-text-color, var(--md-sys-color-on-surface-variant, #49454f));font-family:var(--md-dialog-supporting-text-font, var(--md-sys-typescale-body-medium-font, var(--md-ref-typeface-plain, Roboto)));font-size:var(--md-dialog-supporting-text-size, var(--md-sys-typescale-body-medium-size, 0.875rem));line-height:var(--md-dialog-supporting-text-line-height, var(--md-sys-typescale-body-medium-line-height, 1.25rem));flex:1;font-weight:var(--md-dialog-supporting-text-weight, var(--md-sys-typescale-body-medium-weight, var(--md-ref-typeface-weight-regular, 400)));height:min-content;position:relative}slot[name=content]::slotted(*){box-sizing:border-box;padding:24px}.anchor{position:absolute}.top.anchor{top:0}.bottom.anchor{bottom:0}.actions{position:relative}slot[name=actions]::slotted(*){box-sizing:border-box;display:flex;gap:8px;justify-content:flex-end;padding:16px 24px 24px}.has-actions slot[name=content]::slotted(*){padding-bottom:8px}md-divider{display:none;position:absolute}.has-headline.show-top-divider .headline md-divider,.has-actions.show-bottom-divider .actions md-divider{display:flex}.headline md-divider{bottom:0}.actions md-divider{top:0}@media(forced-colors: active){dialog{outline:2px solid WindowText}}
 `;
+styles$E.styleSheet;
 
 /**
  * @license
@@ -47235,9 +47248,12 @@ function removeIedSubscriptionsAndSupervisions(ied, iedName) {
 const lNodeKey = (ln) => ["lnClass", "lnInst", "ldInst", "prefix"]
     .map((a) => ln.getAttribute(a) ?? "")
     .join("|");
-const getLNodeScopeElement = (ln) => {
-    return ln.closest("Bay, VoltageLevel, Substation");
-};
+/**
+ * The SCL schema applies the LNode uniqueness constraint to the immediate
+ * parent container of the LNode (e.g. a ConductingEquipment or a Function),
+ * so that is also the scope in which duplicate keys have to be detected.
+ */
+const getLNodeScopeElement = (ln) => ln.parentElement;
 const createRemoveEdit = (ln) => {
     return { node: ln };
 };
@@ -47257,9 +47273,11 @@ function removeBoundLNodes(ied, name) {
  * Build the edits required to detach all public LNode bindings to `iedName`
  * from the substation model, preserving each as a specification entry with
  * (iedName="None"). A cache of all LNodes (with iedName="None") is first built
- * up (grouped by their scope/container). This is used to check if changing the
+ * up (grouped by their parent container). This is used to check if changing the
  * iedName of a bound LNode to "None" would create a duplicate binding within its
- * scope. If this would result in a duplicate, the LNode is simply removed instead.
+ * container. If this would result in a duplicate, the LNode is simply removed
+ * instead. The cache is updated while processing, so duplicates within the set
+ * of bound LNodes removed in this call are handled as well.
  */
 function detachLNodeBindings(ied, name) {
     const doc = ied.ownerDocument;
@@ -47277,19 +47295,22 @@ function detachLNodeBindings(ied, name) {
         }
         keys.add(lNodeKey(ln));
     });
-    return boundNodes
-        .map((ln) => {
+    return boundNodes.map((ln) => {
         const scope = getLNodeScopeElement(ln);
-        const keys = unboundLNodesByScope.get(scope);
+        let keys = unboundLNodesByScope.get(scope);
+        if (!keys) {
+            keys = new Set();
+            unboundLNodesByScope.set(scope, keys);
+        }
         const key = lNodeKey(ln);
-        if (keys && keys.has(key)) {
+        if (keys.has(key)) {
             return createRemoveEdit(ln);
         }
-        else {
-            return setLNodeToNone(ln);
-        }
-    })
-        .filter((edit) => edit !== undefined);
+        // Remember the key, so that a second bound LNode with the same key in the
+        // same container would not also be set to "None".
+        keys.add(key);
+        return setLNodeToNone(ln);
+    });
 }
 /**
  * Function to remove an IED.
