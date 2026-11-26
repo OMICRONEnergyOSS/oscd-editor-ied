@@ -60,6 +60,6 @@ export declare class OscdEditorIED extends OscdEditorIED_base {
     private renderHeader;
     private renderSelectedIED;
     render(): TemplateResult;
-    static styles: import("lit").CSSResult[];
+    static styles: import("lit").CSSResult;
 }
 export {};

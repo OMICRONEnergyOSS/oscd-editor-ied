@@ -28,6 +28,8 @@ export declare class ServicesAction extends ServicesAction_base {
     private _element;
     set element(value: Element);
     get element(): Element;
+    enabledTooltip: string;
+    disabledTooltip: string;
     private services;
     activeIndex: number;
     headline: string;

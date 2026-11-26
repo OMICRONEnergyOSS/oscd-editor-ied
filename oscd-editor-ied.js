@@ -53,64 +53,6 @@ const t$1=globalThis,i$4=t=>t,s$1=t$1.trustedTypes,e$5=s$1?s$1.createPolicy("lit
  * SPDX-License-Identifier: BSD-3-Clause
  */const s=globalThis;let i$3 = class i extends y$1{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0;}createRenderRoot(){const t=super.createRenderRoot();return this.renderOptions.renderBefore??=t.firstChild,t}update(t){const r=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=D(r,this.renderRoot,this.renderOptions);}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(true);}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(false);}render(){return E}};i$3._$litElement$=true,i$3["finalized"]=true,s.litElementHydrateSupport?.({LitElement:i$3});const o$5=s.litElementPolyfillSupport;o$5?.({LitElement:i$3});(s.litElementVersions??=[]).push("4.2.2");
 
-const oscdMd3Mappings = i$6 `
-  :host {
-    --md-sys-color-error: var(--oscd-theme-error, #dc322f);
-    --md-sys-color-error-container: var(--oscd-theme-base2, #eee8d5);
-    --md-sys-color-inverse-on-surface: var(--oscd-theme-base3, #fdf6e3);
-    --md-sys-color-inverse-surface: var(--oscd-theme-base03, #002b36);
-    --md-sys-color-on-error: var(--oscd-theme-base3, #fdf6e3);
-    --md-sys-color-on-error-container: var(--oscd-theme-base00, #657b83);
-    --md-sys-color-on-primary: var(--oscd-theme-base3, #fdf6e3);
-    --md-sys-color-on-primary-container: var(--oscd-theme-base00, #657b83);
-    --md-sys-color-on-secondary: var(--oscd-theme-base3, #fdf6e3);
-    --md-sys-color-on-secondary-container: var(--oscd-theme-base00, #657b83);
-    --md-sys-color-on-surface: var(--oscd-theme-base00, #657b83);
-    --md-sys-color-on-surface-variant: var(--oscd-theme-base0, #839496);
-    --md-sys-color-on-tertiary-container: var(--oscd-theme-base00, #657b83);
-    --md-sys-color-outline: var(--oscd-theme-base01, #586e75);
-    --md-sys-color-outline-variant: var(--oscd-theme-base1, #93a1a1);
-    --md-sys-color-primary: var(--oscd-theme-primary, #2aa198);
-    --md-sys-color-primary-container: var(--oscd-theme-base2, #eee8d5);
-    --md-sys-color-scrim: #000;
-    --md-sys-color-secondary: var(--oscd-theme-secondary, #6c71c4);
-    --md-sys-color-secondary-container: var(--oscd-theme-base2, #eee8d5);
-    --md-sys-color-shadow: #000;
-    --md-sys-color-surface: var(--oscd-theme-base3, #fdf6e3);
-    --md-sys-color-surface-container: var(--oscd-theme-base2, #eee8d5);
-    --md-sys-color-surface-container-high: var(--oscd-theme-base2, #eee8d5);
-    --md-sys-color-surface-container-highest: var(--oscd-theme-base2, #eee8d5);
-    --md-sys-color-surface-container-low: var(--oscd-theme-base3, #fdf6e3);
-    --md-sys-color-tertiary: var(--oscd-theme-secondary, #6c71c4);
-    --md-sys-color-tertiary-container: var(--oscd-theme-base2, #eee8d5);
-  }
-`;
-i$6 `
-  :host {
-    --oscd-ace-editor-syntax-keyword-color: var(
-      --oscd-theme-secondary,
-      #0b335b
-    );
-    --oscd-ace-editor-syntax-string-color: var(--oscd-theme-base00, #46505d);
-    --oscd-ace-editor-syntax-tag-color: var(--oscd-theme-secondary, #0b335b);
-    --oscd-ace-editor-syntax-attribute-name-color: var(
-      --oscd-theme-primary,
-      #2485e5
-    );
-    --oscd-ace-editor-syntax-comment-color: var(--oscd-theme-base01, #3d4651);
-    --oscd-ace-editor-syntax-number-color: var(--oscd-theme-base00, #46505d);
-    --oscd-ace-editor-syntax-invalid-color: var(--oscd-theme-error, #dc322f);
-    --oscd-ace-editor-syntax-storage-color: var(--oscd-theme-primary, #2485e5);
-    --oscd-ace-editor-syntax-operator-color: var(--oscd-theme-base01, #3d4651);
-    --oscd-ace-editor-syntax-parameter-color: var(
-      --oscd-theme-warning,
-      #b58900
-    );
-    --oscd-ace-editor-syntax-regex-color: var(--oscd-theme-error, #dc322f);
-    --oscd-ace-editor-step-color: var(--oscd-theme-warning, #b58900);
-  }
-`;
-
 /**
  * @license
  * Copyright 2017 Google LLC
@@ -38337,7 +38279,7 @@ InfoDialog.styles = i$6 `
 
     .divider {
       height: 1px;
-      background: var(--oscd-base1);
+      background: var(--md-sys-color-outline-variant);
       margin: 4px 0;
     }
   `;
@@ -81647,6 +81589,8 @@ function renderClientServerServices() {
 class ServicesAction extends ScopedElementsMixin(i$3) {
     constructor() {
         super(...arguments);
+        this.enabledTooltip = '';
+        this.disabledTooltip = '';
         this.services = null;
         this.activeIndex = 0;
         this.headline = msg('Services');
@@ -81701,9 +81645,14 @@ class ServicesAction extends ScopedElementsMixin(i$3) {
     render() {
         const active = this.pages[this.activeIndex];
         return b `
-      <oscd-icon-button ?disabled=${!this.services} @click=${() => this.show()}
-        ><oscd-icon>settings</oscd-icon></oscd-icon-button
+      <span
+        class="service-button"
+        title=${this.services ? this.enabledTooltip : this.disabledTooltip}
       >
+        <oscd-icon-button ?disabled=${!this.services} @click=${() => this.show()}
+          ><oscd-icon>settings</oscd-icon></oscd-icon-button
+        >
+      </span>
       <oscd-dialog @closed=${this.close} scrollable="false">
         <div slot="headline">${this.headline}</div>
         <div slot="content" class="dialog-content">
@@ -81747,6 +81696,10 @@ ServicesAction.scopedElements = {
     'oscd-form-group': OscdFormGroup,
 };
 ServicesAction.styles = i$6 `
+    .service-button {
+      display: inline-flex;
+    }
+
     oscd-dialog {
       max-width: min(800px, 100% - 48px);
     }
@@ -81767,7 +81720,7 @@ ServicesAction.styles = i$6 `
 
     .nav {
       width: 180px;
-      border-right: 1px solid var(--oscd-base1);
+      border-right: 1px solid var(--md-sys-color-outline-variant);
       padding-right: 8px;
     }
     .nav ul {
@@ -81800,6 +81753,12 @@ ServicesAction.styles = i$6 `
 __decorate([
     n$3({ attribute: false })
 ], ServicesAction.prototype, "element", null);
+__decorate([
+    n$3({ type: String })
+], ServicesAction.prototype, "enabledTooltip", void 0);
+__decorate([
+    n$3({ type: String })
+], ServicesAction.prototype, "disabledTooltip", void 0);
 __decorate([
     r$2()
 ], ServicesAction.prototype, "services", void 0);
@@ -81872,12 +81831,12 @@ class AccessPointContainer extends ScopedElementsMixin(BaseContainer) {
             <oscd-icon>edit</oscd-icon>
           </oscd-icon-button>
         </abbr>
-        <abbr
+        <services-action
           slot="action"
-          title="${msg('Show Services the AccessPoint provides')}"
-        >
-          <services-action .element=${this.element}></services-action>
-        </abbr>
+          .element=${this.element}
+          .enabledTooltip=${msg('Show Services the AccessPoint provides')}
+          .disabledTooltip=${msg('This AccessPoint has no Services section')}
+        ></services-action>
         ${Array.from(this.element.querySelectorAll(':scope > Server')).map(server => b `<server-container
               .docVersion=${this.docVersion}
               .doc=${this.doc}
@@ -82199,9 +82158,12 @@ class IedContainer extends ScopedElementsMixin(BaseContainer) {
           <oscd-icon>edit</oscd-icon></oscd-icon-button
         >
       </abbr>
-      <abbr slot="action" title="${msg('Show Services the IED provides')}">
-        <services-action .element=${this.element}></services-action>
-      </abbr>
+      <services-action
+        slot="action"
+        .element=${this.element}
+        .enabledTooltip=${msg('Show Services the IED provides')}
+        .disabledTooltip=${msg('This IED has no Services section')}
+      ></services-action>
       <abbr slot="action" title="${msg('Add AccessPoint')}">
         <oscd-icon-button
           data-testid="add-access-point-button"
@@ -82334,8 +82296,8 @@ ConfirmDeleteDialog.scopedElements = {
 };
 ConfirmDeleteDialog.styles = i$6 `
     oscd-filled-button {
-      --md-sys-color-primary: var(--oscd-error);
-      --oscd-filled-button-color: var(--oscd-base03);
+      --md-sys-color-primary: var(--md-sys-color-error);
+      --md-sys-color-on-primary: var(--md-sys-color-on-error);
     }
     .dialog-content {
       margin-top: 16px;
@@ -82720,7 +82682,7 @@ class OscdEditorIED extends ScopedElementsMixin(i$3) {
     renderSelectedIED() {
         if (this.iedList.length === 0) {
             return b `<h1>
-        <span style="color: var(--oscd-base1)">${msg('No IED')}</span>
+        <span style="color: var(--md-sys-color-on-surface-variant)">${msg('No IED')}</span>
       </h1>`;
         }
         return b `<section>
@@ -82759,15 +82721,14 @@ OscdEditorIED.scopedElements = {
     'virtual-ied-create-dialog': VirtualIedCreateDialog,
     'confirm-delete-dialog': ConfirmDeleteDialog,
 };
-OscdEditorIED.styles = [
-    oscdMd3Mappings,
-    i$6 `
+OscdEditorIED.styles = i$6 `
     :host {
-      /* patch theme colors defined in shell until we can correct them */
-      --md-icon-button-disabled-icon-color: var(--oscd-base00);
+      --md-icon-button-disabled-icon-color: var(--md-sys-color-on-surface);
 
       position: relative;
-      --oscd-action-pane-contrasted-container-color: var(--oscd-base2);
+      --oscd-action-pane-contrasted-container-color: var(
+        --md-sys-color-surface-container
+      );
     }
 
     .header,
@@ -82798,8 +82759,7 @@ OscdEditorIED.styles = [
       padding-right: 12px;
       min-width: 0;
     }
-  `
-];
+  `;
 __decorate([
     n$3({ type: Object })
 ], OscdEditorIED.prototype, "doc", void 0);
