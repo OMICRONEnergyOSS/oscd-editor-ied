@@ -40,7 +40,6 @@
     "deploy": "oscd deploy",
     "updates": "oscd updates",
     "updates:write": "oscd updates --write",
-    "preinstall": "git submodule update --init --recursive --remote",
     "prepare": "oscd install-hooks"
   },
   "dependencies": {
