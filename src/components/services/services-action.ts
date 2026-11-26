@@ -162,7 +162,7 @@ export class ServicesAction extends ScopedElementsMixin(LitElement) {
 
     .nav {
       width: 180px;
-      border-right: 1px solid var(--oscd-base1);
+      border-right: 1px solid var(--md-sys-color-outline-variant);
       padding-right: 8px;
     }
     .nav ul {

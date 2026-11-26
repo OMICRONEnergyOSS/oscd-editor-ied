@@ -6,7 +6,6 @@ import {
   css,
   nothing,
 } from 'lit';
-import { oscdMd3Mappings } from '@omicronenergy/oscd-ui/oscd-md3-mappings.js';
 import { property, query, state } from 'lit/decorators.js';
 import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
 import { OscdListItem } from '@omicronenergy/oscd-ui/list/OscdListItem.js';
@@ -380,7 +379,7 @@ export class OscdEditorIED extends ScopedElementsMixin(LitElement) {
   private renderSelectedIED(): TemplateResult {
     if (this.iedList.length === 0) {
       return html`<h1>
-        <span style="color: var(--oscd-base1)">${msg('No IED')}</span>
+        <span style="color: var(--md-sys-color-on-surface-variant)">${msg('No IED')}</span>
       </h1>`;
     }
     return html`<section>
@@ -408,15 +407,14 @@ export class OscdEditorIED extends ScopedElementsMixin(LitElement) {
     </div>`;
   }
 
-  static styles = [
-    oscdMd3Mappings,
-    css`
+  static styles = css`
     :host {
-      /* patch theme colors defined in shell until we can correct them */
-      --md-icon-button-disabled-icon-color: var(--oscd-base00);
+      --md-icon-button-disabled-icon-color: var(--md-sys-color-on-surface);
 
       position: relative;
-      --oscd-action-pane-contrasted-container-color: var(--oscd-base2);
+      --oscd-action-pane-contrasted-container-color: var(
+        --md-sys-color-surface-container
+      );
     }
 
     .header,
@@ -447,5 +445,5 @@ export class OscdEditorIED extends ScopedElementsMixin(LitElement) {
       padding-right: 12px;
       min-width: 0;
     }
-  `];
+  `;
 }

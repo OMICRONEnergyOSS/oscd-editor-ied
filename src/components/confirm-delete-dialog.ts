@@ -73,8 +73,8 @@ export class ConfirmDeleteDialog extends ScopedElementsMixin(LitElement) {
 
   static styles = css`
     oscd-filled-button {
-      --md-sys-color-primary: var(--oscd-error);
-      --oscd-filled-button-color: var(--oscd-base03);
+      --md-sys-color-primary: var(--md-sys-color-error);
+      --md-sys-color-on-primary: var(--md-sys-color-on-error);
     }
     .dialog-content {
       margin-top: 16px;

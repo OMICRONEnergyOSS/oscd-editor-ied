@@ -93,7 +93,7 @@ export class InfoDialog extends ScopedElementsMixin(LitElement) {
 
     .divider {
       height: 1px;
-      background: var(--oscd-base1);
+      background: var(--md-sys-color-outline-variant);
       margin: 4px 0;
     }
   `;

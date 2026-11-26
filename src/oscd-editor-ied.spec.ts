@@ -57,9 +57,13 @@ describe('oscd-editor-ied', () => {
   });
 
   it('keeps alternating pane backgrounds visible through nested components', async () => {
-    oscdEditorIED.style.setProperty('--oscd-base2', '#f3f5f6');
-    oscdEditorIED.style.setProperty('--md-sys-color-surface', '#fff');
-    oscdEditorIED.style.setProperty('--md-sys-color-on-primary', '#fff');
+    const host = oscdEditorIED.parentElement;
+    if (!host) {
+      throw new Error('Expected plugin host');
+    }
+    host.style.setProperty('--md-sys-color-surface-container', '#f3f5f6');
+    host.style.setProperty('--md-sys-color-surface', '#fff');
+    host.style.setProperty('--md-sys-color-on-primary', '#fff');
 
     const iedContainer =
       oscdEditorIED.shadowRoot?.querySelector('ied-container');
