@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.4](https://github.com/OMICRONEnergyOSS/oscd-editor-ied/compare/oscd-editor-ied-v0.0.3...oscd-editor-ied-v0.0.4) (2026-11-26)
+
+
+### Bug Fixes
+
+* do not trigger preinstall scripts ([2e2df34](https://github.com/OMICRONEnergyOSS/oscd-editor-ied/commit/2e2df34ec564f543572cf749a3e66e0883a8ad17))
+
 ## [0.0.3](https://github.com/OMICRONEnergyOSS/oscd-editor-ied/compare/oscd-editor-ied-v0.0.2...oscd-editor-ied-v0.0.3) (2026-11-26)
 
 
