@@ -48,6 +48,12 @@ export class ServicesAction extends ScopedElementsMixin(LitElement) {
     return this._element;
   }
 
+  @property({ type: String })
+  enabledTooltip = '';
+
+  @property({ type: String })
+  disabledTooltip = '';
+
   @state()
   private services: Services | null = null;
 
@@ -105,9 +111,14 @@ export class ServicesAction extends ScopedElementsMixin(LitElement) {
   render() {
     const active = this.pages[this.activeIndex];
     return html`
-      <oscd-icon-button ?disabled=${!this.services} @click=${() => this.show()}
-        ><oscd-icon>settings</oscd-icon></oscd-icon-button
+      <span
+        class="service-button"
+        title=${this.services ? this.enabledTooltip : this.disabledTooltip}
       >
+        <oscd-icon-button ?disabled=${!this.services} @click=${() => this.show()}
+          ><oscd-icon>settings</oscd-icon></oscd-icon-button
+        >
+      </span>
       <oscd-dialog @closed=${this.close} scrollable="false">
         <div slot="headline">${this.headline}</div>
         <div slot="content" class="dialog-content">
@@ -142,6 +153,10 @@ export class ServicesAction extends ScopedElementsMixin(LitElement) {
   }
 
   static styles = css`
+    .service-button {
+      display: inline-flex;
+    }
+
     oscd-dialog {
       max-width: min(800px, 100% - 48px);
     }

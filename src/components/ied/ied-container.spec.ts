@@ -16,6 +16,7 @@ import { OscdFilledSelect } from '@omicronenergy/oscd-ui/select/OscdFilledSelect
 import { OscdSwitch } from '@omicronenergy/oscd-ui/switch/OscdSwitch.js';
 import { OscdFilledTextField } from '@omicronenergy/oscd-ui/textfield/OscdFilledTextField.js';
 import { initializeNsdoc } from '../../foundation/nsdoc.js';
+import type { ServicesAction } from '../services/services-action.js';
 customElements.define('ied-container', IedContainer);
 
 describe('with IED', () => {
@@ -91,6 +92,43 @@ describe('with IED', () => {
   /*
    * Tests
    */
+  it('updates the Services tooltip and button when Services changes', async () => {
+    const action = iedContainer.shadowRoot!.querySelector<ServicesAction>(
+      'services-action',
+    )!;
+    await action.updateComplete;
+    const button = action.shadowRoot!.querySelector('oscd-icon-button')!;
+    const tooltip = button.parentElement!;
+    const actionSlot = iedContainer.shadowRoot!
+      .querySelector('oscd-action-pane')!
+      .shadowRoot!.querySelector<HTMLSlotElement>('slot[name="action"]')!;
+    expect(actionSlot.assignedElements().includes(action)).to.be.true;
+    expect(tooltip.title).to.equal('This IED has no Services section');
+    expect(button.hasAttribute('disabled')).to.be.true;
+
+    const services = doc.importNode(
+      parseDoc(testDocs.withIED_instanciated).querySelector('IED > Services')!,
+      true,
+    );
+    harness.editor.commit({
+      parent: iedContainer.element,
+      node: services,
+      reference: iedContainer.element.firstElementChild,
+    });
+    iedContainer.docVersion++;
+    await iedContainer.updateComplete;
+    await action.updateComplete;
+    expect(tooltip.title).to.equal('Show Services the IED provides');
+    expect(button.hasAttribute('disabled')).to.be.false;
+
+    harness.editor.commit({ node: services });
+    iedContainer.docVersion++;
+    await iedContainer.updateComplete;
+    await action.updateComplete;
+    expect(tooltip.title).to.equal('This IED has no Services section');
+    expect(button.hasAttribute('disabled')).to.be.true;
+  });
+
   it('adds a Basic AccessPoint to an IED', async () => {
     addApButton.click();
     await apDialog.updateComplete;

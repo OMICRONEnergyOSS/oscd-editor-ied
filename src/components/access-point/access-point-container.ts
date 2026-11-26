@@ -105,12 +105,12 @@ export class AccessPointContainer extends ScopedElementsMixin(BaseContainer) {
             <oscd-icon>edit</oscd-icon>
           </oscd-icon-button>
         </abbr>
-        <abbr
+        <services-action
           slot="action"
-          title="${msg('Show Services the AccessPoint provides')}"
-        >
-          <services-action .element=${this.element}></services-action>
-        </abbr>
+          .element=${this.element}
+          .enabledTooltip=${msg('Show Services the AccessPoint provides')}
+          .disabledTooltip=${msg('This AccessPoint has no Services section')}
+        ></services-action>
         ${Array.from(this.element.querySelectorAll(':scope > Server')).map(
           server =>
             html`<server-container

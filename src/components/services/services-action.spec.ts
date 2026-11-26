@@ -9,6 +9,7 @@ import { renderReportConfigurationsServices } from './service-report-configurati
 import { renderGseControlServices } from './service-GSE-Control.js';
 import { renderNetworkingServices } from './service-networking.js';
 import { renderSampledValuesServices } from './service-sampled-values.js';
+import type { OscdIconButton } from '@omicronenergy/oscd-ui/iconbutton/OscdIconButton.js';
 
 customElements.define('services-action', ServicesAction);
 
@@ -20,7 +21,10 @@ describe('services-action', () => {
 
   beforeEach(async () => {
     iedServicesAction = await fixture<ServicesAction>(
-      html`<services-action></services-action>`,
+      html`<services-action
+        .enabledTooltip=${'Available'}
+        .disabledTooltip=${'Unavailable'}
+      ></services-action>`,
     );
   });
 
@@ -33,8 +37,22 @@ describe('services-action', () => {
     });
     it('disables icon button', async () => {
       const button =
-        iedServicesAction.shadowRoot!.querySelector('oscd-icon-button')!;
+        iedServicesAction.shadowRoot!.querySelector<OscdIconButton>(
+          'oscd-icon-button',
+        )!;
+      await button.updateComplete;
       expect(button.hasAttribute('disabled')).to.be.true;
+      const wrapper = button.parentElement!;
+      expect(wrapper.title).to.equal('Unavailable');
+      const bounds = button.getBoundingClientRect();
+      expect(bounds.width).to.be.greaterThan(0);
+      expect(bounds.height).to.be.greaterThan(0);
+      expect(
+        iedServicesAction.shadowRoot!.elementFromPoint(
+          bounds.left + bounds.width / 2,
+          bounds.top + bounds.height / 2,
+        ) === wrapper,
+      ).to.be.true;
     });
   });
 
@@ -54,6 +72,7 @@ describe('services-action', () => {
       const button =
         iedServicesAction.shadowRoot!.querySelector('oscd-icon-button')!;
       expect(button.hasAttribute('disabled')).to.be.false;
+      expect(button.parentElement!.title).to.equal('Available');
     });
 
     it('resets activeIndex on show()', () => {

@@ -9,6 +9,7 @@ import { AccessPointContainer } from './access-point-container.js';
 import { OscdIconButton } from '@omicronenergy/oscd-ui/iconbutton/OscdIconButton.js';
 import { initializeNsdoc } from '../../foundation/nsdoc.js';
 import { AccessPointEditDialog } from './access-point-edit-dialog.js';
+import type { ServicesAction } from '../services/services-action.js';
 
 customElements.define('access-point-container', AccessPointContainer);
 
@@ -83,6 +84,43 @@ describe('access-point-container', () => {
   /*
    * Tests
    */
+  it('updates the Services tooltip and button when Services changes', async () => {
+    const action = apContainer.shadowRoot!.querySelector<ServicesAction>(
+      'services-action',
+    )!;
+    await action.updateComplete;
+    const button = action.shadowRoot!.querySelector('oscd-icon-button')!;
+    const tooltip = button.parentElement!;
+    const actionSlot = apContainer.shadowRoot!
+      .querySelector('oscd-action-pane')!
+      .shadowRoot!.querySelector<HTMLSlotElement>('slot[name="action"]')!;
+    expect(actionSlot.assignedElements().includes(action)).to.be.true;
+    expect(tooltip.title).to.equal('This AccessPoint has no Services section');
+    expect(button.hasAttribute('disabled')).to.be.true;
+
+    const services = doc.importNode(
+      parseDoc(testDocs.withIED_instanciated).querySelector('IED > Services')!,
+      true,
+    );
+    harness.editor.commit({
+      parent: apContainer.element,
+      node: services,
+      reference: apContainer.element.firstElementChild,
+    });
+    apContainer.docVersion++;
+    await apContainer.updateComplete;
+    await action.updateComplete;
+    expect(tooltip.title).to.equal('Show Services the AccessPoint provides');
+    expect(button.hasAttribute('disabled')).to.be.false;
+
+    harness.editor.commit({ node: services });
+    apContainer.docVersion++;
+    await apContainer.updateComplete;
+    await action.updateComplete;
+    expect(tooltip.title).to.equal('This AccessPoint has no Services section');
+    expect(button.hasAttribute('disabled')).to.be.true;
+  });
+
   it('edits an AccessPoint', async () => {
     editApButton.click();
     await apDialog.updateComplete;

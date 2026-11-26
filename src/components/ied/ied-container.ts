@@ -125,9 +125,12 @@ export class IedContainer extends ScopedElementsMixin(BaseContainer) {
           <oscd-icon>edit</oscd-icon></oscd-icon-button
         >
       </abbr>
-      <abbr slot="action" title="${msg('Show Services the IED provides')}">
-        <services-action .element=${this.element}></services-action>
-      </abbr>
+      <services-action
+        slot="action"
+        .element=${this.element}
+        .enabledTooltip=${msg('Show Services the IED provides')}
+        .disabledTooltip=${msg('This IED has no Services section')}
+      ></services-action>
       <abbr slot="action" title="${msg('Add AccessPoint')}">
         <oscd-icon-button
           data-testid="add-access-point-button"
